@@ -1,0 +1,452 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2BBFF57F-1C9D-430E-8343-D2662437114D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenNFS1</RootNamespace>
+    <AssemblyName>OpenNFS1</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\WindowsGL\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\WindowsGL\Release\</OutputPath>
+    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Audio\EnvironmentAudioProvider.cs" />
+    <Compile Include="Audio\VehicleAudioProvider.cs" />
+    <Compile Include="AverageValue.cs" />
+    <Compile Include="Dashboards\BaseDashboard.cs" />
+    <Compile Include="Dashboards\CorvetteZR1Dashboard.cs" />
+    <Compile Include="Dashboards\DiabloDashboard.cs" />
+    <Compile Include="Dashboards\DodgeViperDashboard.cs" />
+    <Compile Include="Dashboards\F512Dashboard.cs" />
+    <Compile Include="Dashboards\GearboxAnimation.cs" />
+    <Compile Include="Dashboards\NSXDashboard.cs" />
+    <Compile Include="Dashboards\P911Dashboard.cs" />
+    <Compile Include="Dashboards\Rx7Dashboard.cs" />
+    <Compile Include="Dashboards\SupraDashboard.cs" />
+    <Compile Include="Dashboards\WarriorDashboard.cs" />
+    <Compile Include="Driver.cs" />
+    <Compile Include="Game1.cs" />
+    <Compile Include="GameConfig.cs" />
+    <Compile Include="Loaders\ITrackLoader.cs" />
+    <Compile Include="Loaders\OpenRoadTextureProvider.cs" />
+    <Compile Include="Loaders\Track10Loader.cs" />
+    <Compile Include="Loaders\Track11Loader.cs" />
+    <Compile Include="Loaders\TrackAssembler.cs" />
+    <Compile Include="Loaders\TrackTextureProvider.cs" />
+    <Compile Include="ObjectShadow.cs" />
+    <Compile Include="Parsers\Audio\BnkFileParser.cs" />
+    <Compile Include="Parsers\Audio\WavWriter.cs" />
+    <Compile Include="Parsers\BaseChunk.cs" />
+    <Compile Include="Parsers\BitmapChunk.cs" />
+    <Compile Include="Parsers\BitmapLoader.cs" />
+    <Compile Include="Parsers\CarModel.cs" />
+    <Compile Include="Parsers\HeaderChunk.cs" />
+    <Compile Include="Parsers\MeshChunk.cs" />
+    <Compile Include="Parsers\Polygon.cs" />
+    <Compile Include="Physics\AutoGearbox.cs" />
+    <Compile Include="Physics\BaseGearbox.cs" />
+    <Compile Include="Physics\ManualGearbox.cs" />
+    <Compile Include="Physics\Motor.cs" />
+    <Compile Include="Physics\Spring.cs" />
+    <Compile Include="Physics\Vector3Helper.cs" />
+    <Compile Include="Physics\Vehicle.cs" />
+    <Compile Include="Physics\VehicleFenceCollision.cs" />
+    <Compile Include="Physics\VehicleWheel.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Race.cs" />
+    <Compile Include="Tracks\SceneryObject.cs" />
+    <Compile Include="Tracks\SkyboxGenerator.cs" />
+    <Compile Include="Tracks\Track.cs" />
+    <Compile Include="Tracks\TrackBillboardModel.cs" />
+    <Compile Include="Tracks\TrackDescription.cs" />
+    <Compile Include="TyreSmokeParticleSystem.cs" />
+    <Compile Include="UIController.cs" />
+    <Compile Include="UI\RaceUI.cs" />
+    <Compile Include="UI\Screens\AboutScreen.cs" />
+    <Compile Include="UI\Screens\BaseUIScreen.cs" />
+    <Compile Include="UI\Screens\ChooseCarScreen.cs" />
+    <Compile Include="UI\Screens\ChooseGearboxScreen.cs" />
+    <Compile Include="UI\Screens\ChooseTrackScreen.cs" />
+    <Compile Include="UI\Screens\ControlsScreen.cs" />
+    <Compile Include="UI\Screens\DoRaceScreen.cs" />
+    <Compile Include="UI\Screens\GarageModel.cs" />
+    <Compile Include="UI\Screens\HomeScreen.cs" />
+    <Compile Include="UI\Screens\LoadRaceScreen.cs" />
+    <Compile Include="UI\Screens\MenuPoster.cs" />
+    <Compile Include="UI\Screens\RaceFinishedScreen.cs" />
+    <Compile Include="UI\Screens\RacePausedScreen.cs" />
+    <Compile Include="UI\Screens\TrackPoster.cs" />
+    <Compile Include="UI\SpeedoControl.cs" />
+    <Compile Include="VehicleController.cs" />
+    <Compile Include="Vehicles\CarModelCache.cs" />
+    <Compile Include="Vehicles\CorvetteZR1.cs" />
+    <Compile Include="Vehicles\DodgeViper.cs" />
+    <Compile Include="Vehicles\Ferrari512.cs" />
+    <Compile Include="Vehicles\HondaNsx.cs" />
+    <Compile Include="Vehicles\LamboDiablo.cs" />
+    <Compile Include="Vehicles\MazdaRx7.cs" />
+    <Compile Include="Vehicles\Porsche911.cs" />
+    <Compile Include="Vehicles\ToyotaSupra.cs" />
+    <Compile Include="Vehicles\Traffic\TrafficController.cs" />
+    <Compile Include="Vehicles\Traffic\TrafficVehicle.cs" />
+    <Compile Include="Vehicles\Warrior.cs" />
+    <Compile Include="Views\BumperView.cs" />
+    <Compile Include="Views\ChaseView.cs" />
+    <Compile Include="Views\DashboardView.cs" />
+    <Compile Include="Views\IView.cs" />
+    <Compile Include="Views\TelevisionView.cs" />
+    <Compile Include="Views\TrackFlybyView.cs" />
+    <Compile Include="WheelModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Lidgren.Network, Version=2011.3.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\Lidgren.Network.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="Tao.Sdl, Version=1.2.13.0, Culture=neutral, PublicKeyToken=9c7a200e36c0094e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files (x86)\MonoGame\v3.0\Assemblies\WindowsGL\Tao.Sdl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\..\..\Program Files %28x86%29\MonoGame\v3.0\Assemblies\WindowsGL\SDL.dll">
+      <Link>SDL.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\about.jpg" />
+    <Content Include="Content\Audio\Audio.xap" />
+    <Content Include="Content\Audio\Environment\collision1.wav" />
+    <Content Include="Content\Audio\Environment\collision2.wav" />
+    <Content Include="Content\Audio\Environment\collision3.wav" />
+    <Content Include="Content\Audio\Environment\tunnel.wav" />
+    <Content Include="Content\Audio\Music\Menu.mp3" />
+    <Content Include="Content\Audio\Vehicles\Common\grass_slide.wav" />
+    <Content Include="Content\Audio\Vehicles\Common\skid1.wav" />
+    <Content Include="Content\Audio\Vehicles\Common\skid2.wav" />
+    <Content Include="Content\Audio\Vehicles\Common\skid3.wav" />
+    <Content Include="Content\Audio\Vehicles\CorvetteZR1\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\CorvetteZR1\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\CorvetteZR1\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\CorvetteZR1\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\CorvetteZR1\gear-change.wav" />
+    <Content Include="Content\Audio\Vehicles\DodgeViper\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\DodgeViper\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\DodgeViper\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\DodgeViper\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\DodgeViper\gear-change.wav" />
+    <Content Include="Content\Audio\Vehicles\Ferrari512\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\Ferrari512\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\Ferrari512\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\Ferrari512\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\Ferrari512\gear-change.wav" />
+    <Content Include="Content\Audio\Vehicles\HondaNSX\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\HondaNSX\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\HondaNSX\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\HondaNSX\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\HondaNSX\gear-change.wav" />
+    <Content Include="Content\Audio\Vehicles\LamboDiablo\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\LamboDiablo\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\LamboDiablo\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\LamboDiablo\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\LamboDiablo\gear-change.wav" />
+    <Content Include="Content\Audio\Vehicles\MazdaRx7\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\MazdaRx7\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\MazdaRx7\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\MazdaRx7\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\MazdaRx7\gear-change.wav" />
+    <Content Include="Content\Audio\Vehicles\ToyotaSupra\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\ToyotaSupra\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\ToyotaSupra\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\ToyotaSupra\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\ToyotaSupra\gear-change.wav" />
+    <Content Include="Content\Audio\Vehicles\Warrior\engine-off-high.wav" />
+    <Content Include="Content\Audio\Vehicles\Warrior\engine-off-low.wav" />
+    <Content Include="Content\Audio\Vehicles\Warrior\engine-on-high.wav" />
+    <Content Include="Content\Audio\Vehicles\Warrior\engine-on-low.wav" />
+    <Content Include="Content\Audio\Vehicles\Warrior\gear-change.wav" />
+    <Content Include="Content\blackceramic.jpg" />
+    <Content Include="Content\Controls.jpg" />
+    <Content Include="Content\floor_maya.jpg" />
+    <Content Include="Content\obj\x86\Debug\Content.contentproj.FileListAbsolute.txt" />
+    <Content Include="Content\obj\x86\Debug\ContentPipeline.xml" />
+    <Content Include="Content\obj\x86\Debug\NeedForSpeedContent.contentproj.FileListAbsolute.txt" />
+    <Content Include="Content\race.jpg" />
+    <Content Include="Content\RaceUI-background.png" />
+    <Content Include="Content\smoke.png" />
+    <Content Include="Content\Speedo.bmp" />
+    <Content Include="Content\SpeedoLine.bmp" />
+    <Content Include="Content\TrackImages\alpine-1.jpg" />
+    <Content Include="Content\TrackImages\alpine-2.jpg" />
+    <Content Include="Content\TrackImages\alpine-3.jpg" />
+    <Content Include="Content\TrackImages\AutumnValley.jpg" />
+    <Content Include="Content\TrackImages\BurntSienna.jpg" />
+    <Content Include="Content\TrackImages\city-1.jpg" />
+    <Content Include="Content\TrackImages\city-2.jpg" />
+    <Content Include="Content\TrackImages\city-3.jpg" />
+    <Content Include="Content\TrackImages\coast-1.jpg" />
+    <Content Include="Content\TrackImages\coast-2.jpg" />
+    <Content Include="Content\TrackImages\coast-3.jpg" />
+    <Content Include="Content\TrackImages\LostVegas.jpg" />
+    <Content Include="Content\TrackImages\Need_for_speed_se.png" />
+    <Content Include="Content\TrackImages\RustySprings.jpg" />
+    <Content Include="Content\TrackImages\Transpolis.jpg" />
+    <Content Include="Content\TrackImages\VertigoRidge.jpg" />
+    <Content Include="Content\wall2.jpg" />
+    <Content Include="Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Content\Audio\Win\" />
+    <Folder Include="Content\Audio\Xbox\" />
+    <Folder Include="Content\bin\x86\Debug\" />
+    <Folder Include="Content\obj\x86\Debug\TempPE\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\ArialBlack.spritefont" />
+    <None Include="Content\Fonts\Arial_14.spritefont" />
+    <None Include="Content\obj\x86\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="Content\obj\x86\Debug\ResolveAssemblyReference.cache" />
+    <None Include="Content\ParticleEffect.fx" />
+    <None Include="Data\Cars\ANSX.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\AXXESS.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\BMW.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\COPMUST.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\CRX.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\CZR1.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\DVIPER.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\F512TR.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\JEEP.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\JETTA.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\LDIABL.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\LEMANS.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\MRX7.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\P911.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\PICKUP.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\PROBE.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\RODEO.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\SUNBIRD.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\TRAFFC.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\TSUPRA.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\VANDURA.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Cars\WAGON.CFM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\ANSXDH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\CZR1DH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\DVIPERDH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\F512TRDH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\LDIABLDH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\MRX7DH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\P911DH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\TRAFFCDH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Dashboards\TSUPRADH.FSH">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\AL1.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\AL2.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\AL3.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\CL1.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\CL2.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\CL3.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\CY1.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\CY2.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\CY3.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\TR1.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\TR2.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\TR3.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\TR4.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\TR5.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\TR6.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Tracks\TR7.TRI">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\AL1_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\AL2_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\AL3_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\CL1_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\CL2_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\CL3_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\CY1_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\CY2_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\CY3_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\TR1_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\TR2_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\TR3_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\TR4_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\TR5_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\TR6_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\TrackTextures\TR7_001.FAM">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Content\Content\Content.csproj">
+      <Project>{2f4a6e04-8a3a-4d50-a238-b27d1dbbda55}</Project>
+      <Name>Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Engine\NfsEngine.csproj">
+      <Project>{F66B2F9A-AF38-40F9-A094-522C823D04EE}</Project>
+      <Name>NfsEngine</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
