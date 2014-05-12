@@ -21,7 +21,8 @@ namespace NeedForSpeed.Parsers
         private void Parse(string filename)
         {
             BitmapChunk.ResetPalette();
-            BinaryReader br = new BinaryReader(File.Open(filename, FileMode.Open));
+			string carFile = Path.Combine(GameConfig.CdDataPath, filename);
+            BinaryReader br = new BinaryReader(File.Open(carFile, FileMode.Open));
             _root = new HeaderChunk();
             _root.Read(br, true);
 

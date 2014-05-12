@@ -72,15 +72,15 @@ namespace NeedForSpeed
             get { return 3 - (int)new TimeSpan(DateTime.Now.Ticks - _countdownStartTime.Ticks).TotalSeconds; }
         }
 
-        public void UpdatePosition(int trackSegment)
+        public void UpdatePosition(int trackNode)
         {
-            if (trackSegment == _track.CheckpointSegment && _lastSegment > 30 /* so you cant reverse over the line and get 0.1sec laps */)
+            if (trackNode == _track.CheckpointNode && _lastSegment > 30 /* so you cant reverse over the line and get 0.1sec laps */)
             {
                 _lapTimes.Add((int)new TimeSpan(DateTime.Now.Ticks - _currentLapStartTime.Ticks).TotalSeconds);
                 _currentLap++;
                 _currentLapStartTime = DateTime.Now;
             }
-            _lastSegment = trackSegment;
+            //_lastSegment = trackSegment;
 
             if (SecondsTillStart <= 0 && !_started)
             {

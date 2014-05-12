@@ -18,7 +18,7 @@ namespace NeedForSpeed.Vehicles
             : base(1380, "HondaNSX")
         {
 
-            _model = CarModelCache.GetModel(@"Data\Cars\ansx.CFM");
+            _model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\ansx.CFM");
 
             _wheels[0] = new VehicleWheel(this, new Vector3(-9.2f, 0f, 16.9f), _model.TyreTexture, 6.8f);
             _wheels[1] = new VehicleWheel(this, new Vector3(9.2f, 0f, 16.9f), _model.TyreTexture, 6.8f);

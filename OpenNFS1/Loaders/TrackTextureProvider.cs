@@ -14,12 +14,13 @@ namespace NeedForSpeed.Loaders
 
         public TrackTextureProvider(string trackFile)
         {
-            string textureFilePath = Path.Combine(Path.GetDirectoryName(trackFile), "..\\TrackTextures\\" + Path.GetFileNameWithoutExtension(trackFile) + "_001.fam");
+            string textureFilePath = "SIMDATA\\ETRACKFM\\" + Path.GetFileNameWithoutExtension(trackFile) + "_001.fam";
             ReadFamFile(textureFilePath);
         }
 
         private void ReadFamFile(string filename)
         {
+			filename = Path.Combine(GameConfig.CdDataPath, filename);
             BinaryReader reader = new BinaryReader(File.Open(filename, FileMode.Open));
             _root = new HeaderChunk();
             _root.Read(reader, false);  //we want to load everything up front
@@ -41,15 +42,31 @@ namespace NeedForSpeed.Loaders
 
         public virtual Texture2D GetGroundTextureForNbr(int textureNbr)
         {
-            
+			if (textureNbr == 30)
+			{
+
+			}
+			int groupId2 = textureNbr / 3;
+			int remainder = textureNbr % 3;
+
+			string id = null;
+			if (remainder == 0)
+				id = groupId2.ToString("00") + "A0";
+			else if (remainder == 1)
+				id = groupId2.ToString("00") + "B0";
+			else if (remainder == 2)
+				id = groupId2.ToString("00") + "C0";
+			else
+				throw new NotImplementedException();
+			            
             BitmapEntry found = _root.HeaderChunks[0].BitmapChunks[0].Bitmaps.Find(delegate(BitmapEntry entry)
             {
+				//return entry.Id == id;
+
                 //0 is highest quality texture. Only use these.
                 if (!entry.Id.EndsWith("0"))
                     return false;
-
-                if (entry.Id.ToUpper() == "GA00")
-                    return false;
+				if (entry.Id.ToUpper() == "GA00") return false;
 
                 int groupId = int.Parse(entry.Id.Substring(0, 2)) * 3;
                 if (entry.Id[2] == 'B')

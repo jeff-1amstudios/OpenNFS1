@@ -19,7 +19,7 @@ namespace NeedForSpeed.Vehicles
             : base(1280, "MazdaRx7")
         {
 
-            _model = CarModelCache.GetModel(@"Data\Cars\mrx7.CFM");
+            _model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\mrx7.CFM");
             
             _wheels[0] = new VehicleWheel(this, new Vector3(-9.45f, 0f, 14.2f), _model.TyreTexture, 6.5f);
             _wheels[1] = new VehicleWheel(this, new Vector3(9.45f, 0f, 14.2f), _model.TyreTexture, 6.5f);

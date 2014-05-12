@@ -47,9 +47,7 @@ namespace NeedForSpeed.Physics
 			set
 			{
 				_track = value;
-				_wheels[0].TrackTriangleUnderWheel = _wheels[1].TrackTriangleUnderWheel = _wheels[2].TrackTriangleUnderWheel = _wheels[3].TrackTriangleUnderWheel = -1;
 				_prevPosition = _position;
-				_currentTrackTriangle = -1;
 				_speed = 0;
 			}
 		}
@@ -111,7 +109,7 @@ namespace NeedForSpeed.Physics
 		/// Is car on ground? Only allow rotation, apply ground friction,
 		/// speed changing if we are on ground and adding brake tracks.
 		/// </summary>
-		protected bool _isOnGround = false;
+		protected bool _isOnGround = true;
 
 		/// <summary>
 		/// Car render matrix we calculate each frame.
@@ -171,12 +169,6 @@ namespace NeedForSpeed.Physics
 
 		internal abstract BaseDashboard Dashboard { get; }
 
-		private int _currentTrackTriangle;
-
-		public int CurrentTrackTriangle
-		{
-			get { return _currentTrackTriangle; }
-		}
 
 		public int CurrentTrackNode { get; private set; }
 
@@ -363,7 +355,7 @@ namespace NeedForSpeed.Physics
 			float newAccelerationForce = 0.0f;
 
 			_motor.Throttle = VehicleController.Acceleration;
-			newAccelerationForce += _motor.CurrentPowerOutput * 30;
+			newAccelerationForce += _motor.CurrentPowerOutput * 20;
 
 			if (_motor.Gearbox.GearEngaged && _motor.Gearbox.CurrentGear > 0)
 			{
@@ -469,7 +461,7 @@ namespace NeedForSpeed.Physics
 				_speed -= (_mass * 0.001f * elapsedSeconds);
 			}
 
-			_position += _speed * _direction * moveFactor * 1.5f;
+			_position += _speed * _direction * moveFactor * 1f;
 
 
 			#endregion
@@ -481,95 +473,31 @@ namespace NeedForSpeed.Physics
 
 			Matrix trackMatrix = Matrix.Identity;
 
+			var node = _track.RoadNodes[CurrentTrackNode];
 			var nextNode = _track.RoadNodes[CurrentTrackNode+1];
 			if (!Utility.IsLeftOfLine(nextNode.GetLeftBoundary(), nextNode.GetRightBoundary(), Position))
 			{
+				Debug.WriteLine("Node.b: {0},{1},{2},{3}", nextNode.b[0], nextNode.b[1], nextNode.b[2], nextNode.b[3]);
 				CurrentTrackNode++;
 				Debug.WriteLine("passed node - new node " + CurrentTrackNode);
 			}
 
-			Vector3 hitLocation, avgHit = Vector3.Zero, avgNormal = Vector3.Zero;
-			float hitFl;
-			int hits = 0;
-			int trianglesToLookAt = 100;
+			var closestPoint1 = Utility.GetClosestPointOnLine(node.GetLeftBoundary(), node.GetRightBoundary(), _position);
+			var closestPoint2 = Utility.GetClosestPointOnLine(nextNode.GetLeftBoundary(), nextNode.GetRightBoundary(), _position);
 
-			if (_wheels[0].TrackTriangleUnderWheel == -1)
-				trianglesToLookAt = _track.PhysicalRoadTriangles.Count;
-
-			//Debug.WriteLine(String.Format("{0} {1} {2} {3}", _wheels[0].TrackTriangleUnderWheel,_wheels[1].TrackTriangleUnderWheel, _wheels[2].TrackTriangleUnderWheel, _wheels[3].TrackTriangleUnderWheel));
-			//Debug.WriteLine(String.Format("{0},{1},{2}", _up.X.ToString("0.00"), _up.Y.ToString("0.00"), _up.Z.ToString("0.00")));
-			foreach (VehicleWheel wheel in _wheels)
-			{
-				//var wheel = _wheels[0];
-				Vector3 pos = wheel.WorldPosition + new Vector3(0, 5, 0);
-				
-				int startTriangle = wheel.TrackTriangleUnderWheel - 30;
-				if (startTriangle < 0)
-					startTriangle = _track.PhysicalRoadTriangles.Count + startTriangle;
-
-				for (int i = 0; i < trianglesToLookAt; i++)
-				{
-					int tri = startTriangle + i;
-					if (tri >= _track.PhysicalRoadTriangles.Count)
-						tri -= _track.PhysicalRoadTriangles.Count;
-
-					Triangle triangle = _track.PhysicalRoadTriangles[tri];
-					if (Utility.FindRayTriangleIntersection(ref pos, Vector3.Down, 500, ref triangle.V1, ref triangle.V2, ref triangle.V3, out hitLocation, out hitFl))
-					{
-						wheel.TrackPositionUnderWheel = hitLocation;
-						wheel.TrackTriangleUnderWheel = tri;
-						var normal = Vector3.Normalize(Vector3.Cross(triangle.V2 - triangle.V1, triangle.V3 - triangle.V1));
-						avgHit += hitLocation;
-						hits++;
+			var dist = Vector3.Distance(closestPoint1, closestPoint2);
+			var carDist = Vector3.Distance(closestPoint1, _position);
+			float ratio = Math.Min(carDist / dist, 1.0f);
 						
-						Engine.Instance.GraphicsUtils.AddLine(triangle.V1, triangle.V1 + normal * 40, Color.Yellow);
-						Engine.Instance.GraphicsUtils.AddLine(triangle.V2, triangle.V2 + normal * 40, Color.Yellow);
-						Engine.Instance.GraphicsUtils.AddLine(triangle.V3, triangle.V3 + normal * 40, Color.Yellow);
-						break;
-					}
-				}
-			}
-
-			//var t = _track.PhysicalRoadTriangles[_wheels[0].TrackTriangleUnderWheel];
-			//var n1 = Vector3.Cross(t.V2 - t.V1, t.V3 - t.V1);
-			//var t2 = _track.PhysicalRoadTriangles[_wheels[1].TrackTriangleUnderWheel];
-			//var n2 = Vector3.Cross(t2.V2 - t2.V1, t2.V3 - t2.V1);
-
-			//GameConsole.WriteLine(Math.Abs(n1.Y - n2.Y), 0);
-			//GameConsole.WriteLine(_wheels[0].TrackPositionUnderWheel.Y - _wheels[1].TrackPositionUnderWheel.Y, 1);
-			//GameConsole.WriteLine(_wheels[0].TrackTriangleUnderWheel + ", " + _wheels[1].TrackTriangleUnderWheel, 2);
-			
-
-			_allWheelsOnTrack = hits == 4;
-			if (!_allWheelsOnTrack)
-			{
-			}
-
-
-			var normal2 = Vector3.Cross(_wheels[1].TrackPositionUnderWheel - _wheels[0].TrackPositionUnderWheel,
-				_wheels[2].TrackPositionUnderWheel - _wheels[0].TrackPositionUnderWheel);
-			var normal3 = Vector3.Cross(_wheels[3].TrackPositionUnderWheel - _wheels[0].TrackPositionUnderWheel,
-				_wheels[2].TrackPositionUnderWheel - _wheels[0].TrackPositionUnderWheel);
-			//Debug.WriteLine(_wheels[0].TrackPositionUnderWheel);
-			trackMatrix.Up = Vector3.Normalize(avgNormal / hits);
-			trackMatrix.Translation = avgHit / hits;
-
-			trackMatrix.Up = Vector3.Normalize(normal2);
-
-			Vector3 prevRightVector = CarRight;
-			_upVectors.AddValue(trackMatrix.Up);
-			_up = Vector3.Normalize(_upVectors.GetAveragedValue());
-			//normal2 += normal3;
-			//normal2 /= 4;
-
-			_up = trackMatrix.Up;
-
+			_up = Vector3.Lerp(node.Up, nextNode.Up, ratio);
 			_direction = Vector3.Cross(_up, CarRight);
+			
+			var height = _track.GetHeightAtPoint(CurrentTrackNode, _position);
+			if (height != -9999)  _position.Y = height;
 
 			groundPlaneNormal = trackMatrix.Up;
 			groundPlanePos = trackMatrix.Translation;
-
-
+			
 			UpdateCarMatrixAndCamera();
 
 			UpdateWheels();
@@ -584,15 +512,11 @@ namespace NeedForSpeed.Physics
 		/// </summary>
 		public void Reset()
 		{
-			_prevPosition = new Vector3(-2.191055f, -1195.377f, -6288.538f);
-			int roadNode = _track.GetRoadSegment(_prevPosition, 0);
-			_position = _prevPosition; // _track.RoadNodes[roadNode].Position + new Vector3(0, 5, 0);
-			_direction = Vector3.Transform(Vector3.Forward, Matrix.CreateRotationY(MathHelper.ToRadians(_track.RoadNodes[roadNode].Orientation + 20)));
-			_wheels[0].TrackTriangleUnderWheel = _wheels[1].TrackTriangleUnderWheel = _wheels[2].TrackTriangleUnderWheel = _wheels[3].TrackTriangleUnderWheel = -1;
-			_currentTrackTriangle = -1;
+			_position = _track.RoadNodes[CurrentTrackNode].Position + new Vector3(0, 5, 0);
+			_direction = Vector3.Transform(Vector3.Forward, Matrix.CreateRotationY(MathHelper.ToRadians(_track.RoadNodes[CurrentTrackNode].Orientation)));
 			_prevPosition = _position;
 			_speed = 0;
-			//ScreenEffects.Instance.UnFadeScreen();
+			ScreenEffects.Instance.UnFadeScreen();
 			return;
 		}
 
@@ -602,14 +526,6 @@ namespace NeedForSpeed.Physics
 
 		public void ApplyGravityAndCheckForCollisions(NeedForSpeed.Parsers.Track.Track track)
 		{
-			int triangle = track.GetRoadTriangle(_position, _currentTrackTriangle);
-			if (triangle == -1)
-				triangle = track.GetRoadTriangle(_prevPosition, _currentTrackTriangle);
-			else
-				_prevPosition = _position;
-
-			_currentTrackTriangle = triangle;
-
 			// TODO: TerrainSegment should not contain the road verge
 			//TerrainSegment segment = track.TerrainSegments[triangle / TrackAssembler.TRIANGLES_PER_SEGMENT];
 
@@ -636,7 +552,7 @@ namespace NeedForSpeed.Physics
 			//	_wheels[2].IsSkidding = _wheels[3].IsSkidding = true;
 			//}
 
-			ApplyGravity();
+			//ApplyGravity();
 		}
 
 		float _timeInAir = 0;
@@ -744,15 +660,15 @@ namespace NeedForSpeed.Physics
 			}
 			*/
 
-			foreach (VehicleWheel wheel in _wheels)
-			{
-				Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-					Matrix.CreateTranslation(wheel.TrackPositionUnderWheel - new Vector3(0, 0, 0)), Color.Yellow,
-					null);
-			}
+			//foreach (VehicleWheel wheel in _wheels)
+			//{
+			//	Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
+			//		Matrix.CreateTranslation(wheel.TrackPositionUnderWheel - new Vector3(0, 0, 0)), Color.Yellow,
+			//		null);
+			//}
 
-			Engine.Instance.GraphicsUtils.AddLine(_wheels[2].TrackPositionUnderWheel, _wheels[3].TrackPositionUnderWheel, Color.Green);
-			Engine.Instance.GraphicsUtils.AddLine(_wheels[0].TrackPositionUnderWheel, _wheels[1].TrackPositionUnderWheel, Color.Green);
+			//Engine.Instance.GraphicsUtils.AddLine(_wheels[2].TrackPositionUnderWheel, _wheels[3].TrackPositionUnderWheel, Color.Green);
+			//Engine.Instance.GraphicsUtils.AddLine(_wheels[0].TrackPositionUnderWheel, _wheels[1].TrackPositionUnderWheel, Color.Green);
 
 			Matrix carMatrix = Matrix.Identity;
 			carMatrix.Right = CarRight;
@@ -760,10 +676,13 @@ namespace NeedForSpeed.Physics
 			carMatrix.Forward = -_direction;
 
 			Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-					Matrix.CreateScale(2, 100, 2) * carMatrix *
-					Matrix.CreateTranslation(_position + (Vector3.Up * -10))
-					, Color.Yellow,
+					Matrix.CreateTranslation(_position), Color.Blue,
 					null);
+			/*
+			for (int i = CurrentTrackNode; i < CurrentTrackNode + 10; i++)
+			{
+				Engine.Instance.GraphicsUtils.AddLine(_track.RoadNodes[i].Position, _track.RoadNodes[i].Position + (_track.RoadNodes[i].Up * 40), Color.Yellow);
+			}*/
 			
 			TyreSmokeParticleSystem.Instance.Render();
 		}

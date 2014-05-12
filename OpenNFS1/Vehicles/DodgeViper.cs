@@ -18,7 +18,7 @@ namespace NeedForSpeed.Vehicles
             : base(1380, "DodgeViper")
         {
 
-            _model = CarModelCache.GetModel(@"Data\Cars\dviper.CFM");
+            _model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\dviper.CFM");
 
             _wheels[0] = new VehicleWheel(this, new Vector3(-9.51f, 0f, 16.5f), _model.TyreTexture, 6.9f);
             _wheels[1] = new VehicleWheel(this, new Vector3(9.51f, 0f, 16.5f), _model.TyreTexture, 6.9f);

@@ -158,6 +158,16 @@ namespace NfsEngine
             get { return _spriteBatch; }
         }
 
+		Random _random = new Random();
+
+		public Random Random
+		{
+			get
+			{
+				return _random;
+			}
+		}
+
         
 
         //public bool EnableBloom

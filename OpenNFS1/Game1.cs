@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Storage;
 using NfsEngine;
 using NfsEngine;
 using NeedForSpeed.UI.Screens;
+using OpenNFS1.Parsers;
+using NeedForSpeed.Loaders;
 
 namespace NeedForSpeed
 {
@@ -27,7 +29,7 @@ namespace NeedForSpeed
             Content.RootDirectory = "Content";
 
             _graphics.PreferredBackBufferWidth = 640;
-            _graphics.PreferredBackBufferHeight = 480;
+            _graphics.PreferredBackBufferHeight = 400;
             _graphics.PreferMultiSampling = true;
 			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             
@@ -48,13 +50,14 @@ namespace NeedForSpeed
 
             Engine.Initialize(this, _graphics);
             Engine.Instance.ScreenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
-			//Engine.Instance.Device.DepthStencilState.
-            //enable per-pixel transparency
-            //Engine.Instance.Device.RenderState.AlphaTestEnable = true;
-            //Engine.Instance.Device.RenderState.ReferenceAlpha = 5;
-            //Engine.Instance.Device.RenderState.AlphaFunction = CompareFunction.Greater;
-
-            Engine.Instance.Mode = new HomeScreen();         
+			
+			GameConfig.Load();
+			GameConfig.SelectedVehicle = new NeedForSpeed.Vehicles.Ferrari512();
+			var trackDesc = TrackDescription.Descriptions.Find(a=> a.Name=="Autumn Valley");
+			TriFile tri = new TriFile(trackDesc.FileName);
+			var track = new TrackAssembler().Assemble(tri);
+			GameConfig.SelectedTrack = trackDesc;
+			Engine.Instance.Mode = new DoRaceScreen(track);      
             
         }
 
@@ -92,7 +95,7 @@ namespace NeedForSpeed
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            _graphics.GraphicsDevice.Clear(Color.Black);
+            _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             base.Draw(gameTime);
         }

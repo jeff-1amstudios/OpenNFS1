@@ -25,27 +25,27 @@ namespace NeedForSpeed
         {
             _trackDescriptions = new List<TrackDescription>();
 
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\al1.tri", Name = "Alpine", IsOpenRoad = true, ImageFile = "Content/TrackImages/alpine" });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\cl1.tri", Name = "Coastal", IsOpenRoad = true, ImageFile = "Content/TrackImages/coast" });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\cy1.tri", Name = "City", IsOpenRoad = true, ImageFile = "Content/TrackImages/city" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\al1.tri", Name = "Alpine", IsOpenRoad = true, ImageFile = "Content/TrackImages/alpine" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\cl1.tri", Name = "Coastal", IsOpenRoad = true, ImageFile = "Content/TrackImages/coast" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\cy1.tri", Name = "City", IsOpenRoad = true, ImageFile = "Content/TrackImages/city" });
             
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\tr1.tri", Name = "Rusty Springs", IsOpenRoad = false, ImageFile="Content/TrackImages/RustySprings" });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\tr2.tri", Name = "Autumn Valley", IsOpenRoad = false, ImageFile = "Content/TrackImages/AutumnValley" });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\tr3.tri", Name = "Vertigo Ridge", IsOpenRoad = false, ImageFile = "Content/TrackImages/VertigoRidge" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\tr1.tri", Name = "Rusty Springs", IsOpenRoad = false, ImageFile="Content/TrackImages/RustySprings" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\tr2.tri", Name = "Autumn Valley", IsOpenRoad = false, ImageFile = "Content/TrackImages/AutumnValley" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\tr3.tri", Name = "Vertigo Ridge", IsOpenRoad = false, ImageFile = "Content/TrackImages/VertigoRidge" });
             
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\tr5.tri", Name = "Oasis Springs (hidden track)", IsOpenRoad = false, ImageFile = "Content/TrackImages/Transpolis" });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\tr6.tri", Name = "Burnt Sienna", IsOpenRoad = false, ImageFile = "Content/TrackImages/BurntSienna" });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\tr7.tri", Name = "Transpolis", IsOpenRoad = false, ImageFile = "Content/TrackImages/Transpolis" });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\tr4.tri", Name = "Lost Vegas", IsOpenRoad = false, ImageFile = "Content/TrackImages/LostVegas" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\tr5.tri", Name = "Oasis Springs (hidden track)", IsOpenRoad = false, ImageFile = "Content/TrackImages/Transpolis" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\tr6.tri", Name = "Burnt Sienna", IsOpenRoad = false, ImageFile = "Content/TrackImages/BurntSienna" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\tr7.tri", Name = "Transpolis", IsOpenRoad = false, ImageFile = "Content/TrackImages/Transpolis" });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\tr4.tri", Name = "Lost Vegas", IsOpenRoad = false, ImageFile = "Content/TrackImages/LostVegas" });
             
             
             //Open road stages
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\al2.tri", Name = "Alpine 2", IsOpenRoad = true, ImageFile = "Content/TrackImages/alpine", HideFromMenu = true  });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\al3.tri", Name = "Alpine 3", IsOpenRoad = true, ImageFile = "Content/TrackImages/alpine", HideFromMenu = true });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\cy2.tri", Name = "City 2", IsOpenRoad = true, ImageFile = "Content/TrackImages/city", HideFromMenu = true });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\cy3.tri", Name = "City 3", IsOpenRoad = true, ImageFile = "Content/TrackImages/city", HideFromMenu = true });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\cl2.tri", Name = "Coastal 2", IsOpenRoad = true, ImageFile = "Content/TrackImages/coast", HideFromMenu = true });
-            _trackDescriptions.Add(new TrackDescription() { FileName = "Data\\Tracks\\cl3.tri", Name = "Coastal 3", IsOpenRoad = true, ImageFile = "Content/TrackImages/coast", HideFromMenu = true });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\al2.tri", Name = "Alpine 2", IsOpenRoad = true, ImageFile = "Content/TrackImages/alpine", HideFromMenu = true  });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\al3.tri", Name = "Alpine 3", IsOpenRoad = true, ImageFile = "Content/TrackImages/alpine", HideFromMenu = true });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\cy2.tri", Name = "City 2", IsOpenRoad = true, ImageFile = "Content/TrackImages/city", HideFromMenu = true });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\cy3.tri", Name = "City 3", IsOpenRoad = true, ImageFile = "Content/TrackImages/city", HideFromMenu = true });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\cl2.tri", Name = "Coastal 2", IsOpenRoad = true, ImageFile = "Content/TrackImages/coast", HideFromMenu = true });
+            _trackDescriptions.Add(new TrackDescription() { FileName = "SIMDATA\\MISC\\cl3.tri", Name = "Coastal 3", IsOpenRoad = true, ImageFile = "Content/TrackImages/coast", HideFromMenu = true });
         }
 
         /// <summary>

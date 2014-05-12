@@ -17,7 +17,7 @@ namespace NfsEngine
 
         public Vector3 RightVec = Vector3.Right;
         public Vector3 UpVector = Vector3.Up;
-        AverageValueVector3 _lookAt = new AverageValueVector3(60);
+        AverageValueVector3 _lookAt = new AverageValueVector3(40);
 
 		
 		/// <summary>
@@ -72,7 +72,7 @@ namespace NfsEngine
 			get { return farPlaneDistance; }
 			set { farPlaneDistance = value; }
 		}
-		private float farPlaneDistance = 1500.0f;
+		private float farPlaneDistance = 15000.0f;
 
 
 		/// <summary>
@@ -99,10 +99,10 @@ namespace NfsEngine
             _lookAt.AddValue(new Vector3(ChaseOffset, ChaseHeight, 0) + (-_chaseDirection * new Vector3(ChaseDistance, ChaseDistance, ChaseDistance)));
             Vector3 avgLookAt = _lookAt.GetAveragedValue();
             Vector3 cameraPosition = _position +avgLookAt;
-            _view = Matrix.CreateLookAt(cameraPosition, cameraPosition - avgLookAt + new Vector3(0,15,0), UpVector);
+            _view = Matrix.CreateLookAt(cameraPosition, cameraPosition - avgLookAt + new Vector3(0,13,0), UpVector);
             _projection = Matrix.CreatePerspectiveFieldOfView(FieldOfView, Engine.Instance.AspectRatio, NearPlaneDistance, FarPlaneDistance);
 
-            Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube, Matrix.CreateScale(3) * Matrix.CreateTranslation(_position + avgLookAt), Color.Yellow, null);
+            //Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube, Matrix.CreateScale(3) * Matrix.CreateTranslation(_position + avgLookAt), Color.Yellow, null);
 		}
 
 		public void SetPosition(Vector3 position)

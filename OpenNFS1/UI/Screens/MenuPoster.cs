@@ -29,7 +29,7 @@ namespace NeedForSpeed.UI.Screens
 
         public virtual void Render(AlphaTestEffect effect, bool selected)
         {
-            _billboard.Texture = Engine.Instance.ContentManager.Load<Texture2D>(_textureName);
+            //_billboard.Texture = Engine.Instance.ContentManager.Load<Texture2D>(_textureName);
             Vector3 position = _position;
             if (selected)
             {

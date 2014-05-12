@@ -18,7 +18,7 @@ namespace NeedForSpeed.Vehicles
             : base(1380, "Ferrari512")
         {
 
-            _model = CarModelCache.GetModel(@"Data\Cars\f512tr.CFM");
+            _model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\f512tr.CFM");
 
             _wheels[0] = new VehicleWheel(this, new Vector3(-9.5f, 0f, 12.2f), _model.TyreTexture, 6.3f);
             _wheels[1] = new VehicleWheel(this, new Vector3(9.5f, 0f, 12.2f), _model.TyreTexture, 6.3f);
@@ -35,8 +35,11 @@ namespace NeedForSpeed.Vehicles
 					_effect.View = Engine.Instance.Camera.View;
 					_effect.Projection = Engine.Instance.Camera.Projection;
 					_effect.CurrentTechnique.Passes[0].Apply();
-					_effect.World = Matrix.CreateScale(0.09f) * _renderMatrix;
+					_effect.World = Matrix.CreateScale(0.045f) * _renderMatrix;
+					var rs = Engine.Instance.Device.RasterizerState;
+					Engine.Instance.Device.RasterizerState = new RasterizerState { DepthBias = 2 };
 					_model.Render(_effect, VehicleController.Brake > 0);
+					Engine.Instance.Device.RasterizerState = rs;
 					base.Render();
 				}
 

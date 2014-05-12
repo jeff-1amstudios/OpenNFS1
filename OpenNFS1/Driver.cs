@@ -34,10 +34,10 @@ namespace NeedForSpeed
 
             _track = track;
 
-            _views.Add(new ChaseView(_vehicle, 90, 48, 0));
+            _views.Add(new ChaseView(_vehicle, 32, 14, 0));
             _views.Add(new DashboardView(_vehicle));
             _views.Add(new BumperView(_vehicle));
-            _views.Add(new ChaseView(_vehicle, 120, 60, 0));           
+            //_views.Add(new ChaseView(_vehicle, 140, 60, 0));           
             _views.Add(new TelevisionView(_vehicle));
 			_views[_currentView].Activate();
         }

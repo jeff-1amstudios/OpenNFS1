@@ -18,7 +18,7 @@ namespace NeedForSpeed.Vehicles
             : base(1480, "LamboDiablo")
         {
 
-            _model = CarModelCache.GetModel(@"Data\Cars\ldiabl.CFM");
+            _model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\ldiabl.CFM");
 
             _wheels[0] = new VehicleWheel(this, new Vector3(-9.1f, 0f, 15.9f), _model.TyreTexture, 6.3f);
             _wheels[1] = new VehicleWheel(this, new Vector3(9.1f, 0f, 15.9f), _model.TyreTexture, 6.3f);

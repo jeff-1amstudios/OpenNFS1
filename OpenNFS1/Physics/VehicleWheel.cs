@@ -83,13 +83,6 @@ namespace NeedForSpeed.Physics
 			}
 		}
 
-
-        public int TrackTriangleUnderWheel
-        {
-            get { return _trackTriangleUnderWheel; }
-            set { _trackTriangleUnderWheel = value; }
-        }
-
 		public void Steer(float angle)
 		{
 			_steeringAngle = -angle;

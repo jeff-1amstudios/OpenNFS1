@@ -21,7 +21,7 @@ namespace NeedForSpeed.Views
         {
             _car = car;
             _camera = new FixedChaseCamera();
-						_camera.FieldOfView = MathHelper.ToRadians(55);
+			_camera.FieldOfView = MathHelper.ToRadians(65);
             _camera.ChaseDistance = distance;
             _camera.ChaseHeight = height;
             _camera.ChaseOffset = offset;
@@ -49,8 +49,8 @@ namespace NeedForSpeed.Views
         public void Update(GameTime gameTime)
         {
             _camera.Position = _car.Position;
-			_camera.ChaseDirection = Vector3.Forward; // _car.Direction;
-			_camera.UpVector = Vector3.Up; // _car.UpVector;
+			_camera.ChaseDirection = _car.Direction;
+			_camera.UpVector = _car.UpVector;
         }
 
         public void Render()

@@ -6,12 +6,13 @@ using NeedForSpeed.Parsers.Track;
 using NfsEngine;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
+using OpenNFS1.Tracks;
 
 namespace NeedForSpeed.Views
 {
     class TrackFlybyView : IView
     {
-        private List<PhysicalRoadNode> _nodes;
+        private List<TrackNode> _nodes;
         int _currentNode;
         ChaseCamera _camera = new ChaseCamera();
         double _currentNodeTime = 0;

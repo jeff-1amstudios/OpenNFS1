@@ -18,7 +18,7 @@ namespace NeedForSpeed.Vehicles
 			: base(1380, "CorvetteZR1")
 		{
 
-			_model = CarModelCache.GetModel(@"Data\Cars\czr1.CFM");
+			_model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\czr1.CFM");
 
 			_wheels[0] = new VehicleWheel(this, new Vector3(-9.36f, 0f, 16.0f), _model.TyreTexture, 7.2f);
 			_wheels[1] = new VehicleWheel(this, new Vector3(9.36f, 0f, 16.0f), _model.TyreTexture, 7.2f);

@@ -14,6 +14,7 @@ using NeedForSpeed.Vehicles;
 using NeedForSpeed.Physics;
 using System.Diagnostics;
 using NeedForSpeed.UI.Screens;
+using OpenNFS1;
 
 
 namespace NeedForSpeed
@@ -22,7 +23,6 @@ namespace NeedForSpeed
 	{
 		Track _track;
 		Vehicle _car;
-		SkyBox _skyBox;
 		Race _race;
 		RaceUI _raceUI;
 		TrafficController _trafficController;
@@ -30,10 +30,6 @@ namespace NeedForSpeed
 		public DoRaceScreen(Track track)
 		{
 			_track = track;
-
-			SkyboxGenerator skyBoxGenerator = new SkyboxGenerator(_track.HorizonTexture);
-			_skyBox = skyBoxGenerator.Generate();
-
 			_car = GameConfig.SelectedVehicle;
 			_car.InitializeForDriving();
 			Engine.Instance.Player = new Driver(_car, _track);
@@ -68,10 +64,8 @@ namespace NeedForSpeed
 			_track.Update(gameTime);
 			_trafficController.Update(gameTime);
 
-			int currentSegment = _car.CurrentTrackTriangle / TrackAssembler.TRIANGLES_PER_SEGMENT;
-			_race.UpdatePosition(currentSegment);
-
-			_skyBox.Update(gameTime);
+			//int currentSegment = _car.CurrentTrackTriangle / TrackAssembler.TRIANGLES_PER_SEGMENT;
+			_race.UpdatePosition(_car.CurrentTrackNode);
 
 			if (_race.HasFinished)
 			{
@@ -88,25 +82,10 @@ namespace NeedForSpeed
 
 		public void Draw()
 		{
-			Viewport original = Engine.Instance.Device.Viewport;
-
-			//Viewport viewPort = Engine.Instance.Device.Viewport;
-			//viewPort.Width = 1024;
-			//viewPort.Height = 768;
-			//int width = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
-			//viewPort.X = width / 2 - 512;
-			//Engine.Instance.Device.Viewport = viewPort;
-
-			_skyBox.Draw();
-
 			Engine.Instance.Device.BlendState = BlendState.NonPremultiplied;
 			Engine.Instance.Device.DepthStencilState = DepthStencilState.Default;
-
-
-			if (GameConfig.RenderOnlyPhysicalTrack)
-				_track.RenderPhysicalRoad();
-			else
-				_track.Render(Engine.Instance.Camera.Position, _car.CurrentTrackTriangle);
+			
+			_track.Render(Engine.Instance.Camera.Position, _car.CurrentTrackNode);
 
 			_trafficController.Render();
 

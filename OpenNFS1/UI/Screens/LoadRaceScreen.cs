@@ -15,6 +15,7 @@ using NeedForSpeed.Physics;
 using System.Diagnostics;
 using NeedForSpeed.UI.Screens;
 using System.Threading;
+using OpenNFS1.Parsers;
 
 
 namespace NeedForSpeed
@@ -52,7 +53,8 @@ namespace NeedForSpeed
 
         private void LoadTrack()
         {
-            _track = new TrackAssembler().Load(GameConfig.SelectedTrack);
+			TriFile tri = new TriFile(GameConfig.SelectedTrack.FileName);
+            _track = new TrackAssembler().Assemble(tri);
             
         }
     }

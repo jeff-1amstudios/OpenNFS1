@@ -18,7 +18,7 @@ namespace NeedForSpeed.Vehicles
             : base(1480, "ToyotaSupra")
         {
 
-            _model = CarModelCache.GetModel(@"Data\Cars\p911.CFM");
+            _model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\p911.CFM");
 
             _wheels[0] = new VehicleWheel(this, new Vector3(-9f, 0f, 15.9f), _model.TyreTexture, 6.6f);
             _wheels[1] = new VehicleWheel(this, new Vector3(9f, 0f, 15.9f), _model.TyreTexture, 6.6f);

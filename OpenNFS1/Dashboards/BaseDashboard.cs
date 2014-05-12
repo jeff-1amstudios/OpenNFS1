@@ -58,7 +58,8 @@ namespace NeedForSpeed.Dashboards
             
             _instrumentLine = Engine.Instance.ContentManager.Load<Texture2D>("Content\\SpeedoLine");
 
-            BinaryReader br = new BinaryReader(File.Open(filename, FileMode.Open));
+			string dashboardFile = Path.Combine(GameConfig.CdDataPath, filename);
+            BinaryReader br = new BinaryReader(File.Open(dashboardFile, FileMode.Open));
             BitmapChunk.ResetPalette();
             _bitmapChunk = new BitmapChunk();
             _bitmapChunk.SkipHeader(br);

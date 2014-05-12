@@ -26,19 +26,19 @@ namespace NeedForSpeed.Vehicles
         static TrafficVehicle()
         {
             _trafficModels = new List<string>();
-            _trafficModels.Add(@"Data\Cars\axxess.CFM");
-            _trafficModels.Add(@"Data\Cars\vandura.CFM");
-            _trafficModels.Add(@"Data\Cars\bmw.CFM");
-            _trafficModels.Add(@"Data\Cars\copmust.CFM");
-            _trafficModels.Add(@"Data\Cars\crx.CFM");
-            _trafficModels.Add(@"Data\Cars\jeep.CFM");
-            _trafficModels.Add(@"Data\Cars\jetta.CFM");
-            _trafficModels.Add(@"Data\Cars\lemans.CFM");
-            _trafficModels.Add(@"Data\Cars\pickup.CFM");
-            _trafficModels.Add(@"Data\Cars\probe.CFM");
-            _trafficModels.Add(@"Data\Cars\rodeo.CFM");
-            _trafficModels.Add(@"Data\Cars\sunbird.CFM");
-            _trafficModels.Add(@"Data\Cars\wagon.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\axxess.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\vandura.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\bmw.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\copmust.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\crx.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\jeep.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\jetta.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\lemans.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\pickup.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\probe.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\rodeo.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\sunbird.CFM");
+            _trafficModels.Add(@"SIMDATA\CARFAMS\wagon.CFM");
         }
 
         public TrafficVehicle(int startNode, int travelDirection)

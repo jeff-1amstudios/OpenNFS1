@@ -5,6 +5,7 @@ using NeedForSpeed.Parsers.Track;
 using Microsoft.Xna.Framework;
 using NfsEngine;
 using NeedForSpeed.Physics;
+using OpenNFS1.Tracks;
 
 namespace NeedForSpeed.Vehicles
 {
@@ -49,8 +50,8 @@ namespace NeedForSpeed.Vehicles
                 }
 
                 Vector3 direction = new Vector3();
-                PhysicalRoadNode lastNode = _track.RoadNodes[vehicle.LastNode];
-                PhysicalRoadNode nextNode = _track.RoadNodes[vehicle.NextNode];
+                TrackNode lastNode = _track.RoadNodes[vehicle.LastNode];
+                TrackNode nextNode = _track.RoadNodes[vehicle.NextNode];
 
                 if (Math.Abs(lastNode.Orientation - nextNode.Orientation) > 100)
                 {

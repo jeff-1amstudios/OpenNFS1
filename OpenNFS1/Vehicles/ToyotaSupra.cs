@@ -18,7 +18,7 @@ namespace NeedForSpeed.Vehicles
             : base(1580, "ToyotaSupra")
         {
             
-            _model = CarModelCache.GetModel(@"Data\Cars\tsupra.CFM");
+            _model = CarModelCache.GetModel(@"SIMDATA\CARFAMS\tsupra.CFM");
             
             _wheels[0] = new VehicleWheel(this, new Vector3(-2.4f, 0f, 4.9f), _model.TyreTexture, 6.4f);
             _wheels[1] = new VehicleWheel(this, new Vector3(2.4f, 0f, 4.9f), _model.TyreTexture, 6.4f);
@@ -35,7 +35,7 @@ namespace NeedForSpeed.Vehicles
 					_effect.View = Engine.Instance.Camera.View;
 					_effect.Projection = Engine.Instance.Camera.Projection;
 					_effect.CurrentTechnique.Passes[0].Apply();
-					_effect.World = Matrix.CreateScale(0.02f) * _renderMatrix;
+					_effect.World = Matrix.CreateScale(0.04f) * _renderMatrix;
 					_model.Render(_effect, VehicleController.Brake > 0);
 					base.Render();
 				}

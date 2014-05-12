@@ -13,7 +13,7 @@ namespace NeedForSpeed.Dashboards
     {
 
         public Rx7Dashboard(Vehicle car)
-            : base(car, @"Data\Dashboards\mrx7dh.fsh")
+            : base(car, @"SIMDATA\DASH\mrx7dh.fsh")
         {
             _car = car;
         }

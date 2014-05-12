@@ -193,5 +193,23 @@ namespace NfsEngine
 		{
 			return ((line2.X - line1.X) * (pos.Z - line1.Z) - (line2.Z - line1.Z) * (pos.X - line1.X)) > 0;
 		}
+
+		public static Vector3 GetClosestPointOnLine(Vector3 line1, Vector3 line2, Vector3 pos)
+		{
+			Vector3 lineDir = line2 - line1;
+			lineDir.Normalize();
+
+			float d = Vector3.Distance(line1, line2);
+
+			Vector3 v1 = pos - line1;
+			float t = Vector3.Dot(lineDir, v1);
+
+			if (t <= 0)
+				return line1;
+			if (t >= d)
+				return line2;
+
+			return line1 + lineDir * t;
+		}
     }
 }
