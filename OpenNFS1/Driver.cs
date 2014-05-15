@@ -16,15 +16,14 @@ using NeedForSpeed.Vehicles;
 
 namespace NeedForSpeed
 {
-    class Driver : GameObject
+    class Driver
     {
         Vehicle _vehicle;
         Track _track;
-
         List<IView> _views = new List<IView>();
         int _currentView;
 
-
+		
         public Driver(Vehicle vehicle, Track track)
         {
             _vehicle = vehicle;
@@ -35,6 +34,7 @@ namespace NeedForSpeed
             _track = track;
 
             _views.Add(new ChaseView(_vehicle, 32, 14, 0));
+			_views.Add(new DebugView(_vehicle));
             _views.Add(new DashboardView(_vehicle));
             _views.Add(new BumperView(_vehicle));
             //_views.Add(new ChaseView(_vehicle, 140, 60, 0));           
@@ -42,7 +42,9 @@ namespace NeedForSpeed
 			_views[_currentView].Activate();
         }
 
-        public override void Update(GameTime gameTime)
+		public bool ShouldRenderCar { get { return _views[_currentView].ShouldRenderPlayer; } }
+
+        public void Update(GameTime gameTime)
         {
             _vehicle.Update(gameTime);
             
@@ -62,13 +64,11 @@ namespace NeedForSpeed
                 _views[_currentView].Activate();
             }
 
-            _position = _vehicle.Position;
-            
             _views[_currentView].Update(gameTime);
         }
 		
 
-        public override void Render()
+        public void Render()
         {
             _views[_currentView].Render();
         }

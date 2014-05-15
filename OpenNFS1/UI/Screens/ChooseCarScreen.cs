@@ -41,15 +41,7 @@ namespace NeedForSpeed.UI.Screens
 			_effect = new AlphaTestEffect(Engine.Instance.Device);
 			_screenWidth = Engine.Instance.Device.Viewport.Width;
 
-			_models.Add(new ToyotaSupra());
-			_models.Add(new MazdaRx7());
-			_models.Add(new HondaNSX());
-			_models.Add(new DodgeViper());
-			_models.Add(new CorvetteZR1());
-			_models.Add(new Porsche911());
-			_models.Add(new Ferrari512());
-			_models.Add(new LamboDiablo());
-			_models.Add(new Warrior());
+			
 
 
 			for (int i = 0; i < _models.Count; i++)
@@ -151,34 +143,34 @@ namespace NeedForSpeed.UI.Screens
 
 		private void UpdateDescriptionText()
 		{
-			Vector3 position;
+			//Vector3 position;
 
-			Engine.Instance.SpriteBatch.Begin();
+			//Engine.Instance.SpriteBatch.Begin();
 
-			if (_moveFactor < 0.5f)
-			{
-				position = SlideTextBlock(new Vector3(20, 0, 0), -1000);
-				Engine.Instance.SpriteBatch.DrawString(Font, _models[_selectedIndex].Name, new Vector2(position.X, 50), Color.White, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
-			}
-			else
-			{
-				position = SlideTextBlock(new Vector3(-1000, 0, 1000), 20);
-				Engine.Instance.SpriteBatch.DrawString(Font, _models[_nextSelectedIndex].Name, new Vector2(position.X, 50), Color.White, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
-			}
+			//if (_moveFactor < 0.5f)
+			//{
+			//	position = SlideTextBlock(new Vector3(20, 0, 0), -1000);
+			//	Engine.Instance.SpriteBatch.DrawString(Font, _models[_selectedIndex].Name, new Vector2(position.X, 50), Color.White, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
+			//}
+			//else
+			//{
+			//	position = SlideTextBlock(new Vector3(-1000, 0, 1000), 20);
+			//	Engine.Instance.SpriteBatch.DrawString(Font, _models[_nextSelectedIndex].Name, new Vector2(position.X, 50), Color.White, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
+			//}
 
 
-			if (_moveFactor < 0.5f)
-			{
-				position = SlideTextBlock(new Vector3(_screenWidth - 350, 0, 0), _screenWidth + 1200);
-				Engine.Instance.SpriteBatch.DrawString(Font, _models[_selectedIndex].Description, new Vector2(position.X, 110), Color.White, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
-			}
-			else
-			{
-				position = SlideTextBlock(new Vector3(_screenWidth + 1200, 0, 0), _screenWidth - 350);
-				Engine.Instance.SpriteBatch.DrawString(Font, _models[_nextSelectedIndex].Description, new Vector2(position.X, 110), Color.White, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
-			}
+			//if (_moveFactor < 0.5f)
+			//{
+			//	position = SlideTextBlock(new Vector3(_screenWidth - 350, 0, 0), _screenWidth + 1200);
+			//	Engine.Instance.SpriteBatch.DrawString(Font, _models[_selectedIndex].Description, new Vector2(position.X, 110), Color.White, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
+			//}
+			//else
+			//{
+			//	position = SlideTextBlock(new Vector3(_screenWidth + 1200, 0, 0), _screenWidth - 350);
+			//	Engine.Instance.SpriteBatch.DrawString(Font, _models[_nextSelectedIndex].Description, new Vector2(position.X, 110), Color.White, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
+			//}
 
-			Engine.Instance.SpriteBatch.End();
+			//Engine.Instance.SpriteBatch.End();
 		}
 
 		private Vector3 SlideTextBlock(Vector3 startPos, float destination)

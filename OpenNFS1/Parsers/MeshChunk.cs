@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NfsEngine;
 using System.Diagnostics;
+using OpenNFS1;
 
 namespace NeedForSpeed.Parsers
 {
@@ -13,11 +14,13 @@ namespace NeedForSpeed.Parsers
 	{
 		List<Vector3> _vertices = new List<Vector3>();
 		List<Vector2> _vertexTextureMap = new List<Vector2>();
-
 		List<Polygon> _polygons = new List<Polygon>();
-		private VertexBuffer _vertexBuffer;
-
 		private List<string> _textureNames = new List<string>();
+
+		public List<Polygon> Polygons
+		{
+			get { return _polygons;  }
+		}
 
 		public override void Read(BinaryReader reader)
 		{
@@ -36,7 +39,8 @@ namespace NeedForSpeed.Parsers
 			int polygonBlockOffset = reader.ReadInt32();
 
 			string identifer = new string(reader.ReadChars(12));
-			Debug.WriteLine("mesh id: " + identifer);
+			identifer = identifer.Substring(0, identifer.IndexOf('\0'));
+			Debug.WriteLine("== Mesh id: " + identifer);
 			int textureNameCount = reader.ReadInt32();
 			int textureNameBlockOffset = reader.ReadInt32();
 
@@ -46,8 +50,8 @@ namespace NeedForSpeed.Parsers
 
 			reader.ReadBytes(8); //section 6
 
-			int wheelCount = reader.ReadInt32();
-			int wheelPolygonBlockOffset = reader.ReadInt32();
+			int labelCount = reader.ReadInt32();
+			int polygonLabelBlockOffset = reader.ReadInt32();
 
 			reader.BaseStream.Position = Offset + polygonVertexMapBlockOffset;
 			MemoryStream ms = new MemoryStream(reader.ReadBytes(_length - polygonVertexMapBlockOffset));
@@ -66,15 +70,18 @@ namespace NeedForSpeed.Parsers
 			ReadPolygonBlock(reader, polygonCount, polygonVertexMapReader);
 			polygonVertexMapReader.Close();
 
-			reader.BaseStream.Position = Offset + wheelPolygonBlockOffset;
-			ReadWheelPolygonBlock(reader, wheelCount);
+			reader.BaseStream.Position = Offset + polygonLabelBlockOffset;
+			ReadPolygonLabelBlock(reader, labelCount);
 		}
 
 		private void ReadVertexBlock(BinaryReader reader, int vertexCount)
 		{
 			for (int i = 0; i < vertexCount; i++)
 			{
-				Vector3 vertex = new Vector3(reader.ReadInt32(), reader.ReadInt32(), -reader.ReadInt32());
+				float x = reader.ReadInt32();
+				float y = reader.ReadInt32();
+				float z = reader.ReadInt32(); 
+				Vector3 vertex = new Vector3(x, y, -z) * GameConfig.VehicleScaleFactor;
 				_vertices.Add(vertex);
 			}
 		}
@@ -104,194 +111,92 @@ namespace NeedForSpeed.Parsers
 
 		private void ReadPolygonBlock(BinaryReader reader, int polygonCount, BinaryReader polygonVertexMap)
 		{
-			Polygon lastPoly = null;
-
 			for (int i = 0; i < polygonCount; i++)
 			{
-				PolygonShape shape = (PolygonShape)reader.ReadByte();
-				if (shape == PolygonShape.Triangle2)
-					shape = PolygonShape.Triangle;
-				if (shape == PolygonShape.Quad2)
-					shape = PolygonShape.Quad;
+				byte typeFlag = reader.ReadByte();
+				int shapeId = typeFlag & (0xff >> 5); // type = 3 or 4.  Held in the first 3 bits
+				//bool computeTextureUVs = (typeFlag & (0x1 << 3)) != 0; // bit 3 is set if there are *no* texture co-ords (and we should infer them?)
 
-				Polygon polygon = new Polygon(shape);
+				if (shapeId != 3 && shapeId != 4)
+				{
+				}				
 
 				byte b1 = reader.ReadByte();
 				byte textureNumber = reader.ReadByte();
-
-				polygon.TextureName = _textureNames[textureNumber];
-
 				byte b2 = reader.ReadByte();
-				int poly1Index = reader.ReadInt32();
-				int poly2Index = reader.ReadInt32();
+				int verticesIndex = reader.ReadInt32();
+				int textureCoordsIndex = reader.ReadInt32();
 
-				if (!Enum.IsDefined(typeof(PolygonShape), shape))
-				{
-					polygon.Shape = PolygonShape.Triangle;
-					continue;
-				}
+				// if these 2 indexes are the same, there are no texture coords
+				bool computeTextureUVs = verticesIndex == textureCoordsIndex;
 
-				if (poly1Index == poly2Index && polygon.Shape == PolygonShape.Quad)
-				{
-					Debug.WriteLine("Converting Quad to Untextured");
-					polygon.Shape = PolygonShape.UnTexturedQuad;
-				}
-				else if (poly1Index != poly2Index && polygon.Shape == PolygonShape.UnTexturedQuad)
-				{
-					Debug.WriteLine("Converting UnTextured to Quad");
-					polygon.Shape = PolygonShape.Quad;
-				}
+				Polygon polygon = new Polygon((PolygonShape)shapeId, computeTextureUVs);
+				polygon.TextureName = _textureNames[textureNumber];								
 
 				//Vertices for polygon
-				polygonVertexMap.BaseStream.Position = poly1Index * sizeof(int);
+				polygonVertexMap.BaseStream.Position = verticesIndex * sizeof(int);
 				int v1 = polygonVertexMap.ReadInt32();
 				int v2 = polygonVertexMap.ReadInt32();
 				int v3 = polygonVertexMap.ReadInt32();
 				int v4 = polygonVertexMap.ReadInt32();
 
+				Debug.WriteLine(String.Format("Poly {8} {0} {9} ({7}): {1},{2},{3},{4}, / {5} {6} computeUvs: {10}", i, v1, v2, v3, v4, b1, b2, polygon.TextureName, polygon.Shape, typeFlag.ToString("X"), computeTextureUVs));
+
 				//Texture co-ords for vertices
-				polygonVertexMap.BaseStream.Position = poly2Index * sizeof(int);
-				int t1 = polygonVertexMap.ReadInt32();
-				int t2 = polygonVertexMap.ReadInt32();
-				int t3 = polygonVertexMap.ReadInt32();
-				int t4 = polygonVertexMap.ReadInt32();
-
-				Debug.WriteLine(String.Format("Poly {8} {0} ({7}): {1},{2},{3},{4}, / {5} {6}", i, v1, v2, v3, v4, b1, b2, polygon.TextureName, polygon.Shape));
-
-				if (polygon.Shape == PolygonShape.Triangle || polygon.Shape == PolygonShape.Quad)
+				if (!computeTextureUVs)
 				{
-					polygon.Vertices.Add(_vertices[v1]);
-					polygon.Vertices.Add(_vertices[v2]);
-					polygon.Vertices.Add(_vertices[v3]);
-					polygon.TextureCoords.Add(_vertexTextureMap[t1]);
-					polygon.TextureCoords.Add(_vertexTextureMap[t2]);
-					polygon.TextureCoords.Add(_vertexTextureMap[t3]);
-				}
-				if (polygon.Shape == PolygonShape.Quad)
-				{
-					polygon.Vertices.Add(_vertices[v1]);
-					polygon.Vertices.Add(_vertices[v3]);
-					polygon.Vertices.Add(_vertices[v4]);
-					polygon.TextureCoords.Add(_vertexTextureMap[t1]);
-					polygon.TextureCoords.Add(_vertexTextureMap[t3]);
-					polygon.TextureCoords.Add(_vertexTextureMap[t4]);
-				}
-				else if (polygon.Shape == PolygonShape.UnTexturedQuad)
-				{
-					polygon.Vertices.Add(_vertices[v1]);
-					polygon.Vertices.Add(_vertices[v2]);
-					polygon.Vertices.Add(_vertices[v3]);
-					polygon.Vertices.Add(_vertices[v1]);
-					polygon.Vertices.Add(_vertices[v3]);
-					polygon.Vertices.Add(_vertices[v4]);
+					polygonVertexMap.BaseStream.Position = textureCoordsIndex * sizeof(int);
+					int t1 = polygonVertexMap.ReadInt32();
+					int t2 = polygonVertexMap.ReadInt32();
+					int t3 = polygonVertexMap.ReadInt32();
+					int t4 = polygonVertexMap.ReadInt32();
 
-					polygon.TextureCoords.Add(new Vector2(0, 0));
-					polygon.TextureCoords.Add(new Vector2(1, 0));
-					polygon.TextureCoords.Add(new Vector2(1, 1));
-					polygon.TextureCoords.Add(new Vector2(0, 0));
-					polygon.TextureCoords.Add(new Vector2(1, 1));
-					polygon.TextureCoords.Add(new Vector2(0, 1));
+					polygon.Vertices[0] = _vertices[v1];
+					polygon.Vertices[1] = _vertices[v2];
+					polygon.Vertices[2] = _vertices[v3];
+					polygon.TextureUVs[0] = _vertexTextureMap[t1];
+					polygon.TextureUVs[1] = _vertexTextureMap[t2];
+					polygon.TextureUVs[2] = _vertexTextureMap[t3];
+					
+					if (polygon.Shape == PolygonShape.Quad)
+					{
+						polygon.Vertices[3] = _vertices[v1];
+						polygon.Vertices[4] = _vertices[v3];
+						polygon.Vertices[5] = _vertices[v4];
+						polygon.TextureUVs[3] = _vertexTextureMap[t1];
+						polygon.TextureUVs[4] = _vertexTextureMap[t3];
+						polygon.TextureUVs[5] = _vertexTextureMap[t4];
+					}
 				}
 				else
 				{
-					//throw new NotImplementedException();
-				}
+					if (polygon.Shape == PolygonShape.Quad)
+					{
+						polygon.Vertices[0] = _vertices[v1];
+						polygon.Vertices[1] = _vertices[v2];
+						polygon.Vertices[2] = _vertices[v3];
+						polygon.Vertices[3] = _vertices[v1];
+						polygon.Vertices[4] = _vertices[v3];
+						polygon.Vertices[5] = _vertices[v4];
+					}
+					else
+					{
 
-				lastPoly = polygon;
+					}
+				}
 
 				_polygons.Add(polygon);
 			}
 		}
 
-		private void ReadWheelPolygonBlock(BinaryReader reader, int wheelCount)
+		private void ReadPolygonLabelBlock(BinaryReader reader, int labelCount)
 		{
-			for (int i = 0; i < wheelCount; i++)
+			for (int i = 0; i < labelCount; i++)
 			{
-				string wheelName = new string(reader.ReadChars(8));
-				wheelName = wheelName.Replace("\0", "");
+				string label = new string(reader.ReadChars(8));
+				label = label.Substring(0, label.IndexOf("\0"));
 				int polyIndex = reader.ReadInt32();
-
-				switch (wheelName)
-				{
-					case "rt_rear":
-						_polygons[polyIndex].Type = PolygonType.WheelRearRight;
-						break;
-					case "lt_rear":
-						_polygons[polyIndex].Type = PolygonType.WheelRearLeft;
-						break;
-					case "rt_frnt":
-						_polygons[polyIndex].Type = PolygonType.WheelFrontRight;
-						break;
-					case "lt_frnt":
-						_polygons[polyIndex].Type = PolygonType.WheelFrontLeft;
-						break;
-				}
-			}
-		}
-
-		public void Resolve(BitmapChunk bitmapChunk)
-		{
-			if (_vertexBuffer != null)
-				return; //already resolved
-
-			int vertCount = 0;
-
-			List<VertexPositionTexture> allVerts = new List<VertexPositionTexture>();
-			foreach (Polygon poly in _polygons)
-			{
-				if (poly.TextureName != null)
-				{
-					poly.ResolveTexture(bitmapChunk.FindByName(poly.TextureName));
-				}
-				/*
-				if (poly.Type == PolygonType.WheelFrontLeft || poly.Type == PolygonType.WheelFrontRight || poly.Type == PolygonType.WheelRearLeft
-						|| poly.Type == PolygonType.WheelRearRight
-						|| poly.TextureName == "shad" || poly.TextureName == "circ"
-						|| poly.TextureName == "tire" || poly.TextureName == "tir2")
-				{
-					//dont use this poly - we do the wheels ourselves
-					poly.VertexBufferIndex = -1;
-					continue;
-				}
-				*/
-				poly.VertexBufferIndex = vertCount;
-				vertCount += poly.VertexCount;
-				allVerts.AddRange(poly.GetVertices());
-			}
-
-			_vertexBuffer = new VertexBuffer(Engine.Instance.Device, typeof(VertexPositionTexture), vertCount, BufferUsage.WriteOnly);
-			_vertexBuffer.SetData<VertexPositionTexture>(allVerts.ToArray());
-		}
-
-		public void Render(Effect effect)
-		{
-			Engine.Instance.Device.SetVertexBuffer(_vertexBuffer);
-			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
-
-			effect.CurrentTechnique.Passes[0].Apply();
-
-			foreach (Polygon poly in _polygons)
-			{
-				if (poly.VertexBufferIndex < 0)
-					continue;
-
-				Engine.Instance.Device.Textures[0] = poly.Texture;
-				Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleList, poly.VertexBufferIndex, poly.VertexCount / 3);
-			}
-		}
-
-		public void ChangeTextures(string textureName, string changeTo, BitmapChunk bitmaps)
-		{
-			BitmapEntry replacement = bitmaps.FindByName(changeTo);
-			if (replacement == null)
-				return;
-
-			foreach (Polygon p in _polygons)
-			{
-				if (p.TextureName == textureName)
-				{
-					p.Texture = replacement.Texture;
-				}
+				_polygons[polyIndex].Label = label;
 			}
 		}
 	}

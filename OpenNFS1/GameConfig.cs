@@ -6,6 +6,7 @@ using NeedForSpeed.Physics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using Microsoft.Xna.Framework;
 
 namespace NeedForSpeed
 {
@@ -20,7 +21,10 @@ namespace NeedForSpeed
         public static int DrawDistance { get; set; }
         public static bool ManualGearbox { get; set; }
 		public static bool RespectOpenRoadCheckpoints { get; set; }
-		public static float ScaleFactor = 0.000080f;
+
+		public const float VehicleScaleFactor = 0.040f;
+		public const float ScaleFactor = 0.000080f;
+		public static float FOV = MathHelper.ToRadians(65);
 
         static GameConfig()
         {

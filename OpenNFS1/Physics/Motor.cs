@@ -91,7 +91,7 @@ namespace NeedForSpeed.Physics
 		}
 
 
-        public void Update(GameTime gameTime, float carSpeed)
+        public void Update(float carSpeed)
         {
             _prevRpm = _rpm;
             _lastCarSpeed = carSpeed;
@@ -105,7 +105,7 @@ namespace NeedForSpeed.Physics
             {
                 if (!WheelsSpinning) _currentPowerOutput = 0;
                 //_throttle = 0;
-                _rpmLimiter -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+				_rpmLimiter -= Engine.Instance.FrameTime;
             }
             else
                 _currentPowerOutput = _maxPower * MathHelper.Lerp(_powerCurve[(int)_rpm], _powerCurve[(int)_rpm + 1], _rpm - (int)_rpm);
@@ -114,7 +114,7 @@ namespace NeedForSpeed.Physics
             {
                 if (_gearbox.CurrentGear == 0 || WheelsSpinning)
                 {
-                    HandleRpmNoLoad(gameTime);
+                    HandleRpmNoLoad();
                 }
                 else
                 {
@@ -138,7 +138,7 @@ namespace NeedForSpeed.Physics
                 _rpmLimiter = 0.2f;
             }
 
-            _gearbox.Update(_rpm / _redlineRpm, gameTime);
+            _gearbox.Update(_rpm / _redlineRpm);
         }
 
         public float GetPowerAtRpmForGear(float rpm, int gear)
@@ -159,18 +159,18 @@ namespace NeedForSpeed.Physics
             return _lastCarSpeed * _gearbox.Ratios[gear] / DRIVETRAIN_MULTIPLIER;
         }
 
-        private void HandleRpmNoLoad(GameTime gameTime)
+        private void HandleRpmNoLoad()
         {
             if (_throttle == 0.0f || _rpmLimiter > 0)
             {
-                _rpm -= (float)gameTime.ElapsedGameTime.TotalSeconds * 4.4f;
+                _rpm -= Engine.Instance.FrameTime * 4.4f;
 
                 if (_rpm < 0.8f)
                     _rpm = 0.8f;
             }
             else
             {
-                _rpm += (float)gameTime.ElapsedGameTime.TotalSeconds * _throttle * 5f;
+				_rpm += Engine.Instance.FrameTime *_throttle * 5f;
             }
         }
 

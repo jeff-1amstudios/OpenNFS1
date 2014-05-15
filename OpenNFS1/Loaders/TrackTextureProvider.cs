@@ -5,6 +5,7 @@ using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using NeedForSpeed.Parsers;
+using OpenNFS1;
 
 namespace NeedForSpeed.Loaders
 {
@@ -120,10 +121,11 @@ namespace NeedForSpeed.Loaders
             return GetGroundTextureForId("ga00");
         }
 
-        public MeshChunk GetMesh(int index)
+        public Mesh GetMesh(int index)
         {
-            _root.HeaderChunks[2].HeaderChunks[index].MeshChunks[0].Resolve(_root.HeaderChunks[2].HeaderChunks[index].BitmapChunks[0]);
-            return _root.HeaderChunks[2].HeaderChunks[index].MeshChunks[0];
+            var meshChunk = _root.HeaderChunks[2].HeaderChunks[index].MeshChunks[0];
+			var bmpChunk = _root.HeaderChunks[2].HeaderChunks[index].BitmapChunks[0];
+			return new Mesh(meshChunk, bmpChunk);
         }
     }
 }

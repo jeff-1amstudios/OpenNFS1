@@ -30,7 +30,7 @@ namespace NeedForSpeed.Vehicles
             for (int i = _traffic.Count - 1; i >= 0; i--)
             {
                 TrafficVehicle vehicle = _traffic[i];
-                if (vehicle.LastNode < _player.CurrentTrackNode - 10 || vehicle.LastNode > _player.CurrentTrackNode + 140)
+                if (vehicle.LastNode < _player.CurrentNode.Number - 10 || vehicle.LastNode > _player.CurrentNode.Number + 140)
                 {
                     _traffic.Remove(vehicle);
                     continue;
@@ -41,7 +41,7 @@ namespace NeedForSpeed.Vehicles
                     vehicle.DistanceBetweenNodes = vehicle.DistanceBetweenNodes - 1;
                     vehicle.LastNode = vehicle.NextNode;
                     vehicle.NextNode += vehicle.TravelDirection;
-                    vehicle.DistanceFromPlayer = Math.Abs(vehicle.LastNode - _player.CurrentTrackNode);
+                    vehicle.DistanceFromPlayer = Math.Abs(vehicle.LastNode - _player.CurrentNode.Number);
                     if (vehicle.NextNode >= _track.RoadNodes.Count || vehicle.NextNode < 0)
                     {
                         _traffic.Remove(vehicle);
@@ -77,7 +77,7 @@ namespace NeedForSpeed.Vehicles
             {
                 int direction = Utility.RandomGenerator.Next() % 2 == 0 ? 1 : -1;
                 int node = Utility.RandomGenerator.Next(40, 120);
-                TrafficVehicle vehicle = new TrafficVehicle((_player.CurrentTrackNode + node) % _track.RoadNodes.Count-1, direction);
+                TrafficVehicle vehicle = new TrafficVehicle((_player.CurrentNode.Number + node) % _track.RoadNodes.Count-1, direction);
                 _traffic.Add(vehicle);
             }
         }

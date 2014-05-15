@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using NeedForSpeed.Loaders;
 using NfsEngine;
 using OpenNFS1.Parsers;
+using OpenNFS1;
 
 namespace NeedForSpeed.Parsers.Track
 {
@@ -133,10 +134,10 @@ namespace NeedForSpeed.Parsers.Track
 
 	class ModelScenery : SceneryItem
 	{
-		MeshChunk _mesh;
+		Mesh _mesh;
 		Matrix _matrix;
 
-		public ModelScenery(MeshChunk mesh)
+		public ModelScenery(Mesh mesh)
 		{
 			_mesh = mesh;
 		}

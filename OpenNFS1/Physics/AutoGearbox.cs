@@ -17,7 +17,7 @@ namespace NeedForSpeed.Physics
         {
         }
 
-        public override void Update(float motorRpmPercent, GameTime gameTime)
+        public override void Update(float motorRpmPercent)
         {
             
             if (_motor.Rpm < 2 && _currentGear == GEAR_NEUTRAL || _currentGear == GEAR_1)
@@ -52,7 +52,7 @@ namespace NeedForSpeed.Physics
                 }
             }
 
-            base.Update(motorRpmPercent, gameTime);
+            base.Update(motorRpmPercent);
         }
     }
 }

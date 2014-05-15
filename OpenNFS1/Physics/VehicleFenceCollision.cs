@@ -15,143 +15,110 @@ namespace NeedForSpeed.Physics
     
     class VehicleFenceCollision
     {
-        public static void Handle(Vehicle car, float moveFactor, TerrainSegment segment, int segmentRow)
+        public static void Handle(Vehicle car)
         {
-            Line leftFence = segment.LeftBoundary[segmentRow < 2 ? 0 : 1];
-            Line rightFence = segment.RightBoundary[segmentRow < 2 ? 0 : 1];
+			var leftBound1 = car.CurrentNode.GetLeftBoundary();
+			var leftBound2 = car.CurrentNode.Next.GetLeftBoundary();
 
-            for (int wheelNumber = 0; wheelNumber < 4; wheelNumber++)
-            {
-                VehicleWheel wheel = car.Wheels[wheelNumber];
+			var rightBound1 = car.CurrentNode.GetRightBoundary();
+			var rightBound2 = car.CurrentNode.Next.GetRightBoundary();
+            
+			
+			
 
-                // Hit any guardrail?
-                float distanceFromLeftFence = Vector3Helper.DistanceToLine(wheel.WorldPosition, leftFence.Point1, leftFence.Point2);
-                float distanceFromRightFence = Vector3Helper.DistanceToLine(wheel.WorldPosition, rightFence.Point1, rightFence.Point2);
+			for (int wheelNumber = 0; wheelNumber < 4; wheelNumber++)
+			{
+				VehicleWheel wheel = car.Wheels[wheelNumber];
+				Vector3 fenceNormal = Vector3.Zero;
+				bool collision = false;
+				float collisionAngle = 0;
+				float direction = 0;
+				if (Utility.IsLeftOfLine(leftBound2, leftBound1, wheel.WorldPosition))
+				{
+					fenceNormal = Vector3.Cross(Vector3.Normalize(leftBound2 - leftBound1), car.CurrentNode.Up);
+					collisionAngle = Vector3Helper.GetAngleBetweenVectors(car.CarRight, fenceNormal);
+					collision = true;
+					direction = -1;
+				}
+				else if (!Utility.IsLeftOfLine(rightBound2, rightBound1, wheel.WorldPosition))
+				{
+					fenceNormal = Vector3.Cross(car.CurrentNode.Up, Vector3.Normalize(rightBound2 - rightBound1));
+					collisionAngle = Vector3Helper.GetAngleBetweenVectors(-car.CarRight, fenceNormal);
+					collision = true;
+					direction = 1;
+				}
 
-                Vector3 offsetPos = wheel.WorldPosition + (-rightFence.Normal * 0.5f);
-                float offsetDistance = Vector3Helper.DistanceToLine(offsetPos, rightFence.Point1, rightFence.Point2);
-                bool outsideRightFence = (offsetDistance > distanceFromRightFence);
+				if (!collision) continue;
 
-                offsetPos = wheel.WorldPosition + (-leftFence.Normal * 0.5f);
-                offsetDistance = Vector3Helper.DistanceToLine(offsetPos, leftFence.Point1, leftFence.Point2);
-                bool outsideLeftFence = (offsetDistance > distanceFromLeftFence);
+				Vector3 collisionDir = Vector3.Reflect(car.Direction, fenceNormal);
+				// Force car back on the road, for that calculate impulse and collision direction
+				
+				// Flip at 180 degrees (if driving in wrong direction)
+				if (collisionAngle > MathHelper.Pi / 2)
+					collisionAngle -= MathHelper.Pi;
 
-                if (outsideLeftFence)
-                {
-                    // Force car back on the road, for that calculate impulse and collision direction
-                    Vector3 collisionDir = Vector3.Reflect(car.Direction, leftFence.Normal);
+				// Just correct rotation if we hit the fence at a shallow angle
+				if (Math.Abs(collisionAngle) < MathHelper.ToRadians(45))
+				{
+					SlideAlongFence(car, wheelNumber, collisionAngle, direction);
+				}
 
-                    float collisionAngle = Vector3Helper.GetAngleBetweenVectors(car.CarRight, leftFence.Normal);
-                    // Flip at 180 degrees (if driving in wrong direction)
-                    if (collisionAngle > MathHelper.Pi / 2)
-                        collisionAngle -= MathHelper.Pi;
+				// If 90-45 degrees (in either direction), make frontal crash
+				// + stop car + wobble camera
+				else if (Math.Abs(collisionAngle) < MathHelper.Pi * 3.0f / 4.0f)
+				{
+					HandleHeadOnCrash(car, wheelNumber, collisionAngle);
+				}
 
-                    // Just correct rotation if 0-45 degrees (slowly)
-                    if (Math.Abs(collisionAngle) < MathHelper.Pi / 4.0f)
-                    {
-                        Handle45DegreeCrash(car, wheelNumber, collisionAngle, -1);
-                    }
-
-                    // If 90-45 degrees (in either direction), make frontal crash
-                    // + stop car + wobble camera
-                    else if (Math.Abs(collisionAngle) < MathHelper.Pi * 3.0f / 4.0f)
-                    {
-                        HandleHeadOnCrash(car, wheelNumber, collisionAngle);
-                    }
-
-                    // For all collisions, kill the current car force
-                    car.Force = Vector3.Zero;
-
-                    float speedDistanceToGuardrails = car.Speed * Math.Abs(Vector3.Dot(car.Direction, leftFence.Normal));
-
-                    if (distanceFromLeftFence > 0)
-                    {
-                        car.Position += leftFence.Normal * 1.1f;
-                    }
-                }
-
-                else if (outsideRightFence)
-                {
-                    // Force car back on the road, for that calculate impulse and collision direction
-                    Vector3 collisionDir = Vector3.Reflect(car.Direction, rightFence.Normal);
-
-                    float collisionAngle = Vector3Helper.GetAngleBetweenVectors(-car.CarRight, rightFence.Normal);
-                    // Flip at 180 degrees (if driving in wrong direction)
-                    if (collisionAngle > MathHelper.Pi / 2)
-                        collisionAngle -= MathHelper.Pi;
-                    // Just correct rotation if 0-45 degrees (slowly)
-                    if (Math.Abs(collisionAngle) < MathHelper.Pi / 4.0f)
-                    {
-                        Handle45DegreeCrash(car, wheelNumber, collisionAngle, 1);
-                    }
-
-                    // If 90-45 degrees (in either direction), make frontal crash
-                    // + stop car + wobble camera
-                    else if (Math.Abs(collisionAngle) < MathHelper.Pi * 3.0f / 4.0f)
-                    {
-                        HandleHeadOnCrash(car, wheelNumber, collisionAngle);
-                    }
-
-                    // For all collisions, kill the current car force
-                    car.Force = Vector3.Zero;
-
-                    float speedDistanceToGuardrails = car.Speed * Math.Abs(Vector3.Dot(car.Direction, rightFence.Normal));
-
-                    if (distanceFromRightFence > 0)
-                    {
-                        car.Position += rightFence.Normal * 1.1f;
-                    }
-                }
-            }
+				// move away from the way slightly
+				car.Position += fenceNormal * 1.1f;
+				break;
+			}
         }
 
-        public static int GetWheelsOutsideRoadVerge(Vehicle car, TerrainSegment segment, int segmentRow)
+        public static int GetWheelsOutsideRoadVerge(Vehicle car)
         {
-            Line leftVerge = segment.LeftVerge[segmentRow < 2 ? 0 : 1];
-            Line rightVerge = segment.RightVerge[segmentRow < 2 ? 0 : 1];
+			var leftVerge1 = car.CurrentNode.GetLeftVerge();
+			var leftVerge2 = car.CurrentNode.Next.GetLeftVerge();
 
+			var rightVerge1 = car.CurrentNode.GetRightVerge();
+			var rightVerge2 = car.CurrentNode.Next.GetRightVerge();
+		
             int wheelsOutsideVerge = 0;
 
             for (int wheelNumber = 0; wheelNumber < 4; wheelNumber++)
             {
                 VehicleWheel wheel = car.Wheels[wheelNumber];
 
-                float distanceFromLeftVerge = Vector3Helper.DistanceToLine(wheel.WorldPosition, leftVerge.Point1, leftVerge.Point2);
-                float distanceFromRightVerge = Vector3Helper.DistanceToLine(wheel.WorldPosition, rightVerge.Point1, rightVerge.Point2);
-
-                Vector3 offsetPos = wheel.WorldPosition + (-rightVerge.Normal * 0.5f);
-                float offsetDistance = Vector3Helper.DistanceToLine(offsetPos, rightVerge.Point1, rightVerge.Point2);
-                bool outsideRightFence = (offsetDistance > distanceFromRightVerge);
-
-                if (outsideRightFence)
-                    wheelsOutsideVerge++;
-
-                offsetPos = wheel.WorldPosition + (-leftVerge.Normal * 0.5f);
-                offsetDistance = Vector3Helper.DistanceToLine(offsetPos, leftVerge.Point1, leftVerge.Point2);
-                bool outsideLeftFence = (offsetDistance > distanceFromLeftVerge);
-
-                if (outsideLeftFence)
-                    wheelsOutsideVerge++;
+				if (Utility.IsLeftOfLine(leftVerge2, leftVerge1, wheel.WorldPosition))
+				{
+					wheelsOutsideVerge++;
+				}
+				else if (!Utility.IsLeftOfLine(rightVerge2, rightVerge1, wheel.WorldPosition))
+				{
+					wheelsOutsideVerge++;
+				}
             }
 
             return wheelsOutsideVerge;
         }
     
 
-        private static void Handle45DegreeCrash(Vehicle car, int wheel, float collisionAngle, float direction)
+        private static void SlideAlongFence(Vehicle car, int wheel, float collisionAngle, float direction)
         {
 
             EnvironmentAudioProvider.Instance.PlayVehicleFenceCollision();
 
-            // For front wheels to full collision rotation, for back half!
+            // if we hit the front wheels, change the direction to almost match the fence direction.  If we hit the back wheels this looks weird so
+			// only rotate 50% of the way
             if (wheel < 2)
             {
-                car.RotateCarAfterCollision = direction * collisionAngle / 1.5f;
+				car.RotateCarAfterCollision = direction * collisionAngle * 0.8f;
                 car.Speed *= 0.93f;
             }
             else
             {
-                car.RotateCarAfterCollision = direction * collisionAngle / 2.5f;
+                car.RotateCarAfterCollision = direction * collisionAngle *0.5f;
                 car.Speed *= 0.96f;
             }
         }
@@ -165,9 +132,7 @@ namespace NeedForSpeed.Physics
                 car.RotateCarAfterCollision = +collisionAngle / 3.0f;
 
             // Just stop car!
-            car.Speed = 0;
-            car.Motor.Idle();
-
+			car.Speed *= -0.15f;
         }
     }
 }

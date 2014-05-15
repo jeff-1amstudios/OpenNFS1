@@ -16,12 +16,14 @@ namespace NeedForSpeed.Views
         Vehicle _car;
         FixedChaseCamera _camera;
         SpeedoControl _speedoControl;
+
+		public bool ShouldRenderPlayer { get { return true; } }
         
         public ChaseView(Vehicle car, int distance, int height, int offset)
         {
             _car = car;
             _camera = new FixedChaseCamera();
-			_camera.FieldOfView = MathHelper.ToRadians(65);
+			_camera.FieldOfView = GameConfig.FOV;
             _camera.ChaseDistance = distance;
             _camera.ChaseHeight = height;
             _camera.ChaseOffset = offset;
@@ -44,7 +46,7 @@ namespace NeedForSpeed.Views
 
         public void Deactivate()
         {
-        }
+		}
 
         public void Update(GameTime gameTime)
         {
@@ -55,7 +57,6 @@ namespace NeedForSpeed.Views
 
         public void Render()
         {
-            _car.Render();
             _speedoControl.Render(_car.Motor.Rpm / _car.Motor.RedlineRpm);
         }
 

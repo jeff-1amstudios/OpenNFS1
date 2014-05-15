@@ -18,6 +18,7 @@ namespace NeedForSpeed.Views
         public TelevisionView(Vehicle car)
         {
             _car = car;
+			_camera.FieldOfView = GameConfig.FOV;
             _camera.DesiredPositionOffset = new Vector3(80.0f, 90.0f, 80.0f);
         }
 
@@ -28,6 +29,8 @@ namespace NeedForSpeed.Views
             get { return false; }
         }
 
+		public bool ShouldRenderPlayer { get { return true; } }
+
         public void Update(GameTime gameTime)
         {
             _camera.ChaseDirection = _car.Direction;
@@ -36,7 +39,6 @@ namespace NeedForSpeed.Views
 
         public void Render()
         {
-            _car.Render();
         }
 
         public void Activate()

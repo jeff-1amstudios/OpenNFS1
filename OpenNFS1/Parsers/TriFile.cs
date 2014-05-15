@@ -92,9 +92,12 @@ namespace OpenNFS1.Parsers
 		{
 			reader.BaseStream.Position = 2444;  //start of node list
 
+			TrackNode prevNode = null;
+
 			for (int i = 0; i < 2400; i++)
 			{
 				var node = new TrackNode();
+				node.Number = Nodes.Count;
 				float vergeScale = 8000;
 
 				node.DistanceToLeftVerge = reader.ReadByte();
@@ -148,15 +151,20 @@ namespace OpenNFS1.Parsers
 				node.XOrientation = reader.ReadInt16();
 				node.unk2 = reader.ReadBytes(2);
 
+				if (prevNode != null) prevNode.Next = node;
+				prevNode = node;
 				Nodes.Add(node);
 			}
 
-			for (int i = 0; i < Nodes.Count; i++)
+			// If this is a circuit track, hook the last node up to the first
+			if (!IsOpenRoad) prevNode.Next = Nodes[0];
+			
+
+			for (int i = 0; i < Nodes.Count - 1; i++)
 			{
 				var node = Nodes[i];
-				var nextNode = Nodes[(i + 1) % Nodes.Count];
 				var normal = Vector3.Cross(node.GetRightBoundary() - node.GetLeftBoundary(),
-					nextNode.Position - node.GetLeftBoundary());
+					node.Next.Position - node.GetLeftBoundary());
 				node.Up = Vector3.Normalize(normal);
 			}
 		}
@@ -230,17 +238,14 @@ namespace OpenNFS1.Parsers
 				{
 					break;
 				}
-				if (referenceNode == 0)
-				{
-
-				}
+				
 				if (referenceNode > Nodes.Count)
 				{
 
 				}
 
 				SceneryObject2 obj = new SceneryObject2();
-				obj.ReferenceNode = referenceNode % Nodes.Count;  //why do some tracks reference nodes that don't exist?
+				obj.ReferenceNode = referenceNode % Nodes.Count;  //why do some tracks reference nodes above the node count?
 				int descriptorRef = reader.ReadByte();
 				obj.Descriptor = ObjectDescriptors[descriptorRef];
 
@@ -258,8 +263,9 @@ namespace OpenNFS1.Parsers
 			reader.BaseStream.Position = 0x1A4A8;
 
 			long fileSize = reader.BaseStream.Length;
-			bool atEnd = false;
 			long position = reader.BaseStream.Position;
+
+			TerrainSegment last = null;
 
 			while (true)
 			{
@@ -276,17 +282,14 @@ namespace OpenNFS1.Parsers
 				TerrainSegment terrainSegment = new TerrainSegment();
 				terrainSegment.TextureIds = reader.ReadBytes(10);
 
-				if (Terrain.Count == 48)
-				{
-
-				}
 				terrainSegment.Rows[0] = ReadTerrainRow(reader);
 				terrainSegment.Rows[1] = ReadTerrainRow(reader);
 				terrainSegment.Rows[2] = ReadTerrainRow(reader);
 				terrainSegment.Rows[3] = ReadTerrainRow(reader);
-				
+
 				//fenceType stores the sides of the road the fence lives, and the textureId to use for it.
 				// If the top bit is set, fence on the left exists, if next bit is set, fence is on the right.  Both can also be set. 
+				//The other 6 bits seem to the texture number
 				if (fenceType != 0)
 				{
 					bool bit7 = (fenceType & (0x1 << 7)) != 0;
@@ -300,6 +303,8 @@ namespace OpenNFS1.Parsers
 					//Debug.WriteLine("texture: " + terrainSegment.FenceTextureId + ", " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
 				}
 
+				if (last != null) last.Next = terrainSegment;
+				last = terrainSegment;
 				Terrain.Add(terrainSegment);
 
 				//skip to end of block (+12 to include block header)
@@ -308,19 +313,12 @@ namespace OpenNFS1.Parsers
 
 				if (reader.BaseStream.Position >= fileSize)
 				{
-					atEnd = true;
-					//if (_description.IsOpenRoad)
-					//{
-					//	terrainRows.Add(terrainRows[terrainRows.Count - 1]);
-					//	//else
-					//	//    terrainRows.Add(terrainRows[0]);
-					//	return;
-					//}
-				}
-
-				if (atEnd)
 					break;
+				}
 			}
+
+			// If this is a circuit track, hook the last segment up to the first
+			if (!IsOpenRoad) last.Next = Terrain[0];
 		}
 
 		private TerrainRow ReadTerrainRow(BinaryReader reader)

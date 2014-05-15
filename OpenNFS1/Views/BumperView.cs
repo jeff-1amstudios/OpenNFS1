@@ -6,6 +6,7 @@ using NfsEngine;
 using NeedForSpeed.UI;
 using NfsEngine;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace NeedForSpeed.Views
 {
@@ -18,8 +19,8 @@ namespace NeedForSpeed.Views
 		public BumperView(Vehicle car)
         {
             _car = car;
-            SimpleCamera chaseCam = new SimpleCamera();
-            _camera = chaseCam;
+			_camera = new SimpleCamera();
+			_camera.FieldOfView = GameConfig.FOV;
 
             _speedoControl = new SpeedoControl();
         }
@@ -30,6 +31,8 @@ namespace NeedForSpeed.Views
         {
             get { return true; }
         }
+
+		public bool ShouldRenderPlayer { get { return false; } }
 
         public void Activate()
         {
@@ -43,7 +46,7 @@ namespace NeedForSpeed.Views
         public void Update(GameTime gameTime)
         {
             _camera.Position = _car.Position + _car.Direction * 2.8f + new Vector3(0, 5, 0);
-            _camera.LookAt = _camera.Position + _car.Direction * 60f - new Vector3(0, _car.Pitch.Position, 0);
+            _camera.LookAt = _camera.Position + _car.Direction * 60f + new Vector3(0, _car.Pitch.Position, 0);
             _camera.UpVector = _car.UpVector; // +new Vector3(_car.Roll.Position * 0.2f, 0, 0);
             //float f = 1.8f; // _car.Roll.Position;
             //_camera.UpVector = _car.UpVector + _car.Direction * new Vector3(f, f, f);

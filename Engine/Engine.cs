@@ -15,7 +15,6 @@ namespace NfsEngine
         private static Engine _instance;
         private ContentManager _contentManager;
         private ICamera _camera;
-        private GameObject _player;
         private InputProvider _inputProvider;
         private GraphicsUtilities _graphicsUtils;
         private IWorld _world;
@@ -24,6 +23,7 @@ namespace NfsEngine
         private SpriteBatch _spriteBatch;
         public Vector2 ScreenSize;
         private bool _fullScreen;
+		public float FrameTime;
                 
         public static Engine Instance
         {
@@ -71,9 +71,10 @@ namespace NfsEngine
                 if (_fullScreen)
                     return ScreenSize.X / ScreenSize.Y;
                 else
-                {   
-                    Rectangle rect = Game.Window.ClientBounds;
-                    return (float)rect.Width / (float)rect.Height;
+                {
+					return (float)Device.Viewport.Width / (float)Device.Viewport.Height;
+                    //Rectangle rect = Game.Window.ClientBounds;
+                    //return (float)rect.Width / (float)rect.Height;
                 }
             }
         }
@@ -81,6 +82,8 @@ namespace NfsEngine
 
         public override void Update(GameTime gameTime)
         {
+			FrameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
             base.Update(gameTime);
             
             _inputProvider.Update(gameTime);
@@ -139,12 +142,6 @@ namespace NfsEngine
         {
             get { return _inputProvider; }
             set { _inputProvider = value; }
-        }
-
-        public GameObject Player
-        {
-            get { return _player; }
-            set { _player = value; }
         }
 
         public IGameScreen Mode

@@ -21,7 +21,7 @@ namespace NeedForSpeed
         {
             _car = car;
             _camera = new SimpleCamera();
-            
+			_camera.FieldOfView = GameConfig.FOV;
             _dashboard = _car.Dashboard;
         }
 
@@ -32,10 +32,12 @@ namespace NeedForSpeed
             get { return true; }
         }
 
+		public bool ShouldRenderPlayer { get { return false; } }
+
         public void Update(GameTime gameTime)
         {
-            _camera.Position = _car.Position + new Vector3(0, 10, 0);
-            _camera.LookAt = _camera.Position + _car.Direction * 60f - new Vector3(0, _car.Pitch.Position + 4.06f, 0);
+            _camera.Position = _car.Position + new Vector3(0, 5, 0);
+            _camera.LookAt = _camera.Position + _car.Direction * 60f + new Vector3(0, _car.Pitch.Position, 0);
             _camera.UpVector = _car.UpVector; // +new Vector3(_car.Roll.Position * 0.2f, 0, 0);
 
             _dashboard.Update(gameTime);
@@ -53,7 +55,6 @@ namespace NeedForSpeed
         public void Activate()
         {
             Engine.Instance.Camera = _camera;
-
             _dashboard.IsVisible = true;
         }
 

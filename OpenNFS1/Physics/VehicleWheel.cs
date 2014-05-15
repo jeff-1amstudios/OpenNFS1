@@ -8,17 +8,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace NeedForSpeed.Physics
 {
+
 	class VehicleWheel
 	{
+		public const float Width = 1.5f;
 		Vector3 _axlePoint;
 		Vehicle _car;
 		float _steeringAngle;
 		float _size;
-		Texture2D _texture;
-		Vector3 _trackPositionUnderWheel;
-        int _trackTriangleUnderWheel;
         float _rotation;
+		Texture2D _texture;
         ParticleEmitter _smokeEmitter;
+		Vector3 _renderOffset;  //we need to offset the wheel
 
         public float Rotation
         {
@@ -29,29 +30,33 @@ namespace NeedForSpeed.Physics
         public bool IsSkidding { get; set; }
 
 
-		public VehicleWheel(Vehicle car, Vector3 axlePoint, Texture2D texture, float size)
+		public VehicleWheel(Vehicle car, Vector3 axlePoint, float size, Texture2D texture, float renderXOffset)
 		{
 			_car = car;
 			_axlePoint = axlePoint;
-			_axlePoint.Y += size / 2;
-			_texture = texture;
 			_size = size;
-            _trackTriangleUnderWheel = -1;
+			_texture = texture;
+			_renderOffset = new Vector3(renderXOffset, 0, 0);
 		}
 
         public void InitializeForDriving()
         {
             if (_smokeEmitter == null)
-                _smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, _trackPositionUnderWheel);
+                _smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, BottomPosition);
         }
 
 		public Vector3 WorldPosition
 		{
 			get
 			{
-				return _car.Position + _axlePoint.Y * _car.UpVector + _car.Direction * _axlePoint.Z - (_car.CarRight) * _axlePoint.X;
+				var m = Matrix.Identity; 
+				m.Right = _car.CarRight;
+				m.Up = _car.UpVector;
+				m.Forward = _car.Direction;
+				return Vector3.Transform(_axlePoint, m * Matrix.CreateTranslation(_car.Position));
 			}
 		}
+
 
 		public Vector3 BottomPosition
 		{
@@ -63,7 +68,12 @@ namespace NeedForSpeed.Physics
 
 		public Vector3 GetOffsetPosition(Vector3 offset)
 		{
-            return (_car.Position + ((_axlePoint.Y + offset.Y) * _car.UpVector)) + _car.Direction * (_axlePoint.Z + offset.Z) -_car.CarRight * (_axlePoint.X + offset.X);
+			var m = Matrix.Identity;
+			m.Right = _car.CarRight;
+			m.Up = _car.UpVector;
+			m.Forward = _car.Direction;
+			var pos = _axlePoint + offset;
+			return Vector3.Transform(pos, m * Matrix.CreateTranslation(_car.Position));
 		}
 
 		public float Size
@@ -71,43 +81,32 @@ namespace NeedForSpeed.Physics
 			get { return _size; }
 		}
 
-		public Vector3 _lastPositionUnderWheel;
-
-		public Vector3 TrackPositionUnderWheel
-		{
-			get { return _trackPositionUnderWheel; }
-			set
-			{
-				_lastPositionUnderWheel = _trackPositionUnderWheel;
-				_trackPositionUnderWheel = value;
-			}
-		}
 
 		public void Steer(float angle)
 		{
 			_steeringAngle = -angle;
 		}
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
 			_smokeEmitter.Enabled = IsSkidding;
-            _smokeEmitter.Update(gameTime, _trackPositionUnderWheel);
+            _smokeEmitter.Update(BottomPosition);
             IsSkidding = false;
         }
 
 		public void Render()
 		{
-			Matrix carMatrix = Matrix.Identity;
-			carMatrix.Right = -_car.CarRight;
-			carMatrix.Up = _car.UpVector;
-			carMatrix.Forward = -_car.Direction;
-			carMatrix.Translation = WorldPosition;
+			Matrix carOrientation = Matrix.Identity;
+			carOrientation.Forward = _car.Direction;
+			carOrientation.Up = _car.UpVector;
+			carOrientation.Right = _car.CarRight;
 			WheelModel.Render(
-				Matrix.CreateScale(new Vector3(_size, 2.6f, _size)) *
-				Matrix.CreateRotationZ(MathHelper.ToRadians(-90)) *
+				Matrix.CreateScale(new Vector3(_size, Width, _size)) *
+				Matrix.CreateRotationZ(MathHelper.ToRadians(-90)) *  //cylinder geometry faces upwards
 				Matrix.CreateRotationX(_rotation / _size * 1.5f) *
 				Matrix.CreateRotationY(_steeringAngle * 1.3f) *
-				carMatrix,
+				carOrientation *
+				Matrix.CreateTranslation(GetOffsetPosition(_renderOffset)),
 				_texture);
 		}
 	}

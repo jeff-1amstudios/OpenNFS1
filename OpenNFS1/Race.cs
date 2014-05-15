@@ -6,6 +6,7 @@ using NeedForSpeed.Physics;
 using NfsEngine;
 using NeedForSpeed.UI.Screens;
 using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Tracks;
 
 namespace NeedForSpeed
 {
@@ -72,9 +73,9 @@ namespace NeedForSpeed
             get { return 3 - (int)new TimeSpan(DateTime.Now.Ticks - _countdownStartTime.Ticks).TotalSeconds; }
         }
 
-        public void UpdatePosition(int trackNode)
+        public void UpdatePosition(TrackNode node)
         {
-            if (trackNode == _track.CheckpointNode && _lastSegment > 30 /* so you cant reverse over the line and get 0.1sec laps */)
+            if (node.Number == _track.CheckpointNode && _lastSegment > 30 /* so you cant reverse over the line and get 0.1sec laps */)
             {
                 _lapTimes.Add((int)new TimeSpan(DateTime.Now.Ticks - _currentLapStartTime.Ticks).TotalSeconds);
                 _currentLap++;
@@ -96,7 +97,6 @@ namespace NeedForSpeed
             {
                 if (_playerVehicle.Speed > 1)
                 {
-                    ((Driver)Engine.Instance.Player).ChangeToChaseView();
                     VehicleController.ForceBrake = true;
                 }
                 else

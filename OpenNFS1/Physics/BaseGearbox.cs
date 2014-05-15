@@ -110,11 +110,11 @@ namespace NeedForSpeed.Physics
         /// </summary>
         /// <param name="motorRpmPercent">0..1 where 1 is max rpms</param>
         /// <param name="gameTime"></param>
-        public virtual void Update(float motorRpmPercent, GameTime gameTime)
+        public virtual void Update(float motorRpmPercent)
         {
             if (_gearChange != null)
             {
-                _gearChange.TimeTillEngaged -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+				_gearChange.TimeTillEngaged -= Engine.Instance.FrameTime;
 
                 if (_gearChange.TimeTillEngaged <= 0)
                 {

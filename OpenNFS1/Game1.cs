@@ -13,6 +13,7 @@ using NfsEngine;
 using NeedForSpeed.UI.Screens;
 using OpenNFS1.Parsers;
 using NeedForSpeed.Loaders;
+using OpenNFS1.Vehicles;
 
 namespace NeedForSpeed
 {
@@ -29,7 +30,7 @@ namespace NeedForSpeed
             Content.RootDirectory = "Content";
 
             _graphics.PreferredBackBufferWidth = 640;
-            _graphics.PreferredBackBufferHeight = 400;
+            _graphics.PreferredBackBufferHeight = 480;
             _graphics.PreferMultiSampling = true;
 			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
             
@@ -52,7 +53,7 @@ namespace NeedForSpeed
             Engine.Instance.ScreenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
 			
 			GameConfig.Load();
-			GameConfig.SelectedVehicle = new NeedForSpeed.Vehicles.Ferrari512();
+			GameConfig.SelectedVehicle = new PlayerCar(VehicleDescription.Descriptions.Find(a => a.Name == "ToyotaSupra"));
 			var trackDesc = TrackDescription.Descriptions.Find(a=> a.Name=="Autumn Valley");
 			TriFile tri = new TriFile(trackDesc.FileName);
 			var track = new TrackAssembler().Assemble(tri);
@@ -95,7 +96,8 @@ namespace NeedForSpeed
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            _graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+			Color c = new Color(0.1f, 0.1f, 0.1f);
+            _graphics.GraphicsDevice.Clear(c);
 
             base.Draw(gameTime);
         }

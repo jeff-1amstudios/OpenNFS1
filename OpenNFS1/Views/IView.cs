@@ -8,9 +8,11 @@ namespace NeedForSpeed.Views
     interface IView
     {
         bool Selectable { get; }
+		bool ShouldRenderPlayer { get; }
         void Update(GameTime gameTime);
         void Render();
         void Activate();
         void Deactivate();
+		
     }
 }

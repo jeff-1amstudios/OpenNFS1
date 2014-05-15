@@ -101,8 +101,6 @@ namespace NfsEngine
             Vector3 cameraPosition = _position +avgLookAt;
             _view = Matrix.CreateLookAt(cameraPosition, cameraPosition - avgLookAt + new Vector3(0,13,0), UpVector);
             _projection = Matrix.CreatePerspectiveFieldOfView(FieldOfView, Engine.Instance.AspectRatio, NearPlaneDistance, FarPlaneDistance);
-
-            //Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube, Matrix.CreateScale(3) * Matrix.CreateTranslation(_position + avgLookAt), Color.Yellow, null);
 		}
 
 		public void SetPosition(Vector3 position)

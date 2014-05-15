@@ -25,8 +25,10 @@ namespace NeedForSpeed.Loaders
 		//public static readonly int TRIANGLES_PER_ROW = 12;
 		public static readonly int TRIANGLES_PER_SEGMENT = 2; //48;
 		const int OPEN_ROAD_CHECKPOINT_SCENERYITEM_ID = 124;
+		public const int NbrTrianglesPerTerrainStrip = 8;
 		public const int NbrVerticesPerTerrainStrip = 10;
 		public const int NbrVerticesPerSegment = 10 * NbrVerticesPerTerrainStrip;
+		public const int NbrNodesPerSegment = 4;
 
 		private TrackTextureProvider _textureProvider;
 		private TriFile _tri;
@@ -44,7 +46,8 @@ namespace NeedForSpeed.Loaders
 			track.RoadNodes = _tri.Nodes;
 			track.SceneryItems = AssembleSceneryItems();
 			track.TerrainSegments = _tri.Terrain;
-			track.SetTerrainVertices(AssembleTerrainVertices());
+			track.TerrainVertexBuffer = AssembleTerrainVertices();
+			track.FenceVertexBuffer = AssembleFenceVertices();
 			track.SetHorizonTexture(_textureProvider.HorizonTexture);
 
 			// Find checkpoint scenery object and use it to mark the end of the track.
@@ -141,14 +144,14 @@ namespace NeedForSpeed.Loaders
 		}
 
 
-		private List<VertexPositionTexture> AssembleTerrainVertices()
+		private VertexBuffer AssembleTerrainVertices()
 		{
-			List<VertexPositionTexture> terrainVertices = new List<VertexPositionTexture>();
+			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
 
 			for (int segmentIndex = 0; segmentIndex < _tri.Terrain.Count; segmentIndex++)
 			{
 				var segment = _tri.Terrain[segmentIndex];
-				var nextSegment = _tri.Terrain[(segmentIndex + 1) % _tri.Terrain.Count];
+				segment.TerrainBufferIndex = vertices.Count;
 
 				//Ground textures are rotated 90 degrees, so we swap u,v coordinates around
 				float tU = 0.0f;
@@ -159,14 +162,17 @@ namespace NeedForSpeed.Loaders
 					tU = 0.0f;
 					for (int row = 0; row < TriFile.NbrRowsPerSegment; row++)
 					{
-						terrainVertices.Add(new VertexPositionTexture(segment.Rows[row].RightPoints[j], new Vector2(tU, 0.0f)));
-						terrainVertices.Add(new VertexPositionTexture(segment.Rows[row].RightPoints[j - 1], new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].RightPoints[j], new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].RightPoints[j - 1], new Vector2(tU, 1.0f)));
 						tU += 0.5f;
 					}
 
-					//attach the end of this segment to the start of the next
-					terrainVertices.Add(new VertexPositionTexture(nextSegment.Rows[0].RightPoints[j], new Vector2(tU, 0.0f)));
-					terrainVertices.Add(new VertexPositionTexture(nextSegment.Rows[0].RightPoints[j - 1], new Vector2(tU, 1.0f)));
+					//attach the end of this segment to the start of the next if its not the last
+					if (segment.Next != null)
+					{
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].RightPoints[j], new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].RightPoints[j - 1], new Vector2(tU, 1.0f)));
+					}
 				}
 
 				//Left side of road
@@ -175,88 +181,67 @@ namespace NeedForSpeed.Loaders
 					tU = 0.0f;
 					for (int row = 0; row < TriFile.NbrRowsPerSegment; row++)
 					{
-						terrainVertices.Add(new VertexPositionTexture(segment.Rows[row].LeftPoints[j - 1], new Vector2(tU, 1.0f)));
-						terrainVertices.Add(new VertexPositionTexture(segment.Rows[row].LeftPoints[j], new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].LeftPoints[j - 1], new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].LeftPoints[j], new Vector2(tU, 0.0f)));
 						tU += 0.5f;
 					}
 
-					//attach the end of this segment to the start of the next
-					terrainVertices.Add(new VertexPositionTexture(nextSegment.Rows[0].LeftPoints[j - 1], new Vector2(tU, 1.0f)));
-					terrainVertices.Add(new VertexPositionTexture(nextSegment.Rows[0].LeftPoints[j], new Vector2(tU, 0.0f)));
+					//attach the end of this segment to the start of the next if its not the last
+					if (segment.Next != null)
+					{
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].LeftPoints[j - 1], new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].LeftPoints[j], new Vector2(tU, 0.0f)));
+					}
 				}
 			}
-			
-			//for (int currentRow = rows.Count - 5; currentRow >= 0; currentRow -= 5)
+
+			var vertexBuffer = new VertexBuffer(Engine.Instance.Device, typeof(VertexPositionTexture), vertices.Count, BufferUsage.WriteOnly);
+			vertexBuffer.SetData<VertexPositionTexture>(vertices.ToArray());
+			return vertexBuffer;
+		}
+
+		// Fences are defined by the TerrainSegment. If fence is enabled, we draw a fence from row0 to row2, then row2 to row4.
+		VertexBuffer AssembleFenceVertices()
+		{
+			Vector3 fenceHeight = new Vector3(0, GameConfig.ScaleFactor * 130000, 0);
+
+			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
+
+			for (int i = 0; i < _tri.Terrain.Count; i++)
 			{
-				// Insert Fence vertices from back to front (to preserve indexing)
-				//TerrainSegment terrainSegment = terrainSegments[currentRow / 5];
-				/*
-				Vector3 right4 = GetRoadOffsetPosition(rows[currentRow + 4].RefNode, rows[currentRow + 4].RefNode.DistanceToRightBarrier);
-				Vector3 right2 = GetRoadOffsetPosition(rows[currentRow + 2].RefNode, rows[currentRow + 2].RefNode.DistanceToRightBarrier);
-				Vector3 right0 = GetRoadOffsetPosition(rows[currentRow].RefNode, rows[currentRow].RefNode.DistanceToRightBarrier);
+				var segment = _tri.Terrain[i];
+				if (!(segment.HasLeftFence | segment.HasRightFence)) continue;
 
-				Vector3 left4 = GetRoadOffsetPosition(rows[currentRow + 4].RefNode, -rows[currentRow + 4].RefNode.DistanceToLeftBarrier);
-				Vector3 left2 = GetRoadOffsetPosition(rows[currentRow + 2].RefNode, -rows[currentRow + 2].RefNode.DistanceToLeftBarrier);
-				Vector3 left0 = GetRoadOffsetPosition(rows[currentRow].RefNode, -rows[currentRow].RefNode.DistanceToLeftBarrier);
+				segment.FenceBufferIndex = vertices.Count;
+				segment.FenceTexture = _textureProvider.GetFenceTexture(segment.FenceTextureId);
+				var node0 = _tri.Nodes[i * NbrNodesPerSegment];
+				var node2 = node0.Next.Next;
+				var node4 = node2.Next.Next;
 
-				if (terrainSegment.HasRightFence)
+				if (segment.HasRightFence)
 				{
-					right0.Y = Utility.GetHeightAtPoint(rightSideTerrain, right0);
-					right2.Y = Utility.GetHeightAtPoint(rightSideTerrain, right2);
-					right4.Y = Utility.GetHeightAtPoint(rightSideTerrain, right4);
-
-					terrainVertices.InsertRange(20 * (currentRow + 5), new VertexPositionTexture[] {
-                        new VertexPositionTexture(right0, new Vector2(0, 1)),
-                        new VertexPositionTexture(right0 + fenceHeight, new Vector2(0, 0)),
-                        new VertexPositionTexture(right2, new Vector2(1.5f, 1)),
-                        new VertexPositionTexture(right2 + fenceHeight, new Vector2(1.5f, 0)),
-                        new VertexPositionTexture(right4, new Vector2(3, 1)),
-                        new VertexPositionTexture(right4 + fenceHeight, new Vector2(3, 0))
-                    });
+					vertices.Add(new VertexPositionTexture(node0.GetRightBoundary(), new Vector2(0, 1)));
+					vertices.Add(new VertexPositionTexture(node0.GetRightBoundary() + fenceHeight, new Vector2(0, 0)));
+					vertices.Add(new VertexPositionTexture(node2.GetRightBoundary(), new Vector2(1.5f, 1)));
+					vertices.Add(new VertexPositionTexture(node2.GetRightBoundary() + fenceHeight, new Vector2(1.5f, 0)));
+					vertices.Add(new VertexPositionTexture(node4.GetRightBoundary(), new Vector2(3, 1)));
+					vertices.Add(new VertexPositionTexture(node4.GetRightBoundary() + fenceHeight, new Vector2(3, 0)));
 				}
 
-				if (terrainSegment.HasLeftFence)
+				if (segment.HasRightFence)
 				{
-					left0.Y = Utility.GetHeightAtPoint(leftSideTerrain, left0);
-					left2.Y = Utility.GetHeightAtPoint(leftSideTerrain, left2);
-					left4.Y = Utility.GetHeightAtPoint(leftSideTerrain, left4);
-
-					terrainVertices.InsertRange(20 * (currentRow + 5), new VertexPositionTexture[] {
-                        new VertexPositionTexture(left0, new Vector2(0, 1)),
-                        new VertexPositionTexture(left0 + fenceHeight, new Vector2(0, 0)),
-                        new VertexPositionTexture(left2, new Vector2(1.5f, 1)),
-                        new VertexPositionTexture(left2 + fenceHeight, new Vector2(1.5f, 0)),
-                        new VertexPositionTexture(left4, new Vector2(3, 1)),
-                        new VertexPositionTexture(left4 + fenceHeight, new Vector2(3, 0))
-                    });
+					vertices.Add(new VertexPositionTexture(node0.GetLeftBoundary(), new Vector2(0, 1)));
+					vertices.Add(new VertexPositionTexture(node0.GetLeftBoundary() + fenceHeight, new Vector2(0, 0)));
+					vertices.Add(new VertexPositionTexture(node2.GetLeftBoundary(), new Vector2(1.5f, 1)));
+					vertices.Add(new VertexPositionTexture(node2.GetLeftBoundary() + fenceHeight, new Vector2(1.5f, 0)));
+					vertices.Add(new VertexPositionTexture(node4.GetLeftBoundary(), new Vector2(3, 1)));
+					vertices.Add(new VertexPositionTexture(node4.GetLeftBoundary() + fenceHeight, new Vector2(3, 0)));
 				}
-
-				terrainSegment.LeftBoundary.Add(new Line(left0, left2));
-				terrainSegment.LeftBoundary.Add(new Line(left2, left4));
-				terrainSegment.RightBoundary.Add(new Line(right0, right2));
-				terrainSegment.RightBoundary.Add(new Line(right2, right4));
-
-				right4 = GetRoadOffsetPosition(rows[currentRow + 4].RefNode, rows[currentRow + 4].RefNode.DistanceToRightVerge);
-				right2 = GetRoadOffsetPosition(rows[currentRow + 2].RefNode, rows[currentRow + 2].RefNode.DistanceToRightVerge);
-				right0 = GetRoadOffsetPosition(rows[currentRow].RefNode, rows[currentRow].RefNode.DistanceToRightVerge);
-
-				left4 = GetRoadOffsetPosition(rows[currentRow + 4].RefNode, -rows[currentRow + 4].RefNode.DistanceToLeftVerge);
-				left2 = GetRoadOffsetPosition(rows[currentRow + 2].RefNode, -rows[currentRow + 2].RefNode.DistanceToLeftVerge);
-				left0 = GetRoadOffsetPosition(rows[currentRow].RefNode, -rows[currentRow].RefNode.DistanceToLeftVerge);
-
-				terrainSegment.LeftVerge.Add(new Line(left0, left2));
-				terrainSegment.LeftVerge.Add(new Line(left2, left4));
-				terrainSegment.RightVerge.Add(new Line(right0, right2));
-				terrainSegment.RightVerge.Add(new Line(right2, right4));
-				*/
-
-				//foreach (byte textureId in terrainSegment.TextureIds)
-				//	terrainSegment.Textures.Add(_textureProvider.GetGroundTextureForNbr(textureId));
 			}
-			//var physicalTris = GeneratePhysicalVertices(roadNodes);
-			//track.SetTerrainGeometry(terrainVertices, terrainSegments, physicalTris, roadNodes);
 
-			return terrainVertices;
+			var vertexBuffer = new VertexBuffer(Engine.Instance.Device, typeof(VertexPositionTexture), vertices.Count, BufferUsage.WriteOnly);
+			vertexBuffer.SetData<VertexPositionTexture>(vertices.ToArray());
+			return vertexBuffer;
 		}
 
 		void AssembleTrackSegmentTextures()

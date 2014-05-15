@@ -8,135 +8,81 @@ namespace NeedForSpeed.Parsers
 {
     enum PolygonShape
     {
-        Unknown = 0,
-        Quad2 = 0x4,
-        Triangle = 0x83,
-        Quad = 0x84,
-        UnTexturedQuad = 0x8C,
-        Triangle2 = 0x8B
+		Triangle = 3,
+        Quad = 4,
     }
 
-    enum PolygonType
-    {
-        Normal,
-        WheelFrontLeft,
-        WheelFrontRight,
-        WheelRearRight,
-        WheelRearLeft
-    }
 
     class Polygon
     {
-        private string _textureName;
-        private PolygonShape _shape;
-        private PolygonType _type;
-        List<Vector3> _vertices = new List<Vector3>();
-        List<Vector2> _textureCoords = new List<Vector2>();
-        private int _vertexBufferIndex;
-        private Texture2D _texture;
-
-        public PolygonShape Shape
-        {
-            get { return _shape; }
-            set { _shape = value; }
-        }
-
-        internal PolygonType Type
-        {
-            get { return _type; }
-            set { _type = value; }
-        }
-
-        public string TextureName
-        {
-            get { return _textureName; }
-            set { _textureName = value; }
-        }
-
-        public List<Vector3> Vertices
-        {
-            get { return _vertices; }
-            set { _vertices = value; }
-        }
-
-        public List<Vector2> TextureCoords
-        {
-            get { return _textureCoords; }
-            set { _textureCoords = value; }
-        }
-
-        public Texture2D Texture
-        {
-            get { return _texture; }
-            set { _texture = value; }
-        }
+		public PolygonShape Shape { get; set; }
+		public string Label { get; set; }
+		public string TextureName { get; set; }
+        public Vector3[] Vertices {get ;set; }
+        public Vector2[] TextureUVs {get; set;}
+        public Texture2D Texture {get; set;}
 
         public int VertexCount
         {
             get
             {
-                if (_shape == PolygonShape.Triangle)
+                if (Shape == PolygonShape.Triangle)
                     return 3;
                 else
                     return 6;
             }
         }
 
-        public int VertexBufferIndex
+		public int VertexBufferIndex { get; set; }
+
+		bool _computeUvs;
+
+        public Polygon(PolygonShape type, bool computeUVs)
         {
-            get { return _vertexBufferIndex; }
-            set { _vertexBufferIndex = value; }
+            Shape = type;
+			_computeUvs = computeUVs;
+			Vertices = new Vector3[VertexCount];
+			TextureUVs = new Vector2[VertexCount];
+
+			if (_computeUvs)
+			{
+				TextureUVs[0] = new Vector2(0, 0);
+				TextureUVs[1] = new Vector2(1, 0);
+				TextureUVs[2] = new Vector2(1, 1);
+				TextureUVs[3] = new Vector2(0, 0);
+				TextureUVs[4] = new Vector2(1, 1);
+				TextureUVs[5] = new Vector2(0, 1);
+			}
         }
 
-        public Polygon(PolygonShape type)
+        public void ResolveTexture(BitmapEntry bmpEntry)
         {
-            _shape = type;
-        }
-
-        public void ResolveTexture(BitmapEntry texture)
-        {
-            if (texture == null)
+            if (bmpEntry == null)
             {
                 return;
             }
-            _texture = texture.Texture;
-            if (_shape == PolygonShape.UnTexturedQuad)
+            Texture = bmpEntry.Texture;
+            if (_computeUvs)  //don't need to scale our uvs based on the texture size
                 return;
 
-            for (int i =0; i < _textureCoords.Count; i++)
+			// otherwise, because the uvs are in the range 0,0,tex_width,tex_height we need to scale them to the 0,1 range
+            for (int i =0; i < VertexCount; i++)
             {
-                Vector2 coord = _textureCoords[i];
-                coord.X /= texture.Texture.Width;
-                coord.Y /= texture.Texture.Height;
-                _textureCoords[i] = coord;
+                Vector2 coord = TextureUVs[i];
+                coord.X /= bmpEntry.Texture.Width;
+                coord.Y /= bmpEntry.Texture.Height;
+                TextureUVs[i] = coord;
             }
         }
 
-        public List<VertexPositionTexture> GetVertices()
-        {
-            List<VertexPositionTexture> verts = new List<VertexPositionTexture>();
-            //if (_type == PolygonType.Triangle || _type == PolygonType.Quad)
-            //{
-                verts.Add(new VertexPositionTexture(_vertices[0], _textureCoords[0]));
-                verts.Add(new VertexPositionTexture(_vertices[1], _textureCoords[1]));
-                verts.Add(new VertexPositionTexture(_vertices[2], _textureCoords[2]));
-            //}
-            if (_shape == PolygonShape.Quad || _shape == PolygonShape.UnTexturedQuad)
-            {
-                verts.Add(new VertexPositionTexture(_vertices[3], _textureCoords[3]));
-                verts.Add(new VertexPositionTexture(_vertices[4], _textureCoords[4]));
-                verts.Add(new VertexPositionTexture(_vertices[5], _textureCoords[5]));
-            }
-            //if ()
-            //{
-            //    verts.Add(new VertexPositionTexture(_vertices[0], Vector2.Zero));
-            //    verts.Add(new VertexPositionTexture(_vertices[1], Vector2.Zero));
-            //    verts.Add(new VertexPositionTexture(_vertices[2], Vector2.Zero));
-            //    verts.Add(new VertexPositionTexture(_vertices[3], Vector2.Zero));
-            //    verts.Add(new VertexPositionTexture(_vertices[4], Vector2.Zero));
-            //    verts.Add(new VertexPositionTexture(_vertices[5], Vector2.Zero));
-            //}
-            return verts;
-        }
+		public VertexPositionTexture[] GetVertices()
+		{
+			VertexPositionTexture[] verts = new VertexPositionTexture[VertexCount];
+			for (int i = 0; i < VertexCount; i++ )
+			{
+				verts[i] = new VertexPositionTexture(Vertices[i], TextureUVs[i]);
+			}
+			return verts;
+		}
     }
 }

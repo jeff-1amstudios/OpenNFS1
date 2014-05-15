@@ -69,18 +69,18 @@ namespace NfsEngine
             AllEmitters.Add(this);
         }
 
-        public void Update(GameTime time, Vector3 newPosition)
+        public void Update(Vector3 newPosition)
         {
-            Update(time, newPosition, ParticleSystem);
+            Update(newPosition, ParticleSystem);
         }
 
         /// <summary>
         /// Updates the emitter, creating the appropriate number of particles
         /// in the appropriate positions.
         /// </summary>
-        public void Update(GameTime time, Vector3 newPosition, ParticleSystem particleSystem)
+        public void Update(Vector3 newPosition, ParticleSystem particleSystem)
         {
-			float elapsedSeconds = (float)time.ElapsedGameTime.TotalSeconds;
+			float elapsedSeconds = Engine.Instance.FrameTime;
             
             // Work out how much time has passed since the previous update.
 

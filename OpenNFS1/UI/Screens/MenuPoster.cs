@@ -29,7 +29,6 @@ namespace NeedForSpeed.UI.Screens
 
         public virtual void Render(AlphaTestEffect effect, bool selected)
         {
-            //_billboard.Texture = Engine.Instance.ContentManager.Load<Texture2D>(_textureName);
             Vector3 position = _position;
             if (selected)
             {
@@ -43,11 +42,9 @@ namespace NeedForSpeed.UI.Screens
             _billboard.Initialize();
 
             Matrix world = Matrix.CreateScale(60, 40, 1.5f) * Matrix.CreateRotationY(0.43f) * Matrix.CreateTranslation(position);
-            //Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube, world, Color.White, null);
-
 						
             TrackBillboardModel.BeginBatch();
-						effect.World = world;
+			effect.World = world;
             _billboard.Render(effect);
 
         }

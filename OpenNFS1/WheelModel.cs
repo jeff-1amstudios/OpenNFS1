@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using NfsEngine;
+using NeedForSpeed.Parsers;
 
 namespace NeedForSpeed
 {
@@ -11,15 +12,17 @@ namespace NeedForSpeed
     {
         static VertexPositionTexture[] _cylinderVertices;
         static VertexBuffer _cylinderVertexBuffer;
-        static BasicEffect _effect;
+        static AlphaTestEffect _effect;
+		static Texture2D _rubberTexture;
 
         static WheelModel()
         {
             CreateGeometry();
 
-            _effect = new BasicEffect(Engine.Instance.Device);
+            _effect = new AlphaTestEffect(Engine.Instance.Device);
             _effect.VertexColorEnabled = false;
-            _effect.AmbientLightColor = new Vector3(0.05f, 0.05f, 0.05f);
+			_rubberTexture = new Texture2D(Engine.Instance.Device, 1, 1);
+			_rubberTexture.SetData<Color>(new Color[] { new Color(0.1f, 0.1f, 0.1f) });
         }
 
         public static void BeginBatch()
@@ -30,28 +33,21 @@ namespace NeedForSpeed
             _effect.Projection = Engine.Instance.Camera.Projection;
         }
 
-        public static void Render(Matrix world, Texture2D texture)
-        {
-            _effect.World = world;
-            _effect.Texture = null;
-            _effect.LightingEnabled = false;
-            
-            foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-                Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleList, 0, 288 / 3);
-            }
+		public static void Render(Matrix world, Texture2D texture)
+		{
+			// render rubber tire part
+			_effect.World = world;
+			_effect.Texture = _rubberTexture;
+			_effect.CurrentTechnique.Passes[0].Apply();
+			Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleList, 0, 288 / 3);
 
-            _effect.Texture = texture;
-            _effect.TextureEnabled = true;
-            _effect.LightingEnabled = false;
-            
-            foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
-            {
-				pass.Apply();
-                Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleList, 288, 4);
-            }
-        }
+			// render the sides (hubs)
+			_effect.Texture = texture;
+			_effect.VertexColorEnabled = false;
+			_effect.CurrentTechnique.Passes[0].Apply();
+			Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleList, 288, 4);
+
+		}
 
         private static void CreateGeometry()
         {
@@ -65,6 +61,9 @@ namespace NeedForSpeed
             _cylinderVertices = new VertexPositionTexture[numSides * 9 + 12];
             float angleChange = (float)Math.PI / (numSides / 2);
             float angle;
+			
+			Color c = new Color(0.1f, 0.1f, 0.1f); //rubber color
+
             for (int k = 0; k < numSides; k++)
             {
                 angle = k * angleChange;
@@ -75,34 +74,37 @@ namespace NeedForSpeed
                 currentVector = new Vector3(xPos1, 0, zPos1);
                 nextVector = new Vector3(xPos2, 0, zPos2);
 
-                _cylinderVertices[k * 9 + 0] = new VertexPositionTexture(topCenter + currentVector * radius, new Vector2(0, 0));
-                _cylinderVertices[k * 9 + 1] = new VertexPositionTexture(bottomCenter + currentVector * radius, new Vector2(1, 0));
-                _cylinderVertices[k * 9 + 2] = new VertexPositionTexture(bottomCenter + nextVector * radius, new Vector2(0, 1));
+                _cylinderVertices[k * 9 + 0] = new VertexPositionTexture(topCenter + currentVector * radius, Vector2.Zero);
+				_cylinderVertices[k * 9 + 1] = new VertexPositionTexture(bottomCenter + currentVector * radius, Vector2.Zero);
+				_cylinderVertices[k * 9 + 2] = new VertexPositionTexture(bottomCenter + nextVector * radius, Vector2.Zero);
 
-                _cylinderVertices[k * 9 + 3] = new VertexPositionTexture(bottomCenter + nextVector * radius, new Vector2(0, 0));
-                _cylinderVertices[k * 9 + 5] = new VertexPositionTexture(topCenter + currentVector * radius, new Vector2(1, 0));
-                _cylinderVertices[k * 9 + 4] = new VertexPositionTexture(topCenter + nextVector * radius, new Vector2(0, 1));
+				_cylinderVertices[k * 9 + 3] = new VertexPositionTexture(bottomCenter + nextVector * radius, Vector2.Zero);
+				_cylinderVertices[k * 9 + 5] = new VertexPositionTexture(topCenter + currentVector * radius, Vector2.Zero);
+				_cylinderVertices[k * 9 + 4] = new VertexPositionTexture(topCenter + nextVector * radius, Vector2.Zero);
             }
+
+			// Add the sides of the wheel to the cylinder
 
             float y = 0.505f;
             Vector3 bottomLeftFront = new Vector3(-0.5f, y, 0.5f);
             Vector3 bottomRightFront = new Vector3(0.5f, y, 0.5f);
             Vector3 bottomLeftBack = new Vector3(-0.5f, y, -0.5f);
-            Vector3 bottomRightBack = new Vector3(0.5f, y, -0.5f);            
-            
-            _cylinderVertices[288] = new VertexPositionTexture(bottomLeftFront, new Vector2(0.0f, 0.0f));
-            _cylinderVertices[289] = new VertexPositionTexture(bottomLeftBack, new Vector2(0.0f, 1.0f));
-            _cylinderVertices[290] = new VertexPositionTexture(bottomRightBack, new Vector2(1.0f, 1.0f));
-            _cylinderVertices[291] = new VertexPositionTexture(bottomLeftFront, new Vector2(0.0f, 0.0f));
-            _cylinderVertices[292] = new VertexPositionTexture(bottomRightBack, new Vector2(1.0f, 1.0f));
-            _cylinderVertices[293] = new VertexPositionTexture(bottomRightFront, new Vector2(1.0f, 0.0f));
+            Vector3 bottomRightBack = new Vector3(0.5f, y, -0.5f);
 
-            _cylinderVertices[294] = new VertexPositionTexture(new Vector3(-0.5f, -y, 0.5f), new Vector2(0.0f, 1.0f));
-            _cylinderVertices[295] = new VertexPositionTexture(new Vector3(0.5f, -y, -0.5f), new Vector2(1.0f, 0.0f));
-            _cylinderVertices[296] = new VertexPositionTexture(new Vector3(-0.5f, -y, -0.5f), new Vector2(0.0f, 0.0f));
-            _cylinderVertices[297] = new VertexPositionTexture(new Vector3(-0.5f, -y, 0.5f), new Vector2(0.0f, 1.0f));
-            _cylinderVertices[298] = new VertexPositionTexture(new Vector3(0.5f, -y, 0.5f), new Vector2(1.0f, 1.0f));
-            _cylinderVertices[299] = new VertexPositionTexture(new Vector3(0.5f, -y, -0.5f), new Vector2(1.0f, 0.0f));
+			c = Color.White;
+			_cylinderVertices[288] = new VertexPositionTexture(bottomLeftFront, new Vector2(0.0f, 0.0f));
+			_cylinderVertices[289] = new VertexPositionTexture(bottomLeftBack, new Vector2(0.0f, 1.0f));
+			_cylinderVertices[290] = new VertexPositionTexture(bottomRightBack, new Vector2(1.0f, 1.0f));
+			_cylinderVertices[291] = new VertexPositionTexture(bottomLeftFront, new Vector2(0.0f, 0.0f));
+			_cylinderVertices[292] = new VertexPositionTexture(bottomRightBack, new Vector2(1.0f, 1.0f));
+			_cylinderVertices[293] = new VertexPositionTexture(bottomRightFront, new Vector2(1.0f, 0.0f));
+
+			_cylinderVertices[294] = new VertexPositionTexture(new Vector3(-0.5f, -y, 0.5f), new Vector2(0.0f, 1.0f));
+			_cylinderVertices[295] = new VertexPositionTexture(new Vector3(0.5f, -y, -0.5f), new Vector2(1.0f, 0.0f));
+			_cylinderVertices[296] = new VertexPositionTexture(new Vector3(-0.5f, -y, -0.5f), new Vector2(0.0f, 0.0f));
+			_cylinderVertices[297] = new VertexPositionTexture(new Vector3(-0.5f, -y, 0.5f), new Vector2(0.0f, 1.0f));
+			_cylinderVertices[298] = new VertexPositionTexture(new Vector3(0.5f, -y, 0.5f), new Vector2(1.0f, 1.0f));
+			_cylinderVertices[299] = new VertexPositionTexture(new Vector3(0.5f, -y, -0.5f), new Vector2(1.0f, 0.0f));
 
             _cylinderVertexBuffer = new VertexBuffer(Engine.Instance.Device,
                                                  typeof(VertexPositionTexture), _cylinderVertices.Length,

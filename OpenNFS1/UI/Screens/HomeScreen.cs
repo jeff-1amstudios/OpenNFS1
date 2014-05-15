@@ -30,7 +30,6 @@ namespace NeedForSpeed.UI.Screens
 		public HomeScreen()
 			: base(true)
 		{
-			Engine.Instance.Player = null;
 			_camera = new SimpleCamera();
 			_camera.LookAt = Vector3.Forward;
 			Engine.Instance.Camera = _camera;

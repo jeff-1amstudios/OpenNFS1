@@ -12,7 +12,7 @@ namespace NeedForSpeed.Vehicles
 {
     class TrafficVehicle
     {
-        private CarModel _model;
+        private CfmFile _model;
         public Vector3 Position { get; set; }
         public Vector3 Direction { get; set; }
         public int LastNode { get; set; } 
@@ -43,7 +43,7 @@ namespace NeedForSpeed.Vehicles
 
         public TrafficVehicle(int startNode, int travelDirection)
         {
-            _model = CarModelCache.GetModel(_trafficModels[Utility.RandomGenerator.Next(12)]);
+            _model = CarModelCache.GetCfm(_trafficModels[Utility.RandomGenerator.Next(12)]);
 
             LastNode = startNode;
             NextNode = startNode + travelDirection;

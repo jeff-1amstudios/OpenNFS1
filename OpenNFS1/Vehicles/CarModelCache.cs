@@ -7,13 +7,13 @@ namespace NeedForSpeed.Vehicles
 {
     static class CarModelCache
     {
-        static Dictionary<string, CarModel> _cache = new Dictionary<string,CarModel>();
+        static Dictionary<string, CfmFile> _cache = new Dictionary<string,CfmFile>();
 
-        public static CarModel GetModel(string filename)
+        public static CfmFile GetCfm(string filename)
         {
             if (!_cache.ContainsKey(filename))
             {
-                CarModel model = new CarModel(filename);
+                CfmFile model = new CfmFile(filename);
                 _cache.Add(filename, model);
                 return model;
             }

@@ -267,9 +267,9 @@ namespace NfsEngine
 		/// <summary>
 		/// Updates the particle system.
 		/// </summary>
-		public void Update(GameTime gameTime)
+		public void Update()
 		{
-			currentTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+			currentTime += Engine.Instance.FrameTime;
 
 			RetireActiveParticles();
 			FreeRetiredParticles();

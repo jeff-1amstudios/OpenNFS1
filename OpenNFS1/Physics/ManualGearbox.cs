@@ -14,14 +14,14 @@ namespace NeedForSpeed.Physics
         { }
 
 
-        public override void Update(float motorRpmPercent, GameTime gameTime)
+        public override void Update(float motorRpmPercent)
         {
             if (Engine.Instance.Input.WasPressed(Keys.A) && _currentGear < Ratios.Count - 1)
                 GearUp();
             if (Engine.Instance.Input.WasPressed(Keys.Z) && CurrentGear > -1 && _motor.CanChangeDown)
                 GearDown();
 
-            base.Update(motorRpmPercent, gameTime);
+            base.Update(motorRpmPercent);
         }
     }
 }

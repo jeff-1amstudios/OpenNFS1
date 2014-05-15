@@ -37,6 +37,8 @@ namespace NeedForSpeed.Views
             get { return false; }
         }
 
+		public bool ShouldRenderPlayer { get { return true; } }
+
         public void Update(GameTime gameTime)
         {
             _currentNodeTime += gameTime.ElapsedGameTime.TotalMilliseconds * 0.5f;

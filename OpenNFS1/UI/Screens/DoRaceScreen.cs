@@ -26,23 +26,25 @@ namespace NeedForSpeed
 		Race _race;
 		RaceUI _raceUI;
 		TrafficController _trafficController;
+		Driver _player;
+		Viewport _raceViewport, _uiViewport;
 
 		public DoRaceScreen(Track track)
 		{
 			_track = track;
 			_car = GameConfig.SelectedVehicle;
 			_car.InitializeForDriving();
-			Engine.Instance.Player = new Driver(_car, _track);
-
-			//_car._prevPosition = new Vector3()
-			//_car.Reset();
-
+			_player = new Driver(_car, _track);
+			
 			_race = new Race(2, _car, GameConfig.SelectedTrack, _track);
 			_raceUI = new RaceUI(_race);
 			_race.StartCountdown();
 
 			_trafficController = new TrafficController(_track, _car);
 			_trafficController.Enabled = GameConfig.SelectedTrack.IsOpenRoad;
+
+			_raceViewport = new Viewport(0, 0, 640, 400);
+			_uiViewport = new Viewport(0, 0, 640, 480);
 		}
 
 		#region IDrawableObject Members
@@ -58,14 +60,13 @@ namespace NeedForSpeed
 				GameConfig.Render3dScenery = !GameConfig.Render3dScenery;
 			}
 
-			Engine.Instance.Player.Update(gameTime);
+			_player.Update(gameTime);
 			Engine.Instance.Camera.Update(gameTime);
 
 			_track.Update(gameTime);
 			_trafficController.Update(gameTime);
 
-			//int currentSegment = _car.CurrentTrackTriangle / TrackAssembler.TRIANGLES_PER_SEGMENT;
-			_race.UpdatePosition(_car.CurrentTrackNode);
+			_race.UpdatePosition(_car.CurrentNode);
 
 			if (_race.HasFinished)
 			{
@@ -82,16 +83,26 @@ namespace NeedForSpeed
 
 		public void Draw()
 		{
-			Engine.Instance.Device.BlendState = BlendState.NonPremultiplied;
+			Engine.Instance.Device.BlendState = BlendState.Opaque;
 			Engine.Instance.Device.DepthStencilState = DepthStencilState.Default;
+			Engine.Instance.Device.Viewport = _raceViewport;
 			
-			_track.Render(Engine.Instance.Camera.Position, _car.CurrentTrackNode);
+			_track.Render(Engine.Instance.Camera.Position, _car.CurrentNode);
 
 			_trafficController.Render();
 
-			Engine.Instance.Player.Render();
+			if (_player.ShouldRenderCar)
+			{
+				_car.Render();
+			}
+
+			Engine.Instance.Device.Viewport = _uiViewport;
+
+			_player.Render();
 
 			_raceUI.Render();
+
+			Engine.Instance.Device.Viewport = _raceViewport;
 		}
 
 		#endregion
