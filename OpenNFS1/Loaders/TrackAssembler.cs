@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers.Track;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
@@ -10,7 +10,7 @@ using NfsEngine;
 using OpenNFS1.Parsers;
 using OpenNFS1.Tracks;
 
-namespace NeedForSpeed.Loaders
+namespace OpenNFS1.Loaders
 {
 	class SceneryObjectDescriptor
 	{
@@ -49,6 +49,7 @@ namespace NeedForSpeed.Loaders
 			track.TerrainVertexBuffer = AssembleTerrainVertices();
 			track.FenceVertexBuffer = AssembleFenceVertices();
 			track.SetHorizonTexture(_textureProvider.HorizonTexture);
+			track.IsOpenRoad = _tri.IsOpenRoad;
 
 			// Find checkpoint scenery object and use it to mark the end of the track.
 			// Or ignore it and mark the end of the track as the last node to allow us to drive past the checkpoint!
@@ -65,7 +66,7 @@ namespace NeedForSpeed.Loaders
 			}
 			else
 			{
-				track.CheckpointNode = _tri.Nodes.Count - 1;
+				track.CheckpointNode = _tri.Nodes.Count - 2;
 			}			
 
 			return track;
@@ -133,7 +134,7 @@ namespace NeedForSpeed.Loaders
 				}
 				renderObject.Size = new Vector2(obj.Descriptor.Width, obj.Descriptor.Height);
 				renderObject.SegmentRef = obj.ReferenceNode / 4;
-				renderObject.Position = _tri.Nodes[obj.ReferenceNode].Position + ((obj.RelativePosition * GameConfig.ScaleFactor) * 245);
+				renderObject.Position = _tri.Nodes[obj.ReferenceNode].Position + ((obj.RelativePosition * GameConfig.TerrainScale) * 240);
 				renderObject.Orientation = MathHelper.ToRadians((_tri.Nodes[obj.ReferenceNode].Orientation) - ((obj.Orientation / 256) * 360));
 				renderObject.Initialize();
 				renderObjects.Add(renderObject);
@@ -203,7 +204,7 @@ namespace NeedForSpeed.Loaders
 		// Fences are defined by the TerrainSegment. If fence is enabled, we draw a fence from row0 to row2, then row2 to row4.
 		VertexBuffer AssembleFenceVertices()
 		{
-			Vector3 fenceHeight = new Vector3(0, GameConfig.ScaleFactor * 130000, 0);
+			Vector3 fenceHeight = new Vector3(0, GameConfig.TerrainScale * 130000, 0);
 
 			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
 
@@ -218,6 +219,16 @@ namespace NeedForSpeed.Loaders
 				var node2 = node0.Next.Next;
 				var node4 = node2.Next.Next;
 
+				if (segment.HasLeftFence)
+				{
+					vertices.Add(new VertexPositionTexture(node0.GetLeftBoundary(), new Vector2(0, 1)));
+					vertices.Add(new VertexPositionTexture(node0.GetLeftBoundary() + fenceHeight, new Vector2(0, 0)));
+					vertices.Add(new VertexPositionTexture(node2.GetLeftBoundary(), new Vector2(1.5f, 1)));
+					vertices.Add(new VertexPositionTexture(node2.GetLeftBoundary() + fenceHeight, new Vector2(1.5f, 0)));
+					vertices.Add(new VertexPositionTexture(node4.GetLeftBoundary(), new Vector2(3, 1)));
+					vertices.Add(new VertexPositionTexture(node4.GetLeftBoundary() + fenceHeight, new Vector2(3, 0)));
+				}
+
 				if (segment.HasRightFence)
 				{
 					vertices.Add(new VertexPositionTexture(node0.GetRightBoundary(), new Vector2(0, 1)));
@@ -227,18 +238,9 @@ namespace NeedForSpeed.Loaders
 					vertices.Add(new VertexPositionTexture(node4.GetRightBoundary(), new Vector2(3, 1)));
 					vertices.Add(new VertexPositionTexture(node4.GetRightBoundary() + fenceHeight, new Vector2(3, 0)));
 				}
-
-				if (segment.HasRightFence)
-				{
-					vertices.Add(new VertexPositionTexture(node0.GetLeftBoundary(), new Vector2(0, 1)));
-					vertices.Add(new VertexPositionTexture(node0.GetLeftBoundary() + fenceHeight, new Vector2(0, 0)));
-					vertices.Add(new VertexPositionTexture(node2.GetLeftBoundary(), new Vector2(1.5f, 1)));
-					vertices.Add(new VertexPositionTexture(node2.GetLeftBoundary() + fenceHeight, new Vector2(1.5f, 0)));
-					vertices.Add(new VertexPositionTexture(node4.GetLeftBoundary(), new Vector2(3, 1)));
-					vertices.Add(new VertexPositionTexture(node4.GetLeftBoundary() + fenceHeight, new Vector2(3, 0)));
-				}
 			}
 
+			if (vertices.Count == 0) return null;
 			var vertexBuffer = new VertexBuffer(Engine.Instance.Device, typeof(VertexPositionTexture), vertices.Count, BufferUsage.WriteOnly);
 			vertexBuffer.SetData<VertexPositionTexture>(vertices.ToArray());
 			return vertexBuffer;
@@ -285,7 +287,7 @@ namespace NeedForSpeed.Loaders
 				
 
 				//Road slanting
-				float slantScale = 0.179f * GameConfig.ScaleFactor;
+				float slantScale = 0.179f * GameConfig.TerrainScale;
 				if (Math.Abs(node.Slant) > 0)
 				{
 					//currentLeft.Y -= node.Slant * node.DistanceToLeftBarrier * slantScale;

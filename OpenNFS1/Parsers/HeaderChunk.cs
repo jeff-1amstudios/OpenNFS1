@@ -5,7 +5,7 @@ using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 
-namespace NeedForSpeed.Parsers
+namespace OpenNFS1.Parsers
 {
     class HeaderChunk : BaseChunk
     {

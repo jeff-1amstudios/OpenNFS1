@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NeedForSpeed.Parsers;
+using OpenNFS1.Parsers;
 
-namespace NeedForSpeed.Vehicles
+namespace OpenNFS1.Vehicles
 {
     static class CarModelCache
     {
         static Dictionary<string, CfmFile> _cache = new Dictionary<string,CfmFile>();
 
-        public static CfmFile GetCfm(string filename)
+		public static CfmFile GetCfm(string filename, bool drivable)
         {
             if (!_cache.ContainsKey(filename))
             {
-                CfmFile model = new CfmFile(filename);
+				CfmFile model = new CfmFile(filename, drivable);
                 _cache.Add(filename, model);
                 return model;
             }

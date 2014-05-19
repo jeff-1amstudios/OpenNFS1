@@ -6,7 +6,7 @@ using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace NeedForSpeed.UI.Screens
+namespace OpenNFS1.UI.Screens
 {
     class GarageModel
     {

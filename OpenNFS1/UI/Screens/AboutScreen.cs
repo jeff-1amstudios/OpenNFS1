@@ -5,7 +5,7 @@ using NfsEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed.UI.Screens
+namespace OpenNFS1.UI.Screens
 {
     class AboutScreen : BaseUIScreen, IGameScreen
     {
@@ -39,7 +39,7 @@ namespace NeedForSpeed.UI.Screens
         {
             if (UIController.Back || UIController.Ok)
             {
-                Engine.Instance.Mode = new HomeScreen();
+                Engine.Instance.Mode = new HomeScreen2();
             }
         }
 

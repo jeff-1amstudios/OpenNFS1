@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace NeedForSpeed.Dashboards
+namespace OpenNFS1.Dashboards
 {
     enum AnimationStatus
     {
@@ -15,31 +15,31 @@ namespace NeedForSpeed.Dashboards
 
     class GearboxAnimation
     {
-        List<Vector3> _gearPositions;
+        List<Vector2> _gearPositions;
         public int Current, Next;
-        Vector3 _lastPos, _currentPosition;
+        Vector2 _lastPos, _currentPosition;
         float _amount = 0;
         AnimationStatus _status;
         float _waitAtEndOfAnimationTime;
 
         public GearboxAnimation()
         {
-            _gearPositions = new List<Vector3>();
-            _gearPositions.Add(new Vector3(35, 35, 0));
-            _gearPositions.Add(new Vector3(0, 0, 0));
-            _gearPositions.Add(new Vector3(-35, -35, 0));
-            _gearPositions.Add(new Vector3(-35, 35, 0));
-            _gearPositions.Add(new Vector3(0, -35, 0));
-            _gearPositions.Add(new Vector3(0, 35, 0));
-            _gearPositions.Add(new Vector3(35, -35, 0));
-            _gearPositions.Add(new Vector3(35, 35, 0));
+            _gearPositions = new List<Vector2>();
+            _gearPositions.Add(new Vector2(35, 35));
+            _gearPositions.Add(new Vector2(0, 0));
+            _gearPositions.Add(new Vector2(-35, -35));
+            _gearPositions.Add(new Vector2(-35, 35));
+            _gearPositions.Add(new Vector2(0, -35));
+            _gearPositions.Add(new Vector2(0, 35));
+            _gearPositions.Add(new Vector2(35, -35));
+            _gearPositions.Add(new Vector2(35, 35));
 
             _currentPosition = _gearPositions[2];
             Current = 2;
             Next = 2;
         }
 
-        public Vector3 CurrentPosition
+        public Vector2 CurrentPosition
         {
             get { return _currentPosition; }
             set { _currentPosition = value; }

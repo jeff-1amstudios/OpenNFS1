@@ -13,7 +13,7 @@ using System.Text;
 using System.IO;
 
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
     /// <summary>
     /// Vector 3 helper

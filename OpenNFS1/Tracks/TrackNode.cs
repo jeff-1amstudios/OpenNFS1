@@ -1,5 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using NeedForSpeed;
+using OpenNFS1;
 using NfsEngine;
 using System;
 using System.Collections.Generic;
@@ -20,9 +20,9 @@ namespace OpenNFS1.Tracks
 		public float Orientation;
 		public Vector3 Up;
 		public byte[] unk1, unk2;
-		public TrackNode Next;
+		public TrackNode Next, Prev;
 
-		static float SlopeMultiplier = 0.440f;
+		const float SlantMultiplier = 1.028f;
 
 		public Vector3 GetLeftBoundary()
 		{
@@ -46,27 +46,17 @@ namespace OpenNFS1.Tracks
 		{
 			Vector3 position = Position + Utility.RotatePoint(new Vector2(-offset, 0), -Orientation);
 
-			if (Math.Abs(Slant) > 0)
-			{
-				float slantScale = SlopeMultiplier * GameConfig.ScaleFactor;
-				if (Math.Abs(Slant) > 0)
-				{
-					position.Y -= Slant * offset * slantScale;
-				}
-			}
-			return position;
+			float slantAngle = (((float)Slant / short.MaxValue));
+
+			var pos3 = Vector3.Transform(new Vector3(-offset, 0, 0), Matrix.CreateRotationZ(slantAngle * SlantMultiplier) * Matrix.CreateRotationY(MathHelper.ToRadians(Orientation)));
+			return Position + pos3;
 		}
 
 		private Vector3 GetRightOffset(float offset)
 		{
-			Vector3 position = Position + Utility.RotatePoint(new Vector2(offset, 0), -Orientation);
-
-			if (Math.Abs(Slant) > 0)
-			{
-				float slantScale = SlopeMultiplier * GameConfig.ScaleFactor;
-				position.Y += Slant * offset * slantScale;
-			}
-			return position;
+			float slantAngle = (((float)Slant / short.MaxValue)); // 32000f));
+			var pos3 = Vector3.Transform(new Vector3(offset, 0, 0), Matrix.CreateRotationZ(slantAngle * SlantMultiplier) * Matrix.CreateRotationY(MathHelper.ToRadians(Orientation)));
+			return Position + pos3;
 		}
 	}
 }

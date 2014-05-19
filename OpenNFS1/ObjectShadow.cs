@@ -5,7 +5,7 @@ using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
 	class ObjectShadow
 	{

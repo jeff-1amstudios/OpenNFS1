@@ -2,11 +2,11 @@
 //using System.Collections.Generic;
 
 //using System.Text;
-//using NeedForSpeed.Parsers.Track;
+//using OpenNFS1.Parsers.Track;
 //using System.IO;
 //using Microsoft.Xna.Framework;
 
-//namespace NeedForSpeed.Loaders
+//namespace OpenNFS1.Loaders
 //{
 
 //	class Track10Loader:ITrackLoader

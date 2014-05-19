@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using NfsEngine;
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
     class GearboxGearChange
     {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     class TyreSmokeParticleSystem : ParticleSystem
     {
@@ -45,18 +45,18 @@ namespace NeedForSpeed
             settings.MaxVerticalVelocity = 10;
 
             // Create a wind effect by tilting the gravity vector sideways.
-            settings.Gravity = new Vector3(0, -5, 0);
+            settings.Gravity = new Vector3(0, -3, 0);
 
             settings.EndVelocity = 0.75f;
 
             //settings.MinRotateSpeed = -1;
             //settings.MaxRotateSpeed = 1;
 
-			settings.MinStartSize = 5;
-			settings.MaxStartSize = 10;
+			settings.MinStartSize = 1;
+			settings.MaxStartSize = 4;
 
-			settings.MinEndSize = 20;
-			settings.MaxEndSize = 30;
+			settings.MinEndSize = 3;
+			settings.MaxEndSize = 7;
         }
     }
 }

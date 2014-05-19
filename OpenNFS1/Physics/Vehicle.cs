@@ -7,18 +7,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using NfsEngine;
-using NeedForSpeed.Parsers;
-using NeedForSpeed;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers;
+using OpenNFS1;
+using OpenNFS1.Parsers.Track;
 using System.Diagnostics;
-using NeedForSpeed.Physics;
-using NeedForSpeed.Loaders;
-using NeedForSpeed.Audio;
-using NeedForSpeed.Dashboards;
+using OpenNFS1.Physics;
+using OpenNFS1.Loaders;
+using OpenNFS1.Audio;
+using OpenNFS1.Dashboards;
 using OpenNFS1.Tracks;
 
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
 	abstract class Vehicle
 	{
@@ -32,7 +32,7 @@ namespace NeedForSpeed.Physics
 		/// <summary>
 		/// Max rotation per second we use for our car.
 		/// </summary>
-		public const float MaxRotationPerSec = 2.5f;
+		public float MaxRotationPerSec = 5f;
 
 		#endregion
 
@@ -68,6 +68,7 @@ namespace NeedForSpeed.Physics
 		protected float _speed;
 		protected float _mass; //kg
 		protected float _bodyRideHeight = 0.0f;
+		private float _trackHeight;
 
 		protected Motor _motor;
 		private VehicleAudioProvider _audioProvider;
@@ -138,8 +139,6 @@ namespace NeedForSpeed.Physics
 			set { _speed = value; }
 		}
 
-		AverageValueVector3 _upVectors = new AverageValueVector3(15);
-
 		bool _allWheelsOnTrack;
 
 		protected VehicleWheel[] _wheels = new VehicleWheel[4];
@@ -164,8 +163,6 @@ namespace NeedForSpeed.Physics
 		{
 			get { return _motor; }
 		}
-
-		internal abstract BaseDashboard Dashboard { get; }
 		
 		public TrackNode CurrentNode { get; private set; }
 
@@ -185,18 +182,14 @@ namespace NeedForSpeed.Physics
 			_effect = new AlphaTestEffect(Engine.Instance.Device);
 		}
 
-		public virtual void InitializeForDriving()
+		public void EnableAudio()
 		{
 			_audioProvider.Initialize();
-
-			foreach (VehicleWheel wheel in _wheels)
-				wheel.InitializeForDriving();
 		}
 
-		public void StopDriving()
+		public void DisableAudio()
 		{
 			_audioProvider.StopAll();
-			TyreSmokeParticleSystem.Instance.Clear();
 		}
 
 
@@ -208,11 +201,11 @@ namespace NeedForSpeed.Physics
 		{
 			//front wheels
 			for (int i = 0; i < 2; i++)
-				_wheels[i].Rotation += _speed * Engine.Instance.FrameTime;
+				_wheels[i].Rotation -= _speed * Engine.Instance.FrameTime;
 
 			//back wheels
 			for (int i = 2; i < 4; i++)
-				_wheels[i].Rotation += Engine.Instance.FrameTime * (_motor.WheelsSpinning ? 50 : _speed);
+				_wheels[i].Rotation -= Engine.Instance.FrameTime * (_motor.WheelsSpinning ? 50 : _speed);
 
 			_wheels[0].Steer(_steeringWheel);
 			_wheels[1].Steer(_steeringWheel);
@@ -225,7 +218,6 @@ namespace NeedForSpeed.Physics
 
 			if (VehicleController.Turn < 0)
 			{
-				float extraForce = _steeringWheel > 0 ? 2 : 1;
 				_steeringWheel += steeringSpeed * elapsedSeconds * VehicleController.Turn;
 				_steeringWheel = Math.Max(_steeringWheel, -MaxSteeringLock);
 			}
@@ -236,9 +228,9 @@ namespace NeedForSpeed.Physics
 			}
 			else
 			{
-				if (_steeringWheel > 0.005f)
+				if (_steeringWheel > 0.05f)
 					_steeringWheel -= steeringSpeed * elapsedSeconds;
-				else if (_steeringWheel < -0.005f)
+				else if (_steeringWheel < -0.05f)
 					_steeringWheel += steeringSpeed * elapsedSeconds;
 				else
 					_steeringWheel = 0;
@@ -247,7 +239,7 @@ namespace NeedForSpeed.Physics
 			if (_speed > 0)
 				_rotationChange *= -1;
 
-			float maxRot = MaxRotationPerSec;
+			float maxRot = MaxRotationPerSec * elapsedSeconds;
 
 			// Handle car rotation after collision
 			if (_rotateCarAfterCollision != 0)
@@ -325,31 +317,40 @@ namespace NeedForSpeed.Physics
 			if (_isOnGround == false)
 				groundFriction = 0;
 
-			/* 20% for force slowdown*/
-			_force *= 1.0f - (0.275f * 0.02125f * 0.2f * (groundFriction + airFriction));
-			_speed *= 1.0f - (0.01f * 0.1f * 0.02125f * (groundFriction + airFriction));
+			_force *= 1.0f - (groundFriction + airFriction) * 0.06f * elapsedSeconds;
+			_speed *= 1.0f - (groundFriction + airFriction) * 0.0015f * elapsedSeconds;
 
 			if (_isOnGround)
 			{
-				float drag = _mass * 0.03f * elapsedSeconds * VehicleController.Brake;
-				drag += Math.Abs(_steeringWheel) * 23f * elapsedSeconds;
+				float drag = 6000f * VehicleController.Brake / (_speed * 2f);  //we should slow more quickly as our speed drops
+				float inertia = _mass;
+				drag += Math.Abs(_steeringWheel) * 10f;
 				if (Math.Abs(_speed) > 30)
 				{
-					drag += _wheelsOutsideRoad * 5f * elapsedSeconds;
+					drag += _wheelsOutsideRoad * 5f;
 				}
 
-				if (_motor.Throttle == 0 && _motor.Gearbox.GearEngaged)
-				{
-					drag += _motor.CurrentFriction * elapsedSeconds * 0.5f;
-				}
+				drag += _motor.CurrentFriction * 0.5f;
+
+				if (drag < 0) drag = 0;
 
 				if (Math.Abs(_speed) < 1)
 					drag = 0;
 
+				GameConsole.WriteLine("drag: " + drag, 1);
+
+				//_force -= _direction * drag * 100 * elapsedSeconds;
+				
 				if (_speed > 0)
-					_speed -= drag;
+				{
+					_speed -= drag * elapsedSeconds;
+					if (_speed < 0) _speed = 0; //avoid braking so hard we go backwards
+						
+				}
 				else if (_speed < 0)
-					_speed += drag;
+				{
+					_speed += drag * elapsedSeconds;
+				}
 
 
 				// Calculate pitch depending on the force
@@ -361,19 +362,16 @@ namespace NeedForSpeed.Physics
 				_carPitchSpring.Simulate(_moveFactorPerSecond);
 				_carRollSpring.Simulate(_moveFactorPerSecond);
 			}
-			else
-			{
-				//air drag
-				_speed -= (_mass * 0.001f * elapsedSeconds);
-			}
 		}
 
 		private void UpdateEngineForce()
 		{
+			_previousSpeed = _speed;
+
 			float newAccelerationForce = 0.0f;
 
 			_motor.Throttle = VehicleController.Acceleration;
-			newAccelerationForce += _motor.CurrentPowerOutput * 20;
+			newAccelerationForce += _motor.CurrentPowerOutput * 0.4f;
 
 			if (_motor.Gearbox.GearEngaged && _motor.Gearbox.CurrentGear > 0)
 			{
@@ -382,7 +380,6 @@ namespace NeedForSpeed.Physics
 				_motor.WheelsSpinning = tractionFactor < 1 || (_motor.Rpm > 0.7f && _speed < 5 && _motor.Throttle > 0);
 				if (_motor.WheelsSpinning)
 				{
-					//_force *= 0.98f;
 					_audioProvider.PlaySkid(true);
 					_wheels[2].IsSkidding = _wheels[3].IsSkidding = true;
 				}
@@ -410,19 +407,19 @@ namespace NeedForSpeed.Physics
 				_speed = 0;
 			}
 
-			// Add acceleration force to total car force, but use the current carDir!
 			if (_isOnGround)
 				_force += _direction * newAccelerationForce * (_moveFactorPerSecond) * 1f;
 
 			// Change speed with standard formula, use acceleration as our force
-			_previousSpeed = _speed;
+
 			Vector3 speedChangeVector = _force / _mass;
-			// Only use the amount important for our current direction (slower rot)
+
 			if (_isOnGround && speedChangeVector.Length() > 0)
 			{
 				float speedApplyFactor = Vector3.Dot(Vector3.Normalize(speedChangeVector), _direction);
 				if (speedApplyFactor > 1)
 					speedApplyFactor = 1;
+				GameConsole.WriteLine(speedChangeVector.Length() * speedApplyFactor, 2);
 				_speed += speedChangeVector.Length() * speedApplyFactor;
 			}
 		}
@@ -441,40 +438,40 @@ namespace NeedForSpeed.Physics
 
 		public virtual void Update(GameTime gameTime)
 		{
+			_prevPosition = _position;
 			SetMoveFactor();
 			float moveFactor = _moveFactorPerSecond;
 
 			if (Engine.Instance.Input.WasPressed(Keys.R))
 			{
 				Reset();
-			}			
+			}
 
 			float elapsedSeconds = Engine.Instance.FrameTime;
-			
-			UpdateSteering();
 
+			UpdateSteering();
 			_direction = Vector3.TransformNormal(_direction, Matrix.CreateFromAxisAngle(_up, _rotationChange));
-						
+
 			UpdateEngineForce();
 
 			UpdateDrag();
 
-			_position += _speed * _direction * moveFactor * 1f;
+			_position += _speed * _direction * moveFactor;
 
-			
+
 			_audioProvider.UpdateEngine();
 
-			#region Update track position and handle physics
-
-			Matrix trackMatrix = Matrix.Identity;
-
+			UpdateTrackNode();
 			var nextNode = CurrentNode.Next;
-			if (!Utility.IsLeftOfLine(nextNode.GetLeftBoundary(), nextNode.GetRightBoundary(), Position))
+
+			GameConsole.WriteLine("inAir: " + !_isOnGround + ", " + _direction.Y, 3);
+			GameConsole.WriteLine("slope: " + CurrentNode.Slope + ", " + nextNode.Slope, 4);
+			GameConsole.WriteLine("slope delta: " + (CurrentNode.Slope - nextNode.Slope), 5);
+			if ((CurrentNode.Slope - nextNode.Slope > 50 && _speed > 100) || Engine.Instance.Input.WasPressed(Keys.Space))
 			{
-				Debug.WriteLine("Node.b: {0},{1},{2},{3}", nextNode.b[0], nextNode.b[1], nextNode.b[2], nextNode.b[3]);
-				CurrentNode = CurrentNode.Next;
-				nextNode = CurrentNode.Next;
-				Debug.WriteLine("passed node - new node " + CurrentNode.Number);
+				_isOnGround = false;
+				_upVelocity = -0.5f;
+				_position.Y += 0.2f;
 			}
 
 			var closestPoint1 = Utility.GetClosestPointOnLine(CurrentNode.GetLeftBoundary(), CurrentNode.GetRightBoundary(), _position);
@@ -484,34 +481,56 @@ namespace NeedForSpeed.Physics
 			var carDist = Vector3.Distance(closestPoint1, _position);
 			float ratio = Math.Min(carDist / dist, 1.0f);
 
-			_up = Vector3.Lerp(CurrentNode.Up, nextNode.Up, ratio);
-			_up = Vector3.Normalize(_up);
-			_direction = Vector3.Cross(_up, CarRight);
-			
-			var height = _track.GetHeightAtPoint(CurrentNode, _position);
-			if (height != -9999)  _position.Y = height;
+			if (_isOnGround)
+			{
+				_up = Vector3.Lerp(CurrentNode.Up, nextNode.Up, ratio);
+				_up = Vector3.Normalize(_up);
+				_direction = Vector3.Cross(_up, CarRight);
+			}
 
-			groundPlaneNormal = trackMatrix.Up;
-			groundPlanePos = trackMatrix.Translation;
-			
-			UpdateCarMatrixAndCamera();
+			_trackHeight = MathHelper.Lerp(closestPoint1.Y, closestPoint2.Y, ratio); // _track.GetHeightAtPoint(CurrentNode, _position);
+			if (_trackHeight == -9999)
+			{
+				throw new Exception();
+			}
+			if (_isOnGround)
+			{
+				_position.Y = _trackHeight;
+			}
 
 			UpdateWheels();
-
-			#endregion
+			UpdateCarMatrixAndCamera();
+			ApplyGravityAndCheckForCollisions();
 		}
 
 		#endregion
+
+		private void UpdateTrackNode()
+		{
+			var nextNode = CurrentNode.Next;
+			var prevNode = CurrentNode.Prev;
+			if (!Utility.IsLeftOfLine(nextNode.GetLeftBoundary(), nextNode.GetRightBoundary(), Position))
+			{
+				CurrentNode = CurrentNode.Next;
+				Debug.WriteLine("passed node - new node " + CurrentNode.Number);
+			}
+			else if (prevNode != null && Utility.IsLeftOfLine(prevNode.GetLeftBoundary(), prevNode.GetRightBoundary(), Position))
+			{
+				CurrentNode = prevNode;
+				Debug.WriteLine("passed node (back) - new node " + CurrentNode.Number);
+			}
+		}
 
 		/// <summary>
 		/// Resets the car at the center of the current track segment
 		/// </summary>
 		public void Reset()
 		{
-			_position = CurrentNode.Position + new Vector3(0, 5, 0);
+			_position = CurrentNode.Position + new Vector3(0, 50, 0);
 			_direction = Vector3.Transform(Vector3.Forward, Matrix.CreateRotationY(MathHelper.ToRadians(CurrentNode.Orientation)));
 			_prevPosition = _position;
 			_speed = 0;
+			_isOnGround = false;
 			ScreenEffects.Instance.UnFadeScreen();
 			return;
 		}
@@ -520,7 +539,7 @@ namespace NeedForSpeed.Physics
 
 		//float gravitySpeed = 0.0f;
 
-		public void ApplyGravityAndCheckForCollisions(NeedForSpeed.Parsers.Track.Track track)
+		void ApplyGravityAndCheckForCollisions()
 		{
 			_wheelsOutsideRoad = VehicleFenceCollision.GetWheelsOutsideRoadVerge(this);
 
@@ -532,29 +551,40 @@ namespace NeedForSpeed.Physics
 
 			VehicleFenceCollision.Handle(this);
 
-			//ApplyGravity();
+			ApplyGravity();
 		}
 
+		float _upVelocity = 0;
 		float _timeInAir = 0;
 		private void ApplyGravity()
 		{
+			if (_isOnGround) return;
 
 			// Fix car on ground
-			float distFromGround = Vector3Helper.SignedDistanceToPlane(_position, groundPlanePos, groundPlaneNormal);
+			float distFromGround = _trackHeight - _position.Y;
 
 			bool wasOnGround = _isOnGround;
 
-			_isOnGround = distFromGround > -0.5f;  //underneath ground = on ground
+			_isOnGround = _position.Y < _trackHeight; // distFromGround > -0.5f;  //underneath ground = on ground
 
-			if (distFromGround > 0)
+			if (!_isOnGround)
 			{
-				_position.Y += Math.Max(0.05f, distFromGround) * _moveFactorPerSecond * 7.0f;
-				return;
+				//_position.Y += _upVelocity * Engine.Instance.FrameTime;
+				_position.Y -= Gravity * Engine.Instance.FrameTime;
+				Debug.WriteLine("inair: " + _position.Y + ", " + _direction.Y);
+				//if (_direction.Y > 0)
+				{
+					if (_timeInAir > 0.3f && _direction.Y > -0.5f)
+					_direction.Y -= _timeInAir * 0.005f;
+					_direction = Vector3.Normalize(_direction);
+					//if (_direction.Y < 0) _direction.Y = 0;
+				}
 			}
 
 			if (_isOnGround && !wasOnGround)
 			{
-				if (_timeInAir > 10)
+				Debug.WriteLine("back on ground");
+				if (_timeInAir > 0.2f)
 				{
 					_audioProvider.HitGround();
 				}
@@ -563,29 +593,14 @@ namespace NeedForSpeed.Physics
 			if (_isOnGround)
 				_timeInAir = 0;
 			else
-				_timeInAir++;
-
-
-			// Use more smooth gravity for jumping
-			float minGravity = -Gravity * 1.3f * _moveFactorPerSecond;
-
-			float fixedDist = distFromGround;
-
-			if (fixedDist < minGravity)
 			{
-				fixedDist = minGravity;
+				_timeInAir += Engine.Instance.FrameTime;
+				_upVelocity -= Engine.Instance.FrameTime * 100;
 			}
-
-			_position.Y += fixedDist;
 		}
 
 		#endregion
 
-		#region SetGuardRails
-
-		protected Vector3 groundPlanePos, groundPlaneNormal;
-
-		#endregion
 
 		public void UpdateCarMatrixAndCamera()
 		{
@@ -612,6 +627,14 @@ namespace NeedForSpeed.Physics
 			points[1] = _wheels[1].GetOffsetPosition(new Vector3(xoffset, y, -2));
 			points[2] = _wheels[2].GetOffsetPosition(new Vector3(-xoffset, y, 3.5f));
 			points[3] = _wheels[3].GetOffsetPosition(new Vector3(xoffset, y, 3.5f));
+
+			if (!_isOnGround)
+			{
+				points[0].Y = _trackHeight;
+				points[1].Y = _trackHeight;
+				points[2].Y = _trackHeight;
+				points[3].Y = _trackHeight;
+			}
 
 			ObjectShadow.Render(points);
 		}

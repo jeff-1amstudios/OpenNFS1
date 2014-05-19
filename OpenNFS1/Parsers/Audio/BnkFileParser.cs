@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 
-namespace NeedForSpeed.Parsers.Audio
+namespace OpenNFS1.Parsers.Audio
 {
 	class BnkFileParser
 	{

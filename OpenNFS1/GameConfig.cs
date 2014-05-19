@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 
 using System.Text;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Microsoft.Xna.Framework;
+using OpenNFS1.Vehicles;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     static class GameConfig
     {
-        public static Vehicle SelectedVehicle;
+        public static DrivableVehicle SelectedVehicle;
         public static TrackDescription SelectedTrack;
 
 		public static string CdDataPath { get; set; }
@@ -21,9 +22,11 @@ namespace NeedForSpeed
         public static int DrawDistance { get; set; }
         public static bool ManualGearbox { get; set; }
 		public static bool RespectOpenRoadCheckpoints { get; set; }
+		public static bool DrawDebugInfo { get; set; }
+		public static int ScreenWidth { get; set; }
 
-		public const float VehicleScaleFactor = 0.040f;
-		public const float ScaleFactor = 0.000080f;
+		public const float MeshScale = 0.040f;
+		public const float TerrainScale = 0.000080f;
 		public static float FOV = MathHelper.ToRadians(65);
 
         static GameConfig()
@@ -37,6 +40,7 @@ namespace NeedForSpeed
 			CdDataPath = o1.Value<string>("cdDataPath");
 			DrawDistance = o1.Value<int>("drawDistance");
 			RespectOpenRoadCheckpoints = o1.Value<bool>("respectOpenRoadCheckpoints");
+			DrawDebugInfo = o1.Value<bool>("drawDebugInfo");
 		}
     }
 }

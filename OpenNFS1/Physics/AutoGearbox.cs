@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using NfsEngine;
 using Microsoft.Xna.Framework.Input;
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
     class AutoGearbox : BaseGearbox
     {

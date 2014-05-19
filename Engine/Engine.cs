@@ -19,7 +19,7 @@ namespace NfsEngine
         private GraphicsUtilities _graphicsUtils;
         private IWorld _world;
         private IGameScreen _mode;
-        private GraphicsDeviceManager _graphics;
+        public GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         public Vector2 ScreenSize;
         private bool _fullScreen;
@@ -33,13 +33,11 @@ namespace NfsEngine
             }
         }
 
-        public static void Initialize(Game game, GraphicsDeviceManager graphics)
+        public static void Create(Game game, GraphicsDeviceManager graphics)
         {
             Debug.Assert(_instance == null);
-            _instance = new Engine(game);
-            
+            _instance = new Engine(game);            
             _instance.EngineStartup(graphics);
-                       
         }
 
         
@@ -60,8 +58,6 @@ namespace NfsEngine
             _graphicsUtils = new GraphicsUtilities();
             _spriteBatch = new SpriteBatch(Device);
             base.Game.Components.Add(this);
-
-            _instance._fullScreen = graphics.IsFullScreen;
         }
 
         public float AspectRatio

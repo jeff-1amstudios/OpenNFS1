@@ -3,9 +3,9 @@
 
 //using System.Text;
 //using System.IO;
-//using NeedForSpeed.Parsers.Track;
+//using OpenNFS1.Parsers.Track;
 
-//namespace NeedForSpeed.Loaders
+//namespace OpenNFS1.Loaders
 //{
 //	interface ITrackLoader
 //	{

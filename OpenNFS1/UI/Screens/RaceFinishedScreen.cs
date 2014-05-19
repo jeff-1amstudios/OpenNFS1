@@ -4,9 +4,9 @@ using System.Text;
 using NfsEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers.Track;
 
-namespace NeedForSpeed.UI.Screens
+namespace OpenNFS1.UI.Screens
 {
     class RaceFinishedScreen : BaseUIScreen, IGameScreen
     {
@@ -32,7 +32,7 @@ namespace NeedForSpeed.UI.Screens
         {
             if (UIController.Back)
             {
-                Engine.Instance.Mode = new ChooseTrackScreen();
+                Engine.Instance.Mode = new HomeScreen2();
             }
 
             if (UIController.Up && _selectedOption > 0)
@@ -43,7 +43,7 @@ namespace NeedForSpeed.UI.Screens
             if (UIController.Ok)
             {
                 if (_selectedOption == 0)
-                    Engine.Instance.Mode = new ChooseTrackScreen();
+                    Engine.Instance.Mode = new HomeScreen2();
                 else
                 {
                     if (!_race.TrackDescription.IsOpenRoad)
@@ -52,7 +52,7 @@ namespace NeedForSpeed.UI.Screens
                     {
                         GameConfig.SelectedTrack = TrackDescription.GetNextOpenRoadStage(GameConfig.SelectedTrack);
                         if (GameConfig.SelectedTrack == null)
-                            Engine.Instance.Mode = new ChooseTrackScreen();
+                            Engine.Instance.Mode = new HomeScreen2();
                         else
                             Engine.Instance.Mode = new LoadRaceScreen();
                     }

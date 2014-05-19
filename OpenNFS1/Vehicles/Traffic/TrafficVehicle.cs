@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Parsers;
+using OpenNFS1.Parsers;
 using NfsEngine;
-using NeedForSpeed.Dashboards;
+using OpenNFS1.Dashboards;
 using NfsEngine;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed.Vehicles
+namespace OpenNFS1.Vehicles
 {
     class TrafficVehicle
     {
@@ -43,7 +44,7 @@ namespace NeedForSpeed.Vehicles
 
         public TrafficVehicle(int startNode, int travelDirection)
         {
-            _model = CarModelCache.GetCfm(_trafficModels[Utility.RandomGenerator.Next(12)]);
+            _model = CarModelCache.GetCfm(_trafficModels[Utility.RandomGenerator.Next(12)], false);
 
             LastNode = startNode;
             NextNode = startNode + travelDirection;
@@ -51,25 +52,28 @@ namespace NeedForSpeed.Vehicles
         }
 
 
-        public void Render()
+        public void Render(AlphaTestEffect effect)
         {
             float turnAround = TravelDirection == -1 ? MathHelper.Pi : 0;
             Matrix matrix =
                 Matrix.CreateFromYawPitchRoll(MathHelper.ToRadians(Direction.Y) + turnAround, Direction.X * TravelDirection, Direction.Z * TravelDirection) *
                 Matrix.CreateTranslation(Position);
 
-            if (DistanceFromPlayer < 20)
+			effect.World = matrix;
+
+            //if (DistanceFromPlayer < 20)
             {
+				var bb = _model.Mesh.BoundingBox;
                 Vector3[] points = new Vector3[4];
 
-                points[1] = new Vector3(-12, 0, 35);
-                points[0] = new Vector3(12, 0, 35);
-                points[3] = new Vector3(-12, 0, -35);
-                points[2] = new Vector3(12, 0, -35);
+                points[1] = new Vector3(bb.Min.X, 0, bb.Max.Z);
+                points[0] = new Vector3(bb.Max.X, 0, bb.Max.Z);
+                points[3] = new Vector3(bb.Min.X, 0, bb.Min.Z);
+                points[2] = new Vector3(bb.Max.X, 0, bb.Min.Z);
                 ObjectShadow.Render(points, matrix);
             }
-            
-            //_model.Render(Matrix.CreateScale(0.09f) * matrix, false);
+
+			_model.Mesh.Render(effect);
         }
     }
 }

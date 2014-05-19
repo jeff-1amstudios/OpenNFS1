@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers.Track;
 using NfsEngine;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 
-namespace NeedForSpeed.Views
+namespace OpenNFS1.Views
 {
-    class TelevisionView : IView
+	class TelevisionView : BaseExternalView, IView
     {
         ChaseCamera _camera = new ChaseCamera();
         Vehicle _car;
@@ -39,6 +39,7 @@ namespace NeedForSpeed.Views
 
         public void Render()
         {
+			RenderBackground(_car);
         }
 
         public void Activate()

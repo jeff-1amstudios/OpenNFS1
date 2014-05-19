@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using System.Text;
 using NfsEngine;
 using NfsEngine;
-using NeedForSpeed.Views;
-using NeedForSpeed.Dashboards;
+using OpenNFS1.Views;
+using OpenNFS1.Dashboards;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using Microsoft.Xna.Framework.Graphics;
+using OpenNFS1.Vehicles;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     class DashboardView : IView
     {
-        Vehicle _car;
+        DrivableVehicle _car;
         SimpleCamera _camera;
-        private BaseDashboard _dashboard;
+        private Dashboard _dashboard;
                 
-        public DashboardView(Vehicle car)
+        public DashboardView(DrivableVehicle car)
         {
             _car = car;
             _camera = new SimpleCamera();
@@ -45,7 +46,7 @@ namespace NeedForSpeed
 
         public void Render()
         {
-            Engine.Instance.SpriteBatch.Begin();
+			Engine.Instance.SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.NonPremultiplied);
 
             _dashboard.Render();
 

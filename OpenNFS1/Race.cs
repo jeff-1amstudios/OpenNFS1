@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 
 using System.Text;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using NfsEngine;
-using NeedForSpeed.UI.Screens;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.UI.Screens;
+using OpenNFS1.Parsers.Track;
 using OpenNFS1.Tracks;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     class Race
     {

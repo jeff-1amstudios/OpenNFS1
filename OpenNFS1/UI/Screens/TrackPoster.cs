@@ -5,10 +5,10 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using NfsEngine;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers.Track;
 using Microsoft.Xna.Framework.Input;
 
-namespace NeedForSpeed.UI.Screens
+namespace OpenNFS1.UI.Screens
 {
     class TrackPoster : MenuPoster
     {

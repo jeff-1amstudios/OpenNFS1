@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers.Track;
 using Microsoft.Xna.Framework;
 using NfsEngine;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using OpenNFS1.Tracks;
+using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed.Vehicles
+namespace OpenNFS1.Vehicles
 {
     class TrafficController
     {
         Track _track;
         Vehicle _player;
         List<TrafficVehicle> _traffic = new List<TrafficVehicle>();
+		AlphaTestEffect _effect;
+
         public bool Enabled { get; set; }
 
         public TrafficController(Track track, Vehicle player)
@@ -21,6 +24,7 @@ namespace NeedForSpeed.Vehicles
             _track = track;
             _player = player;
             Enabled = true;
+			_effect = new AlphaTestEffect(Engine.Instance.Device);
         }
 
         public void Update(GameTime gameTime)
@@ -70,7 +74,7 @@ namespace NeedForSpeed.Vehicles
                 //laneOffset = 25;
                 Vector3 offset = Utility.RotatePoint(new Vector2(vehicle.TravelDirection * laneOffset, 0), -_track.RoadNodes[vehicle.LastNode].Orientation);
                 vehicle.Position = Vector3.Lerp(_track.RoadNodes[vehicle.LastNode].Position, nextNode.Position, vehicle.DistanceBetweenNodes) + offset;
-                vehicle.DistanceBetweenNodes += (float)gameTime.ElapsedGameTime.TotalSeconds * 5f;
+                vehicle.DistanceBetweenNodes += (float)gameTime.ElapsedGameTime.TotalSeconds * 3f;
             }
 
             while (_traffic.Count < 5)
@@ -86,10 +90,13 @@ namespace NeedForSpeed.Vehicles
         {
             if (!Enabled) return;
 
+			_effect.View = Engine.Instance.Camera.View;
+			_effect.Projection = Engine.Instance.Camera.Projection;
+
             foreach (TrafficVehicle t in _traffic)
             {
-                if (t.Position != Vector3.Zero && t.DistanceFromPlayer < GameConfig.DrawDistance * 3)
-                    t.Render();
+                if (t.Position != Vector3.Zero && t.DistanceFromPlayer < GameConfig.DrawDistance)
+                    t.Render(_effect);
             }
         }
     }

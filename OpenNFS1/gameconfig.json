@@ -1,5 +1,6 @@
 ﻿{
 	"cdDataPath": "C:\\Games\\NFSSE - Copy",
-	"drawDistance": 30,
-	"respectOpenRoadCheckpoints": true
+	"drawDistance": 25,
+	"respectOpenRoadCheckpoints": true,
+	"drawDebugInfo": false
 }

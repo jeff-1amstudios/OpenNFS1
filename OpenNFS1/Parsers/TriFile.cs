@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1;
+using OpenNFS1.Parsers.Track;
 using OpenNFS1.Tracks;
 using System;
 using System.Collections.Generic;
@@ -79,12 +79,7 @@ namespace OpenNFS1.Parsers
 			ParseSceneryObjectsBlock(reader);
 			ParseTerrainBlock(reader);
 			ComputeAbsoluteTerrainPoints();
-
-			if (Vector3.Distance(Nodes[0].Position, Nodes[Nodes.Count - 1].Position) > 100)
-			{
-				IsOpenRoad = true;
-			}
-
+			
 			reader.Close();
 		}
 
@@ -101,37 +96,47 @@ namespace OpenNFS1.Parsers
 				float vergeScale = 8000;
 
 				node.DistanceToLeftVerge = reader.ReadByte();
+				node.DistanceToLeftVerge *= GameConfig.TerrainScale * vergeScale;
+				node.DistanceToRightVerge = reader.ReadByte();
+				node.DistanceToRightVerge *= GameConfig.TerrainScale * vergeScale;
+				node.DistanceToLeftBarrier = reader.ReadByte();
+				node.DistanceToLeftBarrier *= GameConfig.TerrainScale * vergeScale;
+				node.DistanceToRightBarrier = reader.ReadByte();
+				node.DistanceToRightBarrier *= GameConfig.TerrainScale * vergeScale;
+
+				node.b = reader.ReadBytes(4);
 
 				// unused trackNodes are filled with zeroes, so stop when we have a node with a zero position
-				if (node.DistanceToLeftVerge == 0)
+				if (node.b[1] == 0 && node.b[3] == 0)
 				{
 					break;
 				}
-				node.DistanceToLeftVerge *= GameConfig.ScaleFactor * vergeScale;
-				node.DistanceToRightVerge = reader.ReadByte();
-				node.DistanceToRightVerge *= GameConfig.ScaleFactor * vergeScale;
-				node.DistanceToLeftBarrier = reader.ReadByte();
-				node.DistanceToLeftBarrier *= GameConfig.ScaleFactor * vergeScale;
-				node.DistanceToRightBarrier = reader.ReadByte();
-				node.DistanceToRightBarrier *= GameConfig.ScaleFactor * vergeScale;
-
-				node.b = reader.ReadBytes(4);
 				
-				Debug.WriteLine("{0},{1},{2},{3}", node.b[0], node.b[1], node.b[2], node.b[3]);
+				//Debug.WriteLine("{0},{1},{2},{3}", node.b[0], node.b[1], node.b[2], node.b[3]);
 
 				if (node.b[2] != 0 && node.b[2] != 34 && node.b[2] != 2)
 				{
 
 				}
 
-				node.Position = new Vector3(reader.ReadInt32(), reader.ReadInt32(), -reader.ReadInt32()) * GameConfig.ScaleFactor;
+				node.Position = new Vector3(reader.ReadInt32(), reader.ReadInt32(), -reader.ReadInt32()) * GameConfig.TerrainScale;
 
 
-				Int16 sl = reader.ReadInt16();
-				sl /= 0x3ff;
-				if (sl > 8192)
-					sl -= 16384;
-				node.Slope = sl;
+				// Slope is stored as a 2's complement value.  Convert it back to signed value
+				Int16 slope = reader.ReadInt16();
+				//bool msbSet = (slope & (0x1 << 13)) != 0;
+				//if (msbSet)
+				//{
+				//	slope = (short)~slope;
+				//	slope++;
+				//	slope *= -1;
+				//}
+				if (slope > 0x2000)
+				{
+					slope -= 0x3FFF;
+				}
+				
+				node.Slope = slope;
 
 				node.Slant = reader.ReadInt16(); //weird slant-A
 
@@ -151,13 +156,30 @@ namespace OpenNFS1.Parsers
 				node.XOrientation = reader.ReadInt16();
 				node.unk2 = reader.ReadBytes(2);
 
-				if (prevNode != null) prevNode.Next = node;
+				if (node.Number == 365)
+				{
+					node.GetLeftBoundary();
+				}
+
+				if (prevNode != null)
+				{
+					prevNode.Next = node;
+					node.Prev = prevNode;
+				}
 				prevNode = node;
 				Nodes.Add(node);
 			}
 
 			// If this is a circuit track, hook the last node up to the first
-			if (!IsOpenRoad) prevNode.Next = Nodes[0];
+			if (Vector3.Distance(Nodes[0].Position, Nodes[Nodes.Count - 1].Position) > 100)
+			{
+				IsOpenRoad = true;
+			}
+			else
+			{
+				prevNode.Next = Nodes[0];
+				Nodes[0].Prev = prevNode;
+			}
 			
 
 			for (int i = 0; i < Nodes.Count - 1; i++)
@@ -188,9 +210,9 @@ namespace OpenNFS1.Parsers
 				sd.Flags = (SceneryFlags)bytes[0];
 				sd.Type = (SceneryType)bytes[1];
 				sd.Width = BitConverter.ToInt16(bytes, 6);
-				sd.Width *= GameConfig.ScaleFactor * 65000;
+				sd.Width *= GameConfig.TerrainScale * 65000;
 				sd.Height = BitConverter.ToInt16(bytes, 14);
-				sd.Height *= GameConfig.ScaleFactor * 65000;
+				sd.Height *= GameConfig.TerrainScale * 65000;
 				sd.ResourceId = bytes[2];
 
 				if (sd.Type == SceneryType.TwoSidedBitmap)
@@ -303,7 +325,11 @@ namespace OpenNFS1.Parsers
 					//Debug.WriteLine("texture: " + terrainSegment.FenceTextureId + ", " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
 				}
 
-				if (last != null) last.Next = terrainSegment;
+				if (last != null)
+				{
+					last.Next = terrainSegment;
+					terrainSegment.Prev = last;
+				}
 				last = terrainSegment;
 				Terrain.Add(terrainSegment);
 
@@ -318,7 +344,11 @@ namespace OpenNFS1.Parsers
 			}
 
 			// If this is a circuit track, hook the last segment up to the first
-			if (!IsOpenRoad) last.Next = Terrain[0];
+			if (!IsOpenRoad)
+			{
+				last.Next = Terrain[0];
+				Terrain[0].Prev = last;
+			}
 		}
 
 		private TerrainRow ReadTerrainRow(BinaryReader reader)
@@ -333,20 +363,20 @@ namespace OpenNFS1.Parsers
 
 			}
 
-			row.MiddlePoint *= GameConfig.ScaleFactor;
+			row.MiddlePoint *= GameConfig.TerrainScale;
 			row.RightPoints[0] = row.MiddlePoint;
- 			row.RightPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.RightPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.RightPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.RightPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.RightPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
+ 			row.RightPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.RightPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.RightPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.RightPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.RightPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
 
 			row.LeftPoints[0] = row.MiddlePoint;
-			row.LeftPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.LeftPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.LeftPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.LeftPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
-			row.LeftPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.ScaleFactor;
+			row.LeftPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.LeftPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.LeftPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.LeftPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.LeftPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
 			
 
 			// Each point is relative to the previous point

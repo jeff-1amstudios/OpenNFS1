@@ -4,7 +4,7 @@ using System.Text;
 using NfsEngine;
 using Microsoft.Xna.Framework.Input;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     static class VehicleController
     {

@@ -4,9 +4,9 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using NfsEngine;
-using NeedForSpeed.Parsers;
+using OpenNFS1.Parsers;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     static class WheelModel
     {

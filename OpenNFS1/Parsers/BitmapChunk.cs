@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
-namespace NeedForSpeed.Parsers
+namespace OpenNFS1.Parsers
 {
     enum BitmapEntryType
     {
@@ -21,23 +21,26 @@ namespace NeedForSpeed.Parsers
     {
         public string Id;
         public int Offset;
+		public int Length;
         public int Code;
         public Texture2D Texture;
         public BitmapEntryType Type;
-        public int Unknown;
-        public Vector2 DisplayAt;
+		public short[] Misc = new short[4];  //different purposes for different types of bitmaps
 
         public override string ToString()
         {
             return Id;
         }
+
+		// these misc fields are often used by UI bitmaps to define where they should be displayed
+		public Vector2 GetDisplayAt()
+		{
+			return new Vector2(Misc[2], Misc[3]);
+		}
     }
 
     class BitmapChunk : BaseChunk
     {
-        static byte[] _palette;
-        
-                
         List<BitmapEntry> _bitmaps = new List<BitmapEntry>();
 
         internal List<BitmapEntry> Bitmaps
@@ -49,8 +52,12 @@ namespace NeedForSpeed.Parsers
 
         public static void ResetPalette()
         {
+			_lastPalette = _palette;
             _palette = null;
         }
+
+		public static byte[] _palette;
+		private static byte[] _lastPalette;  //some files don't have their own palettes, in that case, use the last palette we loaded
         
         public override void Read(BinaryReader reader)
         {            
@@ -94,61 +101,87 @@ namespace NeedForSpeed.Parsers
 
         private void ReadEntry(BinaryReader reader, BitmapEntry entry)
         {
-            int code = reader.ReadInt32();
+            int iCode = reader.ReadInt32();
 
-            entry.Code = code & 0xFF;
-            
-            int length = code >> 8;
+            entry.Code = (int)(iCode & 0x7F);            
+            entry.Length = iCode >> 8;
 
             int width = reader.ReadInt16();
             int height = reader.ReadInt16();
-            entry.Unknown = reader.ReadInt32();
-            entry.DisplayAt = new Vector2(reader.ReadInt16(), reader.ReadInt16());
+
+			entry.Misc[0] = reader.ReadInt16();
+			entry.Misc[1] = reader.ReadInt16();
+			entry.Misc[2] = reader.ReadInt16();
+			entry.Misc[3] = reader.ReadInt16();
+
+			if (entry.Code == 0x7b)
+			{
+				//regular bitmap
+				int code = entry.Code;
+				int nattach = 0;
+				int auxoffs = 0;
+				int nxoffs = 0;
+				while (code >> 8 != 0)
+				{
+					nattach++;
+					auxoffs += (code >> 8);
+					if (auxoffs > nxoffs)
+					{
+					}
+				}
+			}
 
             if (entry.Id.ToUpper() == "!PAL")
             {
                 _palette = LoadPalette(reader, entry.Code);
+				entry.Type = BitmapEntryType.Palette;
             }
             else
             {
-                ReadTexture(reader, entry, width, height, code);
+                ReadTexture(reader, entry, width, height);
             }
         }
 
-        private void ReadTexture(BinaryReader reader, BitmapEntry entry, int width, int height, int length)
-        {
-            byte[] pixelData = reader.ReadBytes(width * height);
+		private void ReadTexture(BinaryReader reader, BitmapEntry entry, int width, int height)
+		{
+			byte[] pixelData = reader.ReadBytes(width * height);
 
-            if (_palette == null)
-            {
-                byte[] header = reader.ReadBytes(16);
-                byte[] palette = LoadPalette(reader, header[0]);
-                TextureGenerator tg = new TextureGenerator(palette);
-                entry.Texture = tg.Generate(_bitmaps, entry, pixelData, width, height, Index.ToString("000_"));
-                entry.Type = BitmapEntryType.Texture;
-            }
-            else
-            {
-                TextureGenerator tg = new TextureGenerator(_palette);
-                entry.Texture = tg.Generate(_bitmaps, entry, pixelData, width, height, Index.ToString("000_"));
-                entry.Type = BitmapEntryType.Texture;
-            }
-        }
+			if (_palette == null)
+			{
+				byte[] header = reader.ReadBytes(16);
+				byte[] palette = LoadPalette(reader, header[0]);
+				_palette = _lastPalette;
+			}
+
+			TextureGenerator tg = new TextureGenerator(_palette);
+			entry.Texture = tg.Generate(_bitmaps, entry, pixelData, width, height, Index.ToString("000_"));
+			entry.Type = BitmapEntryType.Texture;
+		}
 
 
         public byte[] LoadPalette(BinaryReader reader, int code)
         {
-            byte[] paletteBuffer = reader.ReadBytes(3 * 256);
-            
-            if (code == 0x22)
-            {
-                for (int i = 0; i < 768; i++)
-                {
-                    paletteBuffer[i] = (byte)Math.Min(255, Math.Round((float)paletteBuffer[i] * 4));
-                }
-            }
+			byte[] pal = reader.ReadBytes(3 * 256);
 
-            return paletteBuffer;
+			// 0x22 palettes are DOS-style. r,g,b values in range 0..64
+			if (code == 0x22)
+			{
+				for (int i = 0; i < 768; i++)
+				{
+					pal[i] = (byte)(pal[i] << 2);
+				}
+			}
+
+			// 0x24 palettes have r,g,b in range 0..255
+			else if (code == 0x24)
+			{
+			}
+			else
+			{
+
+			}
+
+			return pal;
         }
 
         public BitmapEntry FindByName(string name)

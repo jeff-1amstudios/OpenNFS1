@@ -354,7 +354,6 @@ namespace NfsEngine
 		/// </summary>
 		public void Render()
 		{
-			return;
 			GraphicsDevice device = Engine.Instance.Device;
 			
 			ICamera camera = Engine.Instance.Camera;
@@ -424,6 +423,7 @@ namespace NfsEngine
 				// Reset some of the renderstates that we changed,
 				// so as not to mess up any other subsequent drawing.
 				device.DepthStencilState = DepthStencilState.Default;
+				device.BlendState = BlendState.Opaque;
 			}
 
 			drawCounter++;
@@ -537,7 +537,7 @@ namespace NfsEngine
 
 		void SetParticleRenderStates()
 		{
-
+			Engine.Instance.Device.BlendState = BlendState.NonPremultiplied;
 			// Set the alpha blend mode.
 			//renderState.AlphaBlendEnable = true;
 			//renderState.AlphaBlendOperation = BlendFunction.Add;

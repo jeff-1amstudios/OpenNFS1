@@ -6,10 +6,12 @@ using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.Loaders;
+using OpenNFS1.Loaders;
 using OpenNFS1.Tracks;
+using Microsoft.Xna.Framework.Input;
+using OpenNFS1.Vehicles;
 
-namespace NeedForSpeed.Parsers.Track
+namespace OpenNFS1.Parsers.Track
 {
 
 	class Track
@@ -25,10 +27,9 @@ namespace NeedForSpeed.Parsers.Track
 		public List<TerrainSegment> TerrainSegments { get; set; }
 		public VertexBuffer TerrainVertexBuffer { get; set; }
 		public VertexBuffer FenceVertexBuffer { get; set; }
-
 		public Vector3 StartPosition { get; set; }
-
 		public int CheckpointNode { get; set; }
+		public bool IsOpenRoad { get; set; }
 
 		public Track()
 		{
@@ -43,6 +44,13 @@ namespace NeedForSpeed.Parsers.Track
 		public void SetHorizonTexture(Texture2D horizon)
 		{
 			_skybox = new TrackSkyBox(horizon);
+		}
+
+		public void AddVehicle(DrivableVehicle vehicle)
+		{
+			vehicle.Position = StartPosition + new Vector3(0, 2, 0);
+			vehicle.Direction = Vector3.Forward;
+			vehicle.Track = this;
 		}
 
 		public void Update(GameTime gameTime)
@@ -62,11 +70,15 @@ namespace NeedForSpeed.Parsers.Track
 			_effect.World = Matrix.Identity;
 
 			int segmentIndex = currentNode.Number / 4;
-
+			
 			// Draw from 1 segment behind ourselves
 			segmentIndex -= 1;
 			if (segmentIndex < 0)
-				segmentIndex = TerrainSegments.Count + (segmentIndex - 1);
+			{
+				if (IsOpenRoad) segmentIndex = 0;
+				else
+					segmentIndex = TerrainSegments.Count + (segmentIndex - 1);  //wrap around
+			}				
 
 			var startSegment = TerrainSegments[segmentIndex];
 
@@ -99,40 +111,45 @@ namespace NeedForSpeed.Parsers.Track
 
 			DrawScenery(renderedSegments);
 
-			Engine.Instance.Device.SetVertexBuffer(FenceVertexBuffer);
-			_effect.World = Matrix.Identity;
-			_effect.CurrentTechnique.Passes[0].Apply();
-			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
-			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
-			segment = startSegment;
-			for (int i = 0; i < GameConfig.DrawDistance; i++)
+			if (FenceVertexBuffer != null)
 			{
-				DrawFenceStrips(segment);
-				segment = segment.Next;
-				if (segment == null) break;
+				Engine.Instance.Device.SetVertexBuffer(FenceVertexBuffer);
+				_effect.World = Matrix.Identity;
+				_effect.CurrentTechnique.Passes[0].Apply();
+				Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
+				Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
+				segment = startSegment;
+				for (int i = 0; i < GameConfig.DrawDistance; i++)
+				{
+					DrawFenceStrips(segment);
+					segment = segment.Next;
+					if (segment == null) break;
+				}
 			}
 
-			//var node = currentNode;
-			//for (int i = 0; i < 30; i++)
-			//{
+			if (GameConfig.DrawDebugInfo)
+			{
+				var node = currentNode;
+				for (int i = 0; i < GameConfig.DrawDistance; i++)
+				{
+					Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
+						Matrix.CreateTranslation(node.Position), Color.Yellow,
+						null);
 
-			//	//Engine.Instance.GraphicsUtils.AddLine(RoadNodes[i].Position, RoadNodes[i].Position + RoadNodes[i].Up * 50, Color.Yellow);
+					Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
+						Matrix.CreateTranslation(node.GetLeftBoundary()), Color.Yellow,
+						null);
 
-			//	Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-			//		Matrix.CreateTranslation(node.Position), Color.Yellow,
-			//		null);
+					Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
+						Matrix.CreateTranslation(node.GetRightBoundary()), Color.Yellow,
+						null);
 
-			//	Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-			//		Matrix.CreateTranslation(node.GetLeftBoundary()), Color.Yellow,
-			//		null);
+					Engine.Instance.GraphicsUtils.AddLine(node.GetLeftBoundary(), node.GetRightBoundary(), Color.Yellow);
 
-			//	Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-			//		Matrix.CreateTranslation(node.GetRightBoundary()), Color.Yellow,
-			//		null);
-
-			//	node = node.Next;
-			//	if (node == null) break;
-			//}/*
+					node = node.Next;
+					if (node == null) break;
+				}
+			}			
 		}
 
 		private void DrawTerrainStrip(ref int vertexIndex, int stripNumber, Texture2D texture)
@@ -147,15 +164,17 @@ namespace NeedForSpeed.Parsers.Track
 
 		private void DrawFenceStrips(TerrainSegment segment)
 		{
+			int offset = segment.FenceBufferIndex;
 			if (segment.HasLeftFence)
 			{
 				Engine.Instance.Device.Textures[0] = segment.FenceTexture;
-				Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, segment.FenceBufferIndex, 4);
+				Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, offset, 4);
+				offset += 6;
 			}
 			if (segment.HasRightFence)
 			{
 				Engine.Instance.Device.Textures[0] = segment.FenceTexture;
-				Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, segment.FenceBufferIndex + 6, 4);
+				Engine.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, offset, 4);
 			}
 		}
 
@@ -218,70 +237,4 @@ namespace NeedForSpeed.Parsers.Track
 			}
 		}
 	}
-
-
-	#region Helper classes
-
-	
-
-	class Line
-	{
-		public Vector3 Point1, Point2, Normal;
-
-		public Line(Vector3 point1, Vector3 point2)
-		{
-			Point1 = point1;
-			Point2 = point2;
-		}
-	}
-
-
-	class TerrainSegment
-	{
-		public Texture2D[] Textures = new Texture2D[10];
-		public bool HasLeftFence, HasRightFence;
-		public int FenceTextureId;
-		public Texture2D FenceTexture;
-		public List<Line> LeftBoundary, RightBoundary;
-		public List<Line> LeftVerge, RightVerge;
-		public byte[] TextureIds;
-		public TerrainRow[] Rows = new TerrainRow[4];
-		public int FenceBufferIndex;
-		public int TerrainBufferIndex;
-		public TerrainSegment Next;
-
-		public TerrainSegment()
-		{
-			LeftBoundary = new List<Line>();
-			RightBoundary = new List<Line>();
-			LeftVerge = new List<Line>();
-			RightVerge = new List<Line>();
-		}
-
-	}
-
-	
-	
-	class TerrainRow
-	{
-		const int TerrainPositionScale = 500;
-		public Vector3 MiddlePoint;
-		public Vector3[] LeftPoints, RightPoints;
-
-		public void RelativizeTo(Vector3 position)
-		{
-			MiddlePoint = position + MiddlePoint * TerrainPositionScale;
-			for (int i = 0; i < LeftPoints.Length; i++)
-			{
-				LeftPoints[i] = position + LeftPoints[i] * TerrainPositionScale;
-			}
-
-			for (int i = 0; i < RightPoints.Length; i++)
-			{
-				RightPoints[i] = position + RightPoints[i] * TerrainPositionScale;
-			}
-		}
-	}
-
-	#endregion
 }

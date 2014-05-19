@@ -18,33 +18,31 @@ namespace OpenNFS1.Tracks
 			get { return textures; }
 			set { textures = value; }
 		}
-		AlphaTestEffect _effect;
+
+		BasicEffect _effect;
 
 		VertexBuffer vertices;
 		IndexBuffer indices;
+		bool _hasGeneratedTopBottomTextures;
 
 		public float YOffset;
 
 		public TrackSkyBox(Texture2D horizon)
 		{
-			Color[] pixels = new Color[horizon.Width * horizon.Height];
-			horizon.GetData<Color>(pixels);
-
-			var topTexture = new Texture2D(Engine.Instance.Device, 1, 1);
-			topTexture.SetData<Color>(new Color[] { pixels[0] });  //top left pixel
-
-			var bottomTexture = new Texture2D(Engine.Instance.Device, 1, 1);
-			bottomTexture.SetData<Color>(new Color[] { pixels[pixels.Length - 1] }); //bottom right pixel
-
+			// This is silly... for some reason after loading the track on a separate thread, we have to wait until 
+			// we get called in the update() loop to be able to pull the pixel data to generate the top & bottom textures
+			_hasGeneratedTopBottomTextures = false;
+			
 			Textures[0] = horizon;
 			Textures[1] = horizon;
-			Textures[2] = bottomTexture;
-			Textures[3] = topTexture;
+			//Textures[2] = bottomTexture;
+			//Textures[3] = topTexture;
 			Textures[4] = horizon;
 			Textures[5] = horizon;
 			YOffset = 60;
 
-			_effect = new AlphaTestEffect(Engine.Instance.Device);
+			_effect = new BasicEffect(Engine.Instance.Device);
+			_effect.TextureEnabled = true;
 
 			vertices = new VertexBuffer(Engine.Instance.Device,
 								typeof(VertexPositionTexture),
@@ -150,6 +148,27 @@ namespace OpenNFS1.Tracks
 			_effect.World = Matrix.CreateTranslation(pos);
 			_effect.Projection = Engine.Instance.Camera.Projection;
 			_effect.View = Engine.Instance.Camera.View;
+
+
+			// Skybox only has the side textures, generate a single-color top and bottom texture
+			if (!_hasGeneratedTopBottomTextures)
+			{
+				Color[] pixel = new Color[1];
+				textures[0].GetData<Color>(0, new Rectangle(0, 0, 1, 1), pixel, 0, 1); //top left pixel
+				var topTexture = new Texture2D(Engine.Instance.Device, 1, 1);
+				topTexture.SetData<Color>(pixel);
+
+				var bottomTexture = new Texture2D(Engine.Instance.Device, 1, 1);
+				textures[0].GetData<Color>(0, new Rectangle(0, textures[0].Height - 1, 1, 1), pixel, 0, 1); //bottom left pixel
+				bottomTexture.SetData<Color>(pixel);
+
+				Color[] px = new Color[textures[0].Width * textures[1].Height];
+				textures[0].GetData(px);
+
+				Textures[2] = bottomTexture;
+				Textures[3] = topTexture;
+				_hasGeneratedTopBottomTextures = true;
+			}
 		}
 
 
@@ -164,8 +183,7 @@ namespace OpenNFS1.Tracks
 			device.SamplerStates[0] = SamplerState.LinearWrap;
 			device.RasterizerState = RasterizerState.CullCounterClockwise;
 			device.SetVertexBuffer(vertices);
-			device.Indices = indices;
-			
+			device.Indices = indices;			
 
 			for (int x = 0; x < 6; x++)
 			{

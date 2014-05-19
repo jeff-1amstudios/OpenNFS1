@@ -1,15 +1,15 @@
 //using System;
 //using System.Collections.Generic;
 //using System.Text;
-//using NeedForSpeed.Physics;
-//using NeedForSpeed.Parsers;
+//using OpenNFS1.Physics;
+//using OpenNFS1.Parsers;
 //using Microsoft.Xna.Framework;
 //using NfsEngine;
 //using Microsoft.Xna.Framework.Audio;
-//using NeedForSpeed.Dashboards;
+//using OpenNFS1.Dashboards;
 //using Microsoft.Xna.Framework.Graphics;
 
-//namespace NeedForSpeed.Vehicles
+//namespace OpenNFS1.Vehicles
 //{
 //	class MazdaRx7: Vehicle
 //	{

@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers.Track;
 using NfsEngine;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
 using OpenNFS1.Tracks;
 
-namespace NeedForSpeed.Views
+namespace OpenNFS1.Views
 {
     class TrackFlybyView : IView
     {

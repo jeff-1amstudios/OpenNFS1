@@ -1,6 +1,6 @@
 using System;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     static class Program
     {

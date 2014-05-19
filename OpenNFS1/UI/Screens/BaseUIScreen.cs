@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Media;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed.UI.Screens
+namespace OpenNFS1.UI.Screens
 {
     class BaseUIScreen
     {
@@ -28,6 +28,8 @@ namespace NeedForSpeed.UI.Screens
             get { return BaseUIScreen._music; }
             set { BaseUIScreen._music = value; }
         }
+
+		public static Viewport FullViewport = new Viewport(0, 0, 640, 480);
 
         public BaseUIScreen(bool playMusic)
         {

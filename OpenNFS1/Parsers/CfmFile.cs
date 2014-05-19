@@ -7,20 +7,22 @@ using NfsEngine;
 using Microsoft.Xna.Framework;
 using OpenNFS1.Vehicles;
 
-namespace NeedForSpeed.Parsers
+namespace OpenNFS1.Parsers
 {
 
 	// .CFM files contain the vertices and textures for cars.
     class CfmFile
     {
-		public CarMesh Mesh { get; private set; }
+		public Mesh Mesh { get; private set; }
 
-        public CfmFile(string filename)
+		// A CFM file can contain either a 'full' model (drivable, has wheel definitions etc), or a traffic model which is 
+		// only a static model and not drivable
+        public CfmFile(string filename, bool drivable)
         {
-            Parse(filename);
+			Parse(filename, drivable);
         }
 
-		private void Parse(string filename)
+		private void Parse(string filename, bool drivable)
 		{
 			BitmapChunk.ResetPalette();
 			string carFile = Path.Combine(GameConfig.CdDataPath, filename);
@@ -34,7 +36,10 @@ namespace NeedForSpeed.Parsers
 
 			br.Close();
 
-			Mesh = new CarMesh(rootChunk.MeshChunks[0], rootChunk.BitmapChunks[0]);
+			if (drivable)
+				Mesh = new CarMesh(rootChunk.MeshChunks[0], rootChunk.BitmapChunks[0]);
+			else
+				Mesh = new Mesh(rootChunk.MeshChunks[0], rootChunk.BitmapChunks[0]);
 		}
     }
 }

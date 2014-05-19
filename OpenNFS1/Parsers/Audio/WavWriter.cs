@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace NeedForSpeed.Parsers.Audio
+namespace OpenNFS1.Parsers.Audio
 {
 	class WavWriter
 	{

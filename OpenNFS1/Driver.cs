@@ -3,36 +3,30 @@ using System.Collections.Generic;
 using System.Text;
 using NfsEngine;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Parsers;
+using OpenNFS1.Parsers;
 using Microsoft.Xna.Framework.Input;
 using System.Diagnostics;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.Parsers.Track;
-using NeedForSpeed.Views;
-using NeedForSpeed.Physics;
-using NeedForSpeed.Vehicles;
+using OpenNFS1.Parsers.Track;
+using OpenNFS1.Views;
+using OpenNFS1.Physics;
+using OpenNFS1.Vehicles;
 
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     class Driver
     {
-        Vehicle _vehicle;
-        Track _track;
+        DrivableVehicle _vehicle;
         List<IView> _views = new List<IView>();
         int _currentView;
 
 		
-        public Driver(Vehicle vehicle, Track track)
+        public Driver(DrivableVehicle vehicle)
         {
             _vehicle = vehicle;
-            _vehicle.Position = track.StartPosition + new Vector3(0, 2, 0);
-            _vehicle.Direction = Vector3.Forward;
-            _vehicle.Track = track;
-
-            _track = track;
-
+            
             _views.Add(new ChaseView(_vehicle, 32, 14, 0));
 			_views.Add(new DebugView(_vehicle));
             _views.Add(new DashboardView(_vehicle));
@@ -47,8 +41,6 @@ namespace NeedForSpeed
         public void Update(GameTime gameTime)
         {
             _vehicle.Update(gameTime);
-            
-            _vehicle.ApplyGravityAndCheckForCollisions(_track);
 
             if (VehicleController.ChangeView)
             {

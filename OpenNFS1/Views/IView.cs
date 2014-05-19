@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace NeedForSpeed.Views
+namespace OpenNFS1.Views
 {
     interface IView
     {

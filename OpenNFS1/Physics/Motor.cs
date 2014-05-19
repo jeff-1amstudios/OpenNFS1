@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using NfsEngine;
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
 	class Motor
 	{
@@ -36,8 +36,8 @@ namespace NeedForSpeed.Physics
         {
             get
             {
-                if (_gearbox.GearEngaged)
-                    return _currentPowerOutput * Math.Abs(_gearbox.CurrentRatio);
+                if (_gearbox.GearEngaged && _throttle == 0)
+                    return Math.Abs(_gearbox.CurrentRatio);
                 else
                     return 0;
             }
@@ -170,7 +170,7 @@ namespace NeedForSpeed.Physics
             }
             else
             {
-				_rpm += Engine.Instance.FrameTime *_throttle * 5f;
+				_rpm += Engine.Instance.FrameTime *_throttle * 8f;
             }
         }
 

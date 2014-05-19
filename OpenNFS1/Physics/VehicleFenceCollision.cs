@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers.Track;
 using NfsEngine;
 using System.Diagnostics;
 using NfsEngine;
 using Microsoft.Xna.Framework.Audio;
-using NeedForSpeed.Audio;
+using OpenNFS1.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
     
     class VehicleFenceCollision
@@ -23,8 +23,6 @@ namespace NeedForSpeed.Physics
 			var rightBound1 = car.CurrentNode.GetRightBoundary();
 			var rightBound2 = car.CurrentNode.Next.GetRightBoundary();
             
-			
-			
 
 			for (int wheelNumber = 0; wheelNumber < 4; wheelNumber++)
 			{
@@ -70,8 +68,8 @@ namespace NeedForSpeed.Physics
 					HandleHeadOnCrash(car, wheelNumber, collisionAngle);
 				}
 
-				// move away from the way slightly
-				car.Position += fenceNormal * 1.1f;
+				// move away from the way slightly.  We should be a bit smarter and along more of a slide along the wall..
+				car.Position += fenceNormal * 1f;
 				break;
 			}
         }
@@ -113,13 +111,13 @@ namespace NeedForSpeed.Physics
 			// only rotate 50% of the way
             if (wheel < 2)
             {
-				car.RotateCarAfterCollision = direction * collisionAngle * 0.8f;
-                car.Speed *= 0.93f;
+				car.RotateCarAfterCollision = direction * collisionAngle * 1.1f;
+                car.Speed *= 0.80f;
             }
             else
             {
                 car.RotateCarAfterCollision = direction * collisionAngle *0.5f;
-                car.Speed *= 0.96f;
+                car.Speed *= 0.9f;
             }
         }
 

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using NfsEngine;
 using NfsEngine;
-using NeedForSpeed.Views;
-using NeedForSpeed.Dashboards;
+using OpenNFS1.Views;
+using OpenNFS1.Dashboards;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using Microsoft.Xna.Framework.Graphics;
 using OneAmEngine;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
 	class DebugView : IView
 	{
@@ -44,6 +44,7 @@ namespace NeedForSpeed
 		public void Activate()
 		{
 			Engine.Instance.Camera = _camera;
+			_camera.Position = _car.Position;
 		}
 
 		public void Deactivate()

@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Audio;
 using NfsEngine;
 
-namespace NeedForSpeed.Audio
+namespace OpenNFS1.Audio
 {
     class EnvironmentAudioProvider
     {

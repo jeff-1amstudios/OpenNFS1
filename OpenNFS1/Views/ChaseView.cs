@@ -5,18 +5,21 @@ using Microsoft.Xna.Framework;
 using NfsEngine;
 using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.UI;
-using NeedForSpeed.Physics;
+using OpenNFS1.UI;
+using OpenNFS1.Physics;
 using System.Diagnostics;
+using OpenNFS1.Parsers;
+using OpenNFS1.Parsers;
 
-namespace NeedForSpeed.Views
+namespace OpenNFS1.Views
 {
-    class ChaseView : IView
+	
+
+    class ChaseView : BaseExternalView, IView
     {
         Vehicle _car;
         FixedChaseCamera _camera;
-        SpeedoControl _speedoControl;
-
+		
 		public bool ShouldRenderPlayer { get { return true; } }
         
         public ChaseView(Vehicle car, int distance, int height, int offset)
@@ -27,7 +30,6 @@ namespace NeedForSpeed.Views
             _camera.ChaseDistance = distance;
             _camera.ChaseHeight = height;
             _camera.ChaseOffset = offset;
-            _speedoControl = new SpeedoControl();
         }
 
         #region IView Members
@@ -57,7 +59,7 @@ namespace NeedForSpeed.Views
 
         public void Render()
         {
-            _speedoControl.Render(_car.Motor.Rpm / _car.Motor.RedlineRpm);
+			RenderBackground(_car);
         }
 
         #endregion

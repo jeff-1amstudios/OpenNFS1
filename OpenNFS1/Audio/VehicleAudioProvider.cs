@@ -6,11 +6,11 @@ using Microsoft.Xna.Framework.Audio;
 using NfsEngine;
 using NfsEngine;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using System.Diagnostics;
-using NeedForSpeed.Audio;
+using OpenNFS1.Audio;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     class VehicleAudioProvider
     {

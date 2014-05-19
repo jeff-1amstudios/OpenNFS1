@@ -10,12 +10,13 @@ using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
 using NfsEngine;
 using NfsEngine;
-using NeedForSpeed.UI.Screens;
+using OpenNFS1.UI.Screens;
 using OpenNFS1.Parsers;
-using NeedForSpeed.Loaders;
+using OpenNFS1.Loaders;
 using OpenNFS1.Vehicles;
+using System.IO;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
     /// <summary>
     /// This is the main type for your game
@@ -23,19 +24,19 @@ namespace NeedForSpeed
     class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager _graphics;
+		RenderTarget2D _renderTarget;
         
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
+			GameConfig.Load();
+
             _graphics.PreferredBackBufferWidth = 640;
             _graphics.PreferredBackBufferHeight = 480;
-            _graphics.PreferMultiSampling = true;
 			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
-            
-            _graphics.IsFullScreen = false;
-
+			_graphics.IsFullScreen = false;
             //_graphics.GraphicsProfile = GraphicsProfile.Reach;
         }
 
@@ -49,17 +50,34 @@ namespace NeedForSpeed
         {
             base.Initialize();
 
-            Engine.Initialize(this, _graphics);
-            Engine.Instance.ScreenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+			//byte[] pal = System.IO.File.ReadAllBytes("c:\\temp\\pal2.pal");
+			//byte[] palbmp = new byte[1024];
+			//for (int i = 0; i < 168; i++ )
+			//{ 
+
+			//	//rgb -> bgr
+			//	palbmp[i * 4+2] = pal[i * 3];
+			//	palbmp[i * 4 + 1] = pal[i * 3 + 1];
+			//	palbmp[i * 4 + 1] = pal[i * 3 + 2];
+			//}
+
+			//BinaryWriter bw = new BinaryWriter(File.Open(@"C:\Games\NFSSE\FRONTEND\ART\CONTROL\SUP1\0000.bmp", FileMode.Open));
+			//bw.Seek(54, SeekOrigin.Begin);
+			//bw.Write(palbmp);
+
+			//bw.Close();
+						
+
 			
-			GameConfig.Load();
+
+			/*
 			GameConfig.SelectedVehicle = new PlayerCar(VehicleDescription.Descriptions.Find(a => a.Name == "ToyotaSupra"));
-			var trackDesc = TrackDescription.Descriptions.Find(a=> a.Name=="Autumn Valley");
+			var trackDesc = TrackDescription.Descriptions.Find(a=> a.Name=="Transpolis");
 			TriFile tri = new TriFile(trackDesc.FileName);
 			var track = new TrackAssembler().Assemble(tri);
 			GameConfig.SelectedTrack = trackDesc;
 			Engine.Instance.Mode = new DoRaceScreen(track);      
-            
+            */
         }
 
         /// <summary>
@@ -68,7 +86,15 @@ namespace NeedForSpeed
         /// </summary>
         protected override void LoadContent()
         {
-            
+			
+
+			Engine.Create(this, _graphics);
+
+			_renderTarget = new RenderTarget2D(Engine.Instance.Device, 640, 480, false, _graphics.GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24, 1, RenderTargetUsage.DiscardContents);
+			Engine.Instance.Device.SetRenderTarget(_renderTarget);
+			Engine.Instance.ScreenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
+
+			Engine.Instance.Mode = new OpenNFS1.UI.Screens.HomeScreen2();            
         }
 
         /// <summary>
@@ -96,10 +122,21 @@ namespace NeedForSpeed
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+			Engine.Instance.Device.SetRenderTarget(_renderTarget);
+
 			Color c = new Color(0.1f, 0.1f, 0.1f);
             _graphics.GraphicsDevice.Clear(c);
 
             base.Draw(gameTime);
+
+			Engine.Instance.Device.SetRenderTarget(null);
+
+			using (SpriteBatch sprite = new SpriteBatch(Engine.Instance.Device))
+			{
+				sprite.Begin();
+				sprite.Draw(_renderTarget, Window.ClientBounds, Color.White);
+				sprite.End();
+			}
         }
     }
 }

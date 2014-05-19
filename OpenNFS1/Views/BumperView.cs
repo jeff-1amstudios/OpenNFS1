@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 using NfsEngine;
-using NeedForSpeed.UI;
+using OpenNFS1.UI;
 using NfsEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed.Views
+namespace OpenNFS1.Views
 {
-	class BumperView : IView
+	class BumperView : BaseExternalView, IView
 	{
 		Vehicle _car;
         SimpleCamera _camera;
-        SpeedoControl _speedoControl;
 
 		public BumperView(Vehicle car)
         {
             _car = car;
 			_camera = new SimpleCamera();
 			_camera.FieldOfView = GameConfig.FOV;
-
-            _speedoControl = new SpeedoControl();
         }
 
         #region IView Members
@@ -55,7 +52,7 @@ namespace NeedForSpeed.Views
 
         public void Render()
         {
-            _speedoControl.Render(_car.Motor.Rpm / _car.Motor.RedlineRpm);           
+			RenderBackground(_car);
         }
 
         #endregion

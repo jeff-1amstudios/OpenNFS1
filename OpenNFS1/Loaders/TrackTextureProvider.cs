@@ -4,19 +4,22 @@ using System.Text;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
-using NeedForSpeed.Parsers;
+using OpenNFS1.Parsers;
 using OpenNFS1;
 
-namespace NeedForSpeed.Loaders
+namespace OpenNFS1.Loaders
 {
     class TrackTextureProvider
     {
         protected HeaderChunk _root;
+		private Mesh[] _meshCache;
 
         public TrackTextureProvider(string trackFile)
         {
             string textureFilePath = "SIMDATA\\ETRACKFM\\" + Path.GetFileNameWithoutExtension(trackFile) + "_001.fam";
             ReadFamFile(textureFilePath);
+
+			_meshCache = new Mesh[_root.HeaderChunks[2].HeaderChunks.Count];
         }
 
         private void ReadFamFile(string filename)
@@ -121,11 +124,15 @@ namespace NeedForSpeed.Loaders
             return GetGroundTextureForId("ga00");
         }
 
-        public Mesh GetMesh(int index)
-        {
-            var meshChunk = _root.HeaderChunks[2].HeaderChunks[index].MeshChunks[0];
-			var bmpChunk = _root.HeaderChunks[2].HeaderChunks[index].BitmapChunks[0];
-			return new Mesh(meshChunk, bmpChunk);
-        }
+		public Mesh GetMesh(int index)
+		{
+			if (_meshCache[index] == null)
+			{
+				var meshChunk = _root.HeaderChunks[2].HeaderChunks[index].MeshChunks[0];
+				var bmpChunk = _root.HeaderChunks[2].HeaderChunks[index].BitmapChunks[0];
+				_meshCache[index] = new Mesh(meshChunk, bmpChunk);
+			}
+			return _meshCache[index];
+		}
     }
 }

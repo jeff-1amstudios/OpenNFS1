@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.Parsers;
+using OpenNFS1.Parsers;
 
-namespace NeedForSpeed.Loaders
+namespace OpenNFS1.Loaders
 {
 	class OpenRoadTextureProvider : TrackTextureProvider
 	{

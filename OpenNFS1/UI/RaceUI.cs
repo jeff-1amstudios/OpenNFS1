@@ -6,7 +6,7 @@ using NfsEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace NeedForSpeed.UI
+namespace OpenNFS1.UI
 {
     class RaceUI
     {

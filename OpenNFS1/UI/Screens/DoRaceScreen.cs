@@ -4,25 +4,25 @@ using System.Text;
 using NfsEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.Parsers;
-using NeedForSpeed.Parsers.Track;
+using OpenNFS1.Parsers;
+using OpenNFS1.Parsers.Track;
 using Microsoft.Xna.Framework.Input;
 using NfsEngine;
-using NeedForSpeed.Loaders;
-using NeedForSpeed.UI;
-using NeedForSpeed.Vehicles;
-using NeedForSpeed.Physics;
+using OpenNFS1.Loaders;
+using OpenNFS1.UI;
+using OpenNFS1.Vehicles;
+using OpenNFS1.Physics;
 using System.Diagnostics;
-using NeedForSpeed.UI.Screens;
+using OpenNFS1.UI.Screens;
 using OpenNFS1;
 
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
 	class DoRaceScreen : IGameScreen
 	{
 		Track _track;
-		Vehicle _car;
+		DrivableVehicle _car;
 		Race _race;
 		RaceUI _raceUI;
 		TrafficController _trafficController;
@@ -33,8 +33,9 @@ namespace NeedForSpeed
 		{
 			_track = track;
 			_car = GameConfig.SelectedVehicle;
-			_car.InitializeForDriving();
-			_player = new Driver(_car, _track);
+			_track.AddVehicle(_car);
+			_car.EnableAudio();
+			_player = new Driver(_car);
 			
 			_race = new Race(2, _car, GameConfig.SelectedTrack, _track);
 			_raceUI = new RaceUI(_race);
@@ -51,6 +52,8 @@ namespace NeedForSpeed
 
 		public void Update(GameTime gameTime)
 		{
+			Engine.Instance.Device.Viewport = _raceViewport;
+
 			if (Engine.Instance.Input.WasPressed(Keys.F1))
 			{
 				GameConfig.Render2dScenery = !GameConfig.Render2dScenery;
@@ -70,7 +73,7 @@ namespace NeedForSpeed
 
 			if (_race.HasFinished)
 			{
-				_car.StopDriving();
+				_car.DisableAudio();
 				Engine.Instance.Mode = new RaceFinishedScreen(_race, _track);
 			}
 
@@ -99,7 +102,6 @@ namespace NeedForSpeed
 			Engine.Instance.Device.Viewport = _uiViewport;
 
 			_player.Render();
-
 			_raceUI.Render();
 
 			Engine.Instance.Device.Viewport = _raceViewport;

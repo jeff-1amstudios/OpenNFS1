@@ -4,9 +4,9 @@ using System.Text;
 using NfsEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NeedForSpeed.Physics;
+using OpenNFS1.Physics;
 
-namespace NeedForSpeed.UI.Screens
+namespace OpenNFS1.UI.Screens
 {
     class RacePausedScreen : BaseUIScreen, IGameScreen
     {
@@ -19,24 +19,25 @@ namespace NeedForSpeed.UI.Screens
             : base(false)
         {
             _playerCar = playerCar;
-            _playerCar.StopDriving();
+			_playerCar.DisableAudio();
             _currentRace = currentRace;
             _background = ScreenEffects.TakeScreenshot();
+			
         }
 
         #region IDrawableObject Members
 
         public void Update(GameTime gameTime)
         {
+			Engine.Instance.Device.Viewport = FullViewport;
+
             if (UIController.Up && _selectedOption > 0)
                 _selectedOption--;
             else if (UIController.Down && _selectedOption < 1)
                 _selectedOption++;
 
-
             if (UIController.Back)
             {
-                _playerCar.InitializeForDriving();
                 Engine.Instance.Mode = _currentRace;
                 return;
             }
@@ -45,12 +46,12 @@ namespace NeedForSpeed.UI.Screens
             {
                 if (_selectedOption == 0)
                 {
-                    _playerCar.InitializeForDriving();
+                    //_playerCar.InitializeForDriving();
                     Engine.Instance.Mode = _currentRace;
                 }
                 else
                 {
-                    Engine.Instance.Mode = new ChooseTrackScreen();
+                    Engine.Instance.Mode = new HomeScreen2();
                 }
             }
         }
@@ -59,7 +60,7 @@ namespace NeedForSpeed.UI.Screens
         {
             Engine.Instance.SpriteBatch.Begin();
 
-            Engine.Instance.SpriteBatch.Draw(_background, Vector2.Zero, new Color(255, 255, 255, 100));
+            Engine.Instance.SpriteBatch.Draw(_background, Vector2.Zero, new Color(255, 255, 255, 255));
 
             int y = 40;
             Engine.Instance.SpriteBatch.DrawString(Font, "Race Paused", new Vector2(50, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);

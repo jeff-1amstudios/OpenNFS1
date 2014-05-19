@@ -6,7 +6,7 @@ using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
 
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
 
 	class VehicleWheel
@@ -37,13 +37,9 @@ namespace NeedForSpeed.Physics
 			_size = size;
 			_texture = texture;
 			_renderOffset = new Vector3(renderXOffset, 0, 0);
+			if (_smokeEmitter == null)
+				_smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, BottomPosition);
 		}
-
-        public void InitializeForDriving()
-        {
-            if (_smokeEmitter == null)
-                _smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, BottomPosition);
-        }
 
 		public Vector3 WorldPosition
 		{
@@ -103,7 +99,7 @@ namespace NeedForSpeed.Physics
 			WheelModel.Render(
 				Matrix.CreateScale(new Vector3(_size, Width, _size)) *
 				Matrix.CreateRotationZ(MathHelper.ToRadians(-90)) *  //cylinder geometry faces upwards
-				Matrix.CreateRotationX(_rotation / _size * 1.5f) *
+				Matrix.CreateRotationX(_rotation / _size * 2f) *
 				Matrix.CreateRotationY(_steeringAngle * 1.3f) *
 				carOrientation *
 				Matrix.CreateTranslation(GetOffsetPosition(_renderOffset)),

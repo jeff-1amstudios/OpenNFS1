@@ -8,7 +8,7 @@ using NfsEngine;
 using System.Diagnostics;
 using OpenNFS1;
 
-namespace NeedForSpeed.Parsers
+namespace OpenNFS1.Parsers
 {
 	class MeshChunk : BaseChunk
 	{
@@ -16,6 +16,7 @@ namespace NeedForSpeed.Parsers
 		List<Vector2> _vertexTextureMap = new List<Vector2>();
 		List<Polygon> _polygons = new List<Polygon>();
 		private List<string> _textureNames = new List<string>();
+		public string Identifier;
 
 		public List<Polygon> Polygons
 		{
@@ -39,7 +40,7 @@ namespace NeedForSpeed.Parsers
 			int polygonBlockOffset = reader.ReadInt32();
 
 			string identifer = new string(reader.ReadChars(12));
-			identifer = identifer.Substring(0, identifer.IndexOf('\0'));
+			Identifier = identifer.Substring(0, identifer.IndexOf('\0'));
 			Debug.WriteLine("== Mesh id: " + identifer);
 			int textureNameCount = reader.ReadInt32();
 			int textureNameBlockOffset = reader.ReadInt32();
@@ -81,7 +82,7 @@ namespace NeedForSpeed.Parsers
 				float x = reader.ReadInt32();
 				float y = reader.ReadInt32();
 				float z = reader.ReadInt32(); 
-				Vector3 vertex = new Vector3(x, y, -z) * GameConfig.VehicleScaleFactor;
+				Vector3 vertex = new Vector3(x, y, -z) * GameConfig.MeshScale;
 				_vertices.Add(vertex);
 			}
 		}
@@ -117,21 +118,27 @@ namespace NeedForSpeed.Parsers
 				int shapeId = typeFlag & (0xff >> 5); // type = 3 or 4.  Held in the first 3 bits
 				//bool computeTextureUVs = (typeFlag & (0x1 << 3)) != 0; // bit 3 is set if there are *no* texture co-ords (and we should infer them?)
 
-				if (shapeId != 3 && shapeId != 4)
-				{
-				}				
-
 				byte b1 = reader.ReadByte();
 				byte textureNumber = reader.ReadByte();
 				byte b2 = reader.ReadByte();
 				int verticesIndex = reader.ReadInt32();
 				int textureCoordsIndex = reader.ReadInt32();
 
+				if (shapeId != 3 && shapeId != 4)
+				{
+					continue;
+				}	
+
 				// if these 2 indexes are the same, there are no texture coords
 				bool computeTextureUVs = verticesIndex == textureCoordsIndex;
 
 				Polygon polygon = new Polygon((PolygonShape)shapeId, computeTextureUVs);
-				polygon.TextureName = _textureNames[textureNumber];								
+				polygon.TextureName = _textureNames[textureNumber];		
+				
+				if (polygon.TextureName == "dkfr")
+				{
+
+				}
 
 				//Vertices for polygon
 				polygonVertexMap.BaseStream.Position = verticesIndex * sizeof(int);
@@ -140,7 +147,7 @@ namespace NeedForSpeed.Parsers
 				int v3 = polygonVertexMap.ReadInt32();
 				int v4 = polygonVertexMap.ReadInt32();
 
-				Debug.WriteLine(String.Format("Poly {8} {0} {9} ({7}): {1},{2},{3},{4}, / {5} {6} computeUvs: {10}", i, v1, v2, v3, v4, b1, b2, polygon.TextureName, polygon.Shape, typeFlag.ToString("X"), computeTextureUVs));
+				//Debug.WriteLine(String.Format("Poly {8} {0} {9} ({7}): {1},{2},{3},{4}, / {5} {6} computeUvs: {10}", i, v1, v2, v3, v4, b1, b2, polygon.TextureName, polygon.Shape, typeFlag.ToString("X"), computeTextureUVs));
 
 				//Texture co-ords for vertices
 				if (!computeTextureUVs)

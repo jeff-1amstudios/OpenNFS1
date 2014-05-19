@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.IO;
 
-namespace NeedForSpeed.Parsers
+namespace OpenNFS1.Parsers
 {
     class TextureGenerator
     {
@@ -88,6 +88,8 @@ namespace NeedForSpeed.Parsers
 
         private Vector3 GetMostUsedColour(string id, byte[] pixels)
         {
+			if (_palette == null) return new Vector3(255, 0, 255);
+
             if (id.StartsWith("tyr"))
             {
                 return Vector3.Zero;

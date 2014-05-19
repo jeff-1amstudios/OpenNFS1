@@ -3,7 +3,7 @@ using System.Collections;
 using System.Text;
 
 
-namespace NeedForSpeed.Physics
+namespace OpenNFS1.Physics
 {
     /// <summary>
     /// Simple 1D spring

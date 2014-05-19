@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using NeedForSpeed.Loaders;
+using OpenNFS1.Loaders;
 using NfsEngine;
 using OpenNFS1.Parsers;
 using OpenNFS1;
 
-namespace NeedForSpeed.Parsers.Track
+namespace OpenNFS1.Parsers.Track
 {
 
 	abstract class SceneryItem
@@ -38,9 +38,9 @@ namespace NeedForSpeed.Parsers.Track
 		public override void Initialize()
 		{
 			if (Size.X == 0)
-				Size.X = _texture.Width * GameConfig.ScaleFactor * 10000;
+				Size.X = _texture.Width * GameConfig.TerrainScale * 10000;
 			if (Size.Y == 0)
-				Size.Y = _texture.Height * GameConfig.ScaleFactor * 10000;
+				Size.Y = _texture.Height * GameConfig.TerrainScale * 10000;
 
 			_matrix = Matrix.CreateScale(Size.X, Size.Y, 1) *
 							Matrix.CreateRotationY(Orientation) *
@@ -71,9 +71,9 @@ namespace NeedForSpeed.Parsers.Track
 		public override void Initialize()
 		{
 			if (Size.X == 0)
-				Size.X = _textures[0].Width * GameConfig.ScaleFactor * 10000;
+				Size.X = _textures[0].Width * GameConfig.TerrainScale * 10000;
 			if (Size.Y == 0)
-				Size.Y = _textures[0].Height * GameConfig.ScaleFactor * 10000;
+				Size.Y = _textures[0].Height * GameConfig.TerrainScale * 10000;
 
 			_matrix = Matrix.CreateScale(Size.X, Size.Y, 1) *
 							Matrix.CreateRotationY(Orientation) *
@@ -144,7 +144,7 @@ namespace NeedForSpeed.Parsers.Track
 
 		public override void Initialize()
 		{
-			_matrix = Matrix.CreateScale(GameConfig.ScaleFactor * 3650f) *
+			_matrix = Matrix.CreateScale(7.5f) *
 				   Matrix.CreateRotationY(Orientation) *
 				   Matrix.CreateTranslation(Position);
 		}

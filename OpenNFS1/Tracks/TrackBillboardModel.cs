@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using NfsEngine;
 
-namespace NeedForSpeed
+namespace OpenNFS1
 {
 	static class TrackBillboardModel
 	{
