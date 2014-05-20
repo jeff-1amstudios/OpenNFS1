@@ -10,6 +10,7 @@ using OpenNFS1.Loaders;
 using OpenNFS1.Tracks;
 using Microsoft.Xna.Framework.Input;
 using OpenNFS1.Vehicles;
+using OpenNFS1.Vehicles.AI;
 
 namespace OpenNFS1.Parsers.Track
 {
@@ -22,6 +23,7 @@ namespace OpenNFS1.Parsers.Track
 		TrackSkyBox _skybox;
 		BasicEffect _physicalRoadEffect;
 
+		public TrackDescription Description { get; set; }
 		public List<SceneryItem> SceneryItems { get; set; }
 		public List<TrackNode> RoadNodes { get; set; }
 		public List<TerrainSegment> TerrainSegments { get; set; }
@@ -30,6 +32,7 @@ namespace OpenNFS1.Parsers.Track
 		public Vector3 StartPosition { get; set; }
 		public int CheckpointNode { get; set; }
 		public bool IsOpenRoad { get; set; }
+		
 
 		public Track()
 		{
@@ -46,11 +49,11 @@ namespace OpenNFS1.Parsers.Track
 			_skybox = new TrackSkyBox(horizon);
 		}
 
-		public void AddVehicle(DrivableVehicle vehicle)
+		public void AddDriver(IDriver driver)
 		{
-			vehicle.Position = StartPosition + new Vector3(0, 2, 0);
-			vehicle.Direction = Vector3.Forward;
-			vehicle.Track = this;
+			driver.Vehicle.Position = StartPosition + new Vector3(0, 2, 0);
+			driver.Vehicle.Direction = Vector3.Forward;
+			driver.Vehicle.Track = this;
 		}
 
 		public void Update(GameTime gameTime)

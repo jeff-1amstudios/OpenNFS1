@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using NfsEngine;
 using OpenNFS1.Physics;
 using System.Diagnostics;
+using Microsoft.Xna.Framework.Input;
 
 namespace OpenNFS1.Dashboards
 {
@@ -81,13 +82,18 @@ namespace OpenNFS1.Dashboards
             }
         }
 
-        public void Update(GameTime gameTime)
-        {
-            //if (_gearBoxAnimation.IsAnimating)
-            //{
-                _gearBoxAnimation.Update(gameTime);
-            //}
-        }
+		public void Update(GameTime gameTime)
+		{
+			_gearBoxAnimation.Update(gameTime);
+			if (Engine.Instance.Input.WasPressed(Keys.NumPad8))
+				_descriptor.TachPosition.Y += Engine.Instance.FrameTime;
+			if (Engine.Instance.Input.WasPressed(Keys.NumPad2))
+				_descriptor.TachPosition.Y -= Engine.Instance.FrameTime;
+			if (Engine.Instance.Input.WasPressed(Keys.NumPad4))
+				_descriptor.TachPosition.X -= Engine.Instance.FrameTime;
+			if (Engine.Instance.Input.WasPressed(Keys.NumPad6))
+				_descriptor.TachPosition.X += Engine.Instance.FrameTime;
+		}
 
         public void Render()
         {

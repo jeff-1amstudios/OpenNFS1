@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework;
 using OpenNFS1.Physics;
 using Microsoft.Xna.Framework.Graphics;
 using OpenNFS1.Vehicles;
+using System.IO;
 
 namespace OpenNFS1
 {
@@ -23,7 +24,10 @@ namespace OpenNFS1
             _car = car;
             _camera = new SimpleCamera();
 			_camera.FieldOfView = GameConfig.FOV;
-            _dashboard = _car.Dashboard;
+
+			var dashfile = Path.GetFileNameWithoutExtension(car.Descriptor.ModelFile) + "dh.fsh";
+			var dashDescription = DashboardDescription.Descriptions.Find(a => a.Filename == dashfile);
+			_dashboard = new Dashboard(car, dashDescription);
         }
 
         #region IView Members
@@ -38,7 +42,7 @@ namespace OpenNFS1
         public void Update(GameTime gameTime)
         {
             _camera.Position = _car.Position + new Vector3(0, 5, 0);
-            _camera.LookAt = _camera.Position + _car.Direction * 60f + new Vector3(0, _car.Pitch.Position, 0);
+            _camera.LookAt = _camera.Position + _car.Direction * 60f + new Vector3(0, _car.BodyPitch.Position, 0);
             _camera.UpVector = _car.UpVector; // +new Vector3(_car.Roll.Position * 0.2f, 0, 0);
 
             _dashboard.Update(gameTime);

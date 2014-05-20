@@ -42,7 +42,7 @@
     <Compile Include="Dashboards\Dashboard.cs" />
     <Compile Include="Dashboards\DashboardDescription.cs" />
     <Compile Include="Dashboards\GearboxAnimation.cs" />
-    <Compile Include="Driver.cs" />
+    <Compile Include="PlayerUI.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameConfig.cs" />
     <Compile Include="Loaders\ITrackLoader.cs" />
@@ -108,6 +108,11 @@
     <Compile Include="UI\Screens\TrackPoster.cs" />
     <Compile Include="UI\SpeedoControl.cs" />
     <Compile Include="VehicleController.cs" />
+    <Compile Include="Vehicles\AIVehicle.cs" />
+    <Compile Include="Vehicles\AI\AIDriver.cs" />
+    <Compile Include="Vehicles\AI\IDriver.cs" />
+    <Compile Include="Vehicles\AI\PlayerDriver.cs" />
+    <Compile Include="Vehicles\AI\TrafficDriver.cs" />
     <Compile Include="Vehicles\CarModel.cs" />
     <Compile Include="Vehicles\CarModelCache.cs" />
     <Compile Include="Vehicles\CorvetteZR1.cs" />

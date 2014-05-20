@@ -21,6 +21,7 @@ namespace OpenNFS1
         SoundEffect _gearChange, _horn;
         List<SoundEffect> _skids = new List<SoundEffect>();
         Random _random;
+		bool _isActive = false;
                 
         public VehicleAudioProvider(Vehicle car, string vehicleSoundName)
         {
@@ -37,6 +38,7 @@ namespace OpenNFS1
             }
 
             _random = new Random();
+			_isActive = true;
             
             SoundEffect temp;
             temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-on-low", _soundName));
@@ -68,6 +70,7 @@ namespace OpenNFS1
 
         public void UpdateEngine()
         {
+			if (!_isActive) return;
             float engineRpmFactor = (_car.Motor.Rpm - 0.8f) / _car.Motor.RedlineRpm;
             SoundEffectInstance low, high;
 
@@ -110,6 +113,7 @@ namespace OpenNFS1
 
         public void PlaySkid(bool play)
         {
+			if (!_isActive) return;
             if (play)
             {
                 if (_skidInstance != null && _skidInstance.State == SoundState.Playing)
@@ -135,16 +139,19 @@ namespace OpenNFS1
 
         public void ChangeGear()
         {
+			if (!_isActive) return;
             _gearChange.Play();
         }
 
         public void BeepHorn()
         {
+			if (!_isActive) return;
             _horn.Play();
         }
 
         public void HitGround()
         {
+			if (!_isActive) return;
             EnvironmentAudioProvider.Instance.PlayCollision(2);
             SoundEngine2.Instance.PlayEffect(_skids[2].CreateInstance(), 0.2f);
         }
@@ -152,6 +159,7 @@ namespace OpenNFS1
 
         public void PlayOffRoad(bool play)
         {
+			if (!_isActive) return;
             if (play)
             {
                 _offRoadInstance.Volume = 0.4f;
@@ -168,6 +176,7 @@ namespace OpenNFS1
 
         public void StopAll()
         {
+			if (!_isActive) return;
             if (_skidInstance != null)
                 _skidInstance.Stop();
             _engineOffHigh.Stop();

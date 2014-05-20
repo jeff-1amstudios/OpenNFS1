@@ -64,6 +64,7 @@ namespace OpenNFS1
         {
 			TriFile tri = new TriFile(GameConfig.SelectedTrack.FileName);
             _track = new TrackAssembler().Assemble(tri);
+			_track.Description = GameConfig.SelectedTrack;
             
         }
     }

@@ -20,25 +20,16 @@ using OpenNFS1.Tracks;
 
 namespace OpenNFS1.Physics
 {
+
 	abstract class Vehicle
 	{
-		#region Constants
-
 		const float Gravity = 9.81f;
 		const float CarFrictionOnRoad = 14;// 0.005f;
 		const float AirFrictionPerSpeed = 0.07f; //0.001f;
 		const float MaxAirFriction = AirFrictionPerSpeed * 100.0f;
-
-		/// <summary>
-		/// Max rotation per second we use for our car.
-		/// </summary>
+		// for reflecting away from walls
 		public float MaxRotationPerSec = 5f;
-
-		#endregion
-
-		#region Variables
-
-		#region Car variables (based on the car model)
+		public float SteeringSpeed = 2.1f;
 
 		private Track _track;
 
@@ -48,7 +39,6 @@ namespace OpenNFS1.Physics
 			set
 			{
 				_track = value;
-				_prevPosition = _position;
 				_speed = 0;
 				CurrentNode = _track.RoadNodes[0];
 			}
@@ -60,15 +50,13 @@ namespace OpenNFS1.Physics
 		public float _steeringWheel;
 		public float MaxSteeringLock = 0.3f;
 
-		public Vector3 _position, _prevPosition;
 		protected Vector3 _direction;
 		protected Vector3 _up;
 		protected Vector3 _force;
 		protected float _previousSpeed;
 		protected float _speed;
-		protected float _mass; //kg
-		protected float _bodyRideHeight = 0.0f;
-		private float _trackHeight;
+		protected float _mass; //kg;
+		private float _currentHeightOfTrack;
 
 		protected Motor _motor;
 		private VehicleAudioProvider _audioProvider;
@@ -82,64 +70,28 @@ namespace OpenNFS1.Physics
 			get { return _up; }
 		}
 
-		public float FrontSlipFactor
-		{
-			get { return _slipFactor; }
-		}
+		
+		public Spring BodyPitch { get; private set; }
+		public Spring BodyRoll { get; private set; }
 
-		#endregion
-
-		private Spring _carPitchSpring;
-
-		public Spring Pitch
-		{
-			get { return _carPitchSpring; }
-		}
-		private Spring _carRollSpring;
-
-
-		/// <summary>
-		/// Rotate car after collision.
-		/// </summary>
-		float _rotateCarAfterCollision = 0;
-
-		public float RotateCarAfterCollision
-		{
-			get { return _rotateCarAfterCollision; }
-			set { _rotateCarAfterCollision = value; }
-		}
-
-		/// <summary>
-		/// Is car on ground? Only allow rotation, apply ground friction,
-		/// speed changing if we are on ground and adding brake tracks.
-		/// </summary>
+		public float RotateCarAfterCollision {get; set; }		
 		protected bool _isOnGround = true;
 
-		/// <summary>
-		/// Car render matrix we calculate each frame.
-		/// </summary>
 		protected Matrix _renderMatrix = Matrix.Identity;
-
 		protected AlphaTestEffect _effect;
 
-		#endregion
-
-		#region Properties
-
+		private Vector3 _position;
 		public Vector3 Position
 		{
 			get { return _position; }
 			set { _position = value; }
 		}
-
-
-		public float Speed
+		
+		public float Speed 
 		{
 			get { return _speed; }
 			set { _speed = value; }
 		}
-
-		bool _allWheelsOnTrack;
 
 		protected VehicleWheel[] _wheels = new VehicleWheel[4];
 
@@ -166,8 +118,8 @@ namespace OpenNFS1.Physics
 		
 		public TrackNode CurrentNode { get; private set; }
 
-		#endregion
-
+		// inputs
+		public float ThrottlePedalInput, BrakePedalInput, SteeringInput;
 
 		public Vehicle(float mass, string name)
 		{
@@ -175,25 +127,27 @@ namespace OpenNFS1.Physics
 			_up = Vector3.Up;
 			_mass = mass;
 
-			_carPitchSpring = new Spring(1200, 1.5f, 200, 0, 1.4f);
-			_carRollSpring = new Spring(1200, 1.5f, 180, 0, 3);
+			BodyPitch = new Spring(1200, 1.5f, 200, 0, 1.4f);
+			BodyRoll = new Spring(1200, 1.5f, 180, 0, 3);
 
 			_audioProvider = new VehicleAudioProvider(this, name);
 			_effect = new AlphaTestEffect(Engine.Instance.Device);
 		}
 
-		public void EnableAudio()
+		bool _audioEnabled;
+		public bool AudioEnabled
 		{
-			_audioProvider.Initialize();
+			get { return _audioEnabled; }
+			set
+			{
+				if (value)
+					_audioProvider.Initialize();
+				else
+					_audioProvider.StopAll();
+				_audioEnabled = value;
+			}
 		}
 
-		public void DisableAudio()
-		{
-			_audioProvider.StopAll();
-		}
-
-
-		#region Update
 
 		float _rotationChange = 0.0f;
 
@@ -213,25 +167,24 @@ namespace OpenNFS1.Physics
 
 		private void UpdateSteering()
 		{
-			float steeringSpeed = 2.4f;
 			float elapsedSeconds = Engine.Instance.FrameTime;
 
-			if (VehicleController.Turn < 0)
+			if (SteeringInput < 0)
 			{
-				_steeringWheel += steeringSpeed * elapsedSeconds * VehicleController.Turn;
+				_steeringWheel += SteeringSpeed * elapsedSeconds * SteeringInput;
 				_steeringWheel = Math.Max(_steeringWheel, -MaxSteeringLock);
 			}
-			else if (VehicleController.Turn > 0)
+			else if (SteeringInput > 0)
 			{
-				_steeringWheel += steeringSpeed * elapsedSeconds * VehicleController.Turn;
+				_steeringWheel += SteeringSpeed * elapsedSeconds * SteeringInput;
 				_steeringWheel = Math.Min(_steeringWheel, MaxSteeringLock);
 			}
 			else
 			{
 				if (_steeringWheel > 0.05f)
-					_steeringWheel -= steeringSpeed * elapsedSeconds;
+					_steeringWheel -= SteeringSpeed * elapsedSeconds;
 				else if (_steeringWheel < -0.05f)
-					_steeringWheel += steeringSpeed * elapsedSeconds;
+					_steeringWheel += SteeringSpeed * elapsedSeconds;
 				else
 					_steeringWheel = 0;
 			}
@@ -242,24 +195,24 @@ namespace OpenNFS1.Physics
 			float maxRot = MaxRotationPerSec * elapsedSeconds;
 
 			// Handle car rotation after collision
-			if (_rotateCarAfterCollision != 0)
+			if (RotateCarAfterCollision != 0)
 			{
 				_audioProvider.PlaySkid(true);
 
-				if (_rotateCarAfterCollision > maxRot)
+				if (RotateCarAfterCollision > maxRot)
 				{
 					_rotationChange += maxRot;
-					_rotateCarAfterCollision -= maxRot;
+					RotateCarAfterCollision -= maxRot;
 				}
-				else if (_rotateCarAfterCollision < -maxRot)
+				else if (RotateCarAfterCollision < -maxRot)
 				{
 					_rotationChange -= maxRot;
-					_rotateCarAfterCollision += maxRot;
+					RotateCarAfterCollision += maxRot;
 				}
 				else
 				{
-					_rotationChange += _rotateCarAfterCollision;
-					_rotateCarAfterCollision = 0;
+					_rotationChange += RotateCarAfterCollision;
+					RotateCarAfterCollision = 0;
 				}
 			}
 			else
@@ -275,7 +228,7 @@ namespace OpenNFS1.Physics
 					if (_rotationChange != 0)
 					{
 						_slipFactor = _mass * Math.Abs(_speed) * 0.0000020f;
-						if (VehicleController.Brake > 0)
+						if (BrakePedalInput > 0)
 							_slipFactor *= 1.2f;
 
 						_slipFactor = Math.Min(_slipFactor, 0.91f);
@@ -286,7 +239,7 @@ namespace OpenNFS1.Physics
 					}
 				}
 
-				if (_isOnGround && VehicleController.Brake > 0.5f && Math.Abs(_speed) > 5)
+				if (_isOnGround && BrakePedalInput > 0.5f && Math.Abs(_speed) > 5)
 				{
 					_wheels[0].IsSkidding = _wheels[1].IsSkidding = _wheels[2].IsSkidding = _wheels[3].IsSkidding = true;
 					_audioProvider.PlaySkid(true);
@@ -322,7 +275,7 @@ namespace OpenNFS1.Physics
 
 			if (_isOnGround)
 			{
-				float drag = 6000f * VehicleController.Brake / (_speed * 2f);  //we should slow more quickly as our speed drops
+				float drag = 6000f * BrakePedalInput / (_speed * 2f);  //we should slow more quickly as our speed drops
 				float inertia = _mass;
 				drag += Math.Abs(_steeringWheel) * 10f;
 				if (Math.Abs(_speed) > 30)
@@ -337,7 +290,7 @@ namespace OpenNFS1.Physics
 				if (Math.Abs(_speed) < 1)
 					drag = 0;
 
-				GameConsole.WriteLine("drag: " + drag, 1);
+				
 
 				//_force -= _direction * drag * 100 * elapsedSeconds;
 				
@@ -356,11 +309,11 @@ namespace OpenNFS1.Physics
 				// Calculate pitch depending on the force
 				float speedChange = _speed - _previousSpeed;
 
-				_carPitchSpring.ChangePosition(speedChange * 0.6f);
-				_carRollSpring.ChangePosition(_steeringWheel * -0.05f * Math.Min(1, _speed / 30));
+				BodyPitch.ChangePosition(speedChange * 0.6f);
+				BodyRoll.ChangePosition(_steeringWheel * -0.05f * Math.Min(1, _speed / 30));
 
-				_carPitchSpring.Simulate(_moveFactorPerSecond);
-				_carRollSpring.Simulate(_moveFactorPerSecond);
+				BodyPitch.Simulate(_moveFactorPerSecond);
+				BodyRoll.Simulate(_moveFactorPerSecond);
 			}
 		}
 
@@ -370,7 +323,7 @@ namespace OpenNFS1.Physics
 
 			float newAccelerationForce = 0.0f;
 
-			_motor.Throttle = VehicleController.Acceleration;
+			_motor.Throttle = ThrottlePedalInput;
 			newAccelerationForce += _motor.CurrentPowerOutput * 0.4f;
 
 			if (_motor.Gearbox.GearEngaged && _motor.Gearbox.CurrentGear > 0)
@@ -419,7 +372,6 @@ namespace OpenNFS1.Physics
 				float speedApplyFactor = Vector3.Dot(Vector3.Normalize(speedChangeVector), _direction);
 				if (speedApplyFactor > 1)
 					speedApplyFactor = 1;
-				GameConsole.WriteLine(speedChangeVector.Length() * speedApplyFactor, 2);
 				_speed += speedChangeVector.Length() * speedApplyFactor;
 			}
 		}
@@ -436,9 +388,8 @@ namespace OpenNFS1.Physics
 				_moveFactorPerSecond = 0.5f;
 		}
 
-		public virtual void Update(GameTime gameTime)
+		public virtual void Update()
 		{
-			_prevPosition = _position;
 			SetMoveFactor();
 			float moveFactor = _moveFactorPerSecond;
 
@@ -464,9 +415,9 @@ namespace OpenNFS1.Physics
 			UpdateTrackNode();
 			var nextNode = CurrentNode.Next;
 
-			GameConsole.WriteLine("inAir: " + !_isOnGround + ", " + _direction.Y, 3);
-			GameConsole.WriteLine("slope: " + CurrentNode.Slope + ", " + nextNode.Slope, 4);
-			GameConsole.WriteLine("slope delta: " + (CurrentNode.Slope - nextNode.Slope), 5);
+			//GameConsole.WriteLine("inAir: " + !_isOnGround + ", " + _direction.Y, 3);
+			//GameConsole.WriteLine("slope: " + CurrentNode.Slope + ", " + nextNode.Slope, 4);
+			//GameConsole.WriteLine("slope delta: " + (CurrentNode.Slope - nextNode.Slope), 5);
 			if ((CurrentNode.Slope - nextNode.Slope > 50 && _speed > 100) || Engine.Instance.Input.WasPressed(Keys.Space))
 			{
 				_isOnGround = false;
@@ -488,14 +439,14 @@ namespace OpenNFS1.Physics
 				_direction = Vector3.Cross(_up, CarRight);
 			}
 
-			_trackHeight = MathHelper.Lerp(closestPoint1.Y, closestPoint2.Y, ratio); // _track.GetHeightAtPoint(CurrentNode, _position);
-			if (_trackHeight == -9999)
+			_currentHeightOfTrack = MathHelper.Lerp(closestPoint1.Y, closestPoint2.Y, ratio); // _track.GetHeightAtPoint(CurrentNode, Position);
+			if (_currentHeightOfTrack == -9999)
 			{
 				throw new Exception();
 			}
 			if (_isOnGround)
 			{
-				_position.Y = _trackHeight;
+				_position.Y = _currentHeightOfTrack;
 			}
 
 			UpdateWheels();
@@ -503,18 +454,17 @@ namespace OpenNFS1.Physics
 			ApplyGravityAndCheckForCollisions();
 		}
 
-		#endregion
 
 		private void UpdateTrackNode()
 		{
 			var nextNode = CurrentNode.Next;
 			var prevNode = CurrentNode.Prev;
-			if (!Utility.IsLeftOfLine(nextNode.GetLeftBoundary(), nextNode.GetRightBoundary(), Position))
+			if (!Utility.IsLeftOfLine(nextNode.GetLeftBoundary(), nextNode.GetRightBoundary(), _position))
 			{
 				CurrentNode = CurrentNode.Next;
-				Debug.WriteLine("passed node - new node " + CurrentNode.Number);
+				//Debug.WriteLine("passed node - new node " + CurrentNode.Number);
 			}
-			else if (prevNode != null && Utility.IsLeftOfLine(prevNode.GetLeftBoundary(), prevNode.GetRightBoundary(), Position))
+			else if (prevNode != null && Utility.IsLeftOfLine(prevNode.GetLeftBoundary(), prevNode.GetRightBoundary(), _position))
 			{
 				CurrentNode = prevNode;
 				Debug.WriteLine("passed node (back) - new node " + CurrentNode.Number);
@@ -528,17 +478,13 @@ namespace OpenNFS1.Physics
 		{
 			_position = CurrentNode.Position + new Vector3(0, 50, 0);
 			_direction = Vector3.Transform(Vector3.Forward, Matrix.CreateRotationY(MathHelper.ToRadians(CurrentNode.Orientation)));
-			_prevPosition = _position;
 			_speed = 0;
 			_isOnGround = false;
 			ScreenEffects.Instance.UnFadeScreen();
 			return;
 		}
 
-		#region CheckForCollisions
-
-		//float gravitySpeed = 0.0f;
-
+		
 		void ApplyGravityAndCheckForCollisions()
 		{
 			_wheelsOutsideRoad = VehicleFenceCollision.GetWheelsOutsideRoadVerge(this);
@@ -560,25 +506,18 @@ namespace OpenNFS1.Physics
 		{
 			if (_isOnGround) return;
 
-			// Fix car on ground
-			float distFromGround = _trackHeight - _position.Y;
-
 			bool wasOnGround = _isOnGround;
 
-			_isOnGround = _position.Y < _trackHeight; // distFromGround > -0.5f;  //underneath ground = on ground
+			_isOnGround = _position.Y < _currentHeightOfTrack;
 
 			if (!_isOnGround)
 			{
-				//_position.Y += _upVelocity * Engine.Instance.FrameTime;
-				_position.Y -= Gravity * Engine.Instance.FrameTime;
-				Debug.WriteLine("inair: " + _position.Y + ", " + _direction.Y);
-				//if (_direction.Y > 0)
-				{
-					if (_timeInAir > 0.3f && _direction.Y > -0.5f)
-					_direction.Y -= _timeInAir * 0.005f;
-					_direction = Vector3.Normalize(_direction);
-					//if (_direction.Y < 0) _direction.Y = 0;
-				}
+				_position.Y -= Gravity * 1.2f * Engine.Instance.FrameTime;
+				Debug.WriteLine("inair: " + Position.Y + ", " + _direction.Y);
+				// slowly pitch the nose of the car downwards - helps to flatten out the jump and looks better
+				if (_timeInAir > 0.2f && _direction.Y > -0.5f)
+					_direction.Y -= _timeInAir * 0.006f;
+				_direction = Vector3.Normalize(_direction);
 			}
 
 			if (_isOnGround && !wasOnGround)
@@ -599,8 +538,6 @@ namespace OpenNFS1.Physics
 			}
 		}
 
-		#endregion
-
 
 		public void UpdateCarMatrixAndCamera()
 		{
@@ -610,10 +547,10 @@ namespace OpenNFS1.Physics
 			orientation.Forward = _direction;
 
 			_renderMatrix =
-					Matrix.CreateRotationX( _carPitchSpring.Position / 60) *
-					Matrix.CreateRotationZ(-_carRollSpring.Position * 0.21f) *
+					Matrix.CreateRotationX( BodyPitch.Position / 60) *
+					Matrix.CreateRotationZ(-BodyRoll.Position * 0.21f) *
 					orientation *
-					Matrix.CreateTranslation(_position);
+					Matrix.CreateTranslation(Position);
 		}
 
 
@@ -630,12 +567,11 @@ namespace OpenNFS1.Physics
 
 			if (!_isOnGround)
 			{
-				points[0].Y = _trackHeight;
-				points[1].Y = _trackHeight;
-				points[2].Y = _trackHeight;
-				points[3].Y = _trackHeight;
+				points[0].Y = _currentHeightOfTrack;
+				points[1].Y = _currentHeightOfTrack;
+				points[2].Y = _currentHeightOfTrack;
+				points[3].Y = _currentHeightOfTrack;
 			}
-
 			ObjectShadow.Render(points);
 		}
 

@@ -12,17 +12,13 @@ namespace OpenNFS1.UI.Screens
     {
         DoRaceScreen _currentRace;
         Texture2D _background;
-        Vehicle _playerCar;
         int _selectedOption = 0;
 
-        public RacePausedScreen(DoRaceScreen currentRace, Vehicle playerCar)
+        public RacePausedScreen(DoRaceScreen currentRace)
             : base(false)
         {
-            _playerCar = playerCar;
-			_playerCar.DisableAudio();
             _currentRace = currentRace;
-            _background = ScreenEffects.TakeScreenshot();
-			
+            _background = ScreenEffects.TakeScreenshot();	
         }
 
         #region IDrawableObject Members
@@ -46,8 +42,8 @@ namespace OpenNFS1.UI.Screens
             {
                 if (_selectedOption == 0)
                 {
-                    //_playerCar.InitializeForDriving();
                     Engine.Instance.Mode = _currentRace;
+					_currentRace.Resume();
                 }
                 else
                 {
@@ -62,12 +58,12 @@ namespace OpenNFS1.UI.Screens
 
             Engine.Instance.SpriteBatch.Draw(_background, Vector2.Zero, new Color(255, 255, 255, 255));
 
-            int y = 40;
+            int y = 20;
             Engine.Instance.SpriteBatch.DrawString(Font, "Race Paused", new Vector2(50, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
 
-            y += 400;
+            y += 200;
             Engine.Instance.SpriteBatch.DrawString(Font, " Continue", new Vector2(200, y), _selectedOption == 0 ? Color.Yellow : Color.WhiteSmoke, 0, Vector2.Zero, 1.2f, SpriteEffects.None, 0);
-            y += 50;
+            y += 25;
             Engine.Instance.SpriteBatch.DrawString(Font, " Main Menu", new Vector2(200, y), _selectedOption == 1 ? Color.Yellow : Color.WhiteSmoke, 0, Vector2.Zero, 1.2f, SpriteEffects.None, 0);
 
             Engine.Instance.SpriteBatch.End();

@@ -10,18 +10,25 @@ namespace OpenNFS1
 	class ObjectShadow
 	{
 		static BasicEffect _effect;
+		static VertexPositionColor[] _verts = new VertexPositionColor[4];
 		static ObjectShadow()
 		{
 			_effect = new BasicEffect(Engine.Instance.Device);
+			_effect.TextureEnabled = false;
+			_effect.VertexColorEnabled = true;
+
+			Color shadowColor = new Color(10, 10, 10, 150);
+			for (int i = 0; i < 4; i++)
+			{
+				_verts[i] = new VertexPositionColor(Vector3.Zero, shadowColor);
+			}
 		}
 
 		public static void Render(Vector3[] points, Matrix world)
 		{
-			Color shadowColor = new Color(10, 10, 10, 150);
-			VertexPositionColor[] verts = new VertexPositionColor[points.Length];
-			for (int i = 0; i < points.Length; i++)
+			for (int i = 0; i < 4; i++)
 			{
-				verts[i] = new VertexPositionColor(points[i], shadowColor);
+				_verts[i].Position = points[i];
 			}
 
 			GraphicsDevice device = Engine.Instance.Device;
@@ -29,15 +36,13 @@ namespace OpenNFS1
 			_effect.World = world;
 			_effect.View = Engine.Instance.Camera.View;
 			_effect.Projection = Engine.Instance.Camera.Projection;
-			_effect.TextureEnabled = false;
-			_effect.VertexColorEnabled = true;
 
 			device.DepthStencilState = DepthStencilState.None;
 			device.BlendState = BlendState.AlphaBlend;
 
 			_effect.CurrentTechnique.Passes[0].Apply();
 
-			device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleStrip, verts, 0, 2);
+			device.DrawUserPrimitives<VertexPositionColor>(PrimitiveType.TriangleStrip, _verts, 0, 2);
 
 			//device.RenderState.AlphaBlendEnable = false;
 			device.BlendState = BlendState.Opaque;

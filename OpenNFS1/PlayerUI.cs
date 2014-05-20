@@ -12,18 +12,19 @@ using OpenNFS1.Parsers.Track;
 using OpenNFS1.Views;
 using OpenNFS1.Physics;
 using OpenNFS1.Vehicles;
+using OpenNFS1.Tracks;
 
 
 namespace OpenNFS1
 {
-    class Driver
+    class PlayerUI
     {
         DrivableVehicle _vehicle;
         List<IView> _views = new List<IView>();
         int _currentView;
 
 		
-        public Driver(DrivableVehicle vehicle)
+        public PlayerUI(DrivableVehicle vehicle)
         {
             _vehicle = vehicle;
             
@@ -38,10 +39,10 @@ namespace OpenNFS1
 
 		public bool ShouldRenderCar { get { return _views[_currentView].ShouldRenderPlayer; } }
 
+		public TrackNode CurrentNode { get { return _vehicle.CurrentNode; } }
+
         public void Update(GameTime gameTime)
         {
-            _vehicle.Update(gameTime);
-
             if (VehicleController.ChangeView)
             {
                 _views[_currentView].Deactivate();

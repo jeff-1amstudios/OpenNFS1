@@ -69,7 +69,7 @@ namespace OpenNFS1.Physics
 				}
 
 				// move away from the way slightly.  We should be a bit smarter and along more of a slide along the wall..
-				car.Position += fenceNormal * 1f;
+				car.Position += fenceNormal * 1.5f;
 				break;
 			}
         }
@@ -104,8 +104,10 @@ namespace OpenNFS1.Physics
 
         private static void SlideAlongFence(Vehicle car, int wheel, float collisionAngle, float direction)
         {
-
-            EnvironmentAudioProvider.Instance.PlayVehicleFenceCollision();
+			if (car.AudioEnabled)
+			{
+				EnvironmentAudioProvider.Instance.PlayVehicleFenceCollision();
+			}
 
             // if we hit the front wheels, change the direction to almost match the fence direction.  If we hit the back wheels this looks weird so
 			// only rotate 50% of the way
@@ -123,7 +125,11 @@ namespace OpenNFS1.Physics
 
         private static void HandleHeadOnCrash(Vehicle car, int wheel, float collisionAngle)
         {
-            EnvironmentAudioProvider.Instance.PlayVehicleFenceCollision();
+			if (car.AudioEnabled)
+			{
+				EnvironmentAudioProvider.Instance.PlayVehicleFenceCollision();
+			}
+
 
             // Also rotate car if less than 60 degrees
             if (Math.Abs(collisionAngle) < MathHelper.Pi / 3.0f)

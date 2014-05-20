@@ -46,7 +46,7 @@ namespace OpenNFS1.UI.Screens
                     Engine.Instance.Mode = new HomeScreen2();
                 else
                 {
-                    if (!_race.TrackDescription.IsOpenRoad)
+					if (!GameConfig.SelectedTrack.IsOpenRoad)
                         Engine.Instance.Mode = new DoRaceScreen(_raceTrack);
                     else
                     {
@@ -66,7 +66,7 @@ namespace OpenNFS1.UI.Screens
 
             Engine.Instance.SpriteBatch.Draw(_background, Vector2.Zero, new Color(255, 255, 255, 100));
 
-            if (_race.TrackDescription.IsOpenRoad)
+			if (GameConfig.SelectedTrack.IsOpenRoad)
                 DrawOpenRoadResult();
             else
                 DrawCircuitResult();
@@ -81,7 +81,7 @@ namespace OpenNFS1.UI.Screens
             int y = 80;
             Engine.Instance.SpriteBatch.DrawString(Font, "Race completed!", new Vector2(50, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
             y += 70;
-            Engine.Instance.SpriteBatch.DrawString(Font, _race.TrackDescription.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
+			Engine.Instance.SpriteBatch.DrawString(Font, GameConfig.SelectedTrack.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
             y += 20;
             int totalSeconds = 0;
             for (int i = 0; i < _race.LapTimes.Count; i++)
@@ -106,7 +106,7 @@ namespace OpenNFS1.UI.Screens
             int y = 80;
             Engine.Instance.SpriteBatch.DrawString(Font, "Stage completed!", new Vector2(50, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
             y += 70;
-            Engine.Instance.SpriteBatch.DrawString(Font, _race.TrackDescription.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
+			Engine.Instance.SpriteBatch.DrawString(Font, GameConfig.SelectedTrack.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
             y += 20;
                         
             y += 50;

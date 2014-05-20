@@ -47,8 +47,8 @@ namespace OpenNFS1.UI
 
             string msg = String.Format("{0}:{1}", _race.CurrentLapTime.Minutes.ToString("00"), _race.CurrentLapTime.Seconds.ToString("00"));
             Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(20, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
-            
-            if (!_race.TrackDescription.IsOpenRoad)
+
+			if (!GameConfig.SelectedTrack.IsOpenRoad)
                 Engine.Instance.SpriteBatch.DrawString(_font, String.Format("{0}:{1}", _race.RaceTime.Minutes.ToString("00"), _race.RaceTime.Seconds.ToString("00")), new Vector2(20, 20), Color.DimGray, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
 
             msg = String.Format("{0} kph", Math.Abs((int)_race.PlayerVehicle.Speed));
@@ -58,7 +58,7 @@ namespace OpenNFS1.UI
             msg = String.Format("[{0}]", GearToString(_race.PlayerVehicle.Motor.Gearbox.CurrentGear));
             Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(580, 2), Color.GreenYellow, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
 
-            if (!_race.TrackDescription.IsOpenRoad)
+			if (!GameConfig.SelectedTrack.IsOpenRoad)
             {
                 msg = String.Format("Lap {0}/{1}", Math.Min(_race.CurrentLap, _race.NbrLaps), _race.NbrLaps);
                 Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(800, 5), Color.GreenYellow, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
