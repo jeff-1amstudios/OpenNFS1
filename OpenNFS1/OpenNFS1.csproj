@@ -42,6 +42,7 @@
     <Compile Include="Dashboards\Dashboard.cs" />
     <Compile Include="Dashboards\DashboardDescription.cs" />
     <Compile Include="Dashboards\GearboxAnimation.cs" />
+    <Compile Include="PlayerRaceStats.cs" />
     <Compile Include="PlayerUI.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameConfig.cs" />
@@ -115,19 +116,10 @@
     <Compile Include="Vehicles\AI\TrafficDriver.cs" />
     <Compile Include="Vehicles\CarModel.cs" />
     <Compile Include="Vehicles\CarModelCache.cs" />
-    <Compile Include="Vehicles\CorvetteZR1.cs" />
-    <Compile Include="Vehicles\DodgeViper.cs" />
-    <Compile Include="Vehicles\Ferrari512.cs" />
-    <Compile Include="Vehicles\HondaNsx.cs" />
-    <Compile Include="Vehicles\LamboDiablo.cs" />
-    <Compile Include="Vehicles\MazdaRx7.cs" />
     <Compile Include="Vehicles\DrivableVehicle.cs" />
-    <Compile Include="Vehicles\Porsche911.cs" />
-    <Compile Include="Vehicles\ToyotaSupra.cs" />
     <Compile Include="Vehicles\Traffic\TrafficController.cs" />
     <Compile Include="Vehicles\Traffic\TrafficVehicle.cs" />
     <Compile Include="Vehicles\VehicleDescription.cs" />
-    <Compile Include="Vehicles\Warrior.cs" />
     <Compile Include="Views\BaseExternalView.cs" />
     <Compile Include="Views\BumperView.cs" />
     <Compile Include="Views\ChaseView.cs" />

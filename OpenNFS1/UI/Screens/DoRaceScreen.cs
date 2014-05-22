@@ -26,11 +26,9 @@ namespace OpenNFS1
 		DrivableVehicle _car;
 		Race _race;
 		RaceUI _raceUI;
-		TrafficController _trafficController;
 		PlayerUI _playerUI;
 		Viewport _raceViewport, _uiViewport;
 		PlayerDriver _playerDriver;
-		List<IDriver> _aiDrivers = new List<IDriver>();
 
 		public DoRaceScreen(Track track)
 		{
@@ -38,15 +36,15 @@ namespace OpenNFS1
 			_car = GameConfig.SelectedVehicle;
 
 			_playerDriver = new PlayerDriver(_car);
-			_track.AddDriver(_playerDriver);
-			_car.AudioEnabled = true;
+			//_car.AudioEnabled = true;
 
-			AIDriver d = new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "RX7"));
-			_aiDrivers.Add(d);
-			_track.AddDriver(d);
+			_race = new Race(3, _track, _playerDriver);
+			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
+			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
+			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
+			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
 			_playerUI = new PlayerUI(_car);
-			
-			
+			/*
 			d = new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "911"));
 			_aiDrivers.Add(d);
 			_track.AddDriver(d);
@@ -65,14 +63,10 @@ namespace OpenNFS1
 			d = new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "NSX"));
 			_aiDrivers.Add(d);
 			_track.AddDriver(d);
-			
-
-			_race = new Race(3, _car, _aiDrivers, _track);
+			*/
+						
 			_raceUI = new RaceUI(_race);
 			_race.StartCountdown();
-
-			_trafficController = new TrafficController(_track, _car);
-			_trafficController.Enabled = GameConfig.SelectedTrack.IsOpenRoad;
 
 			_raceViewport = new Viewport(0, 0, 640, 400);
 			_uiViewport = new Viewport(0, 0, 640, 480);
@@ -84,22 +78,16 @@ namespace OpenNFS1
 		{
 			Engine.Instance.Device.Viewport = _raceViewport;
 
+			_race.Update();
+			TyreSmokeParticleSystem.Instance.Update();
+			
 			_playerUI.Update(gameTime);
-			_playerDriver.Update();
-			foreach (var driver in _aiDrivers)
-				driver.Update();
-
-			Engine.Instance.Camera.Update(gameTime);
-
-			_track.Update(gameTime);
-			_trafficController.Update(gameTime);
-
-			_race.UpdatePlayerPosition(_playerUI.CurrentNode);
 
 			if (_race.HasFinished)
 			{
 				_car.AudioEnabled = false;
 				Engine.Instance.Mode = new RaceFinishedScreen(_race, _track);
+				return;
 			}
 
 			if (UIController.Pause)
@@ -107,6 +95,9 @@ namespace OpenNFS1
 				Pause();
 				return;
 			}
+
+			TyreSmokeParticleSystem.Instance.SetCamera(Engine.Instance.Camera);
+			Engine.Instance.Camera.Update(gameTime);
 		}
 
 		public void Pause()
@@ -122,39 +113,15 @@ namespace OpenNFS1
 
 		public void Draw()
 		{
-			Engine.Instance.Device.BlendState = BlendState.Opaque;
-			Engine.Instance.Device.DepthStencilState = DepthStencilState.Default;
 			Engine.Instance.Device.Viewport = _raceViewport;
 
-			_track.Render(Engine.Instance.Camera.Position, _playerUI.CurrentNode);
-
-			_trafficController.Render();
-
-			if (_playerUI.ShouldRenderCar)
-			{
-				_car.RenderShadow();
-			}
-
-			foreach (var driver in _aiDrivers)
-			{
-				driver.Vehicle.RenderShadow();
-			}
-
-			if (_playerUI.ShouldRenderCar)
-			{
-				_car.Render();
-			}
-			foreach (var driver in _aiDrivers)
-			{
-				driver.Vehicle.Render();
-			}
+			_race.Render(_playerUI.ShouldRenderCar);
+			TyreSmokeParticleSystem.Instance.Render();
 
 			Engine.Instance.Device.Viewport = _uiViewport;
 
-			_playerUI.Render();
 			_raceUI.Render();
-
-			Engine.Instance.Device.Viewport = _raceViewport;
+			_playerUI.Render();
 		}
 
 		#endregion

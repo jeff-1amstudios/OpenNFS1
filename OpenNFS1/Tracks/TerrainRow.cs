@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
+using OpenNFS1.Parsers;
 
 namespace OpenNFS1.Tracks
 {
@@ -10,9 +11,11 @@ namespace OpenNFS1.Tracks
 	// that the vehicles follow (slope, slant, width...)
 	class TerrainRow
 	{
+
 		const int TerrainPositionScale = 500;
 		public Vector3 MiddlePoint;
-		public Vector3[] LeftPoints, RightPoints;
+		public Vector3[] LeftPoints = new Vector3[TriFile.NbrTerrainPointsPerSide];
+		public Vector3[] RightPoints = new Vector3[TriFile.NbrTerrainPointsPerSide];
 
 		public void RelativizeTo(Vector3 position)
 		{

@@ -24,7 +24,6 @@ namespace OpenNFS1.Parsers
 
 		private void Parse(string filename, bool drivable)
 		{
-			BitmapChunk.ResetPalette();
 			string carFile = Path.Combine(GameConfig.CdDataPath, filename);
 			BinaryReader br = new BinaryReader(File.Open(carFile, FileMode.Open));
 			HeaderChunk rootChunk = new HeaderChunk();

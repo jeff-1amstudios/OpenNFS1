@@ -17,20 +17,15 @@ namespace OpenNFS1.Vehicles
         List<TrafficVehicle> _traffic = new List<TrafficVehicle>();
 		AlphaTestEffect _effect;
 
-        public bool Enabled { get; set; }
-
         public TrafficController(Track track, Vehicle player)
         {
             _track = track;
             _player = player;
-            Enabled = true;
 			_effect = new AlphaTestEffect(Engine.Instance.Device);
         }
 
-        public void Update(GameTime gameTime)
+        public void Update()
         {
-            if (!Enabled) return;
-
             for (int i = _traffic.Count - 1; i >= 0; i--)
             {
                 TrafficVehicle vehicle = _traffic[i];
@@ -74,7 +69,7 @@ namespace OpenNFS1.Vehicles
                 //laneOffset = 25;
                 Vector3 offset = Utility.RotatePoint(new Vector2(vehicle.TravelDirection * laneOffset, 0), -_track.RoadNodes[vehicle.LastNode].Orientation);
                 vehicle.Position = Vector3.Lerp(_track.RoadNodes[vehicle.LastNode].Position, nextNode.Position, vehicle.DistanceBetweenNodes) + offset;
-                vehicle.DistanceBetweenNodes += (float)gameTime.ElapsedGameTime.TotalSeconds * 3f;
+                vehicle.DistanceBetweenNodes += Engine.Instance.FrameTime * 3f;
             }
 
             while (_traffic.Count < 5)
@@ -88,8 +83,6 @@ namespace OpenNFS1.Vehicles
 
         public void Render()
         {
-            if (!Enabled) return;
-
 			_effect.View = Engine.Instance.Camera.View;
 			_effect.Projection = Engine.Instance.Camera.Projection;
 

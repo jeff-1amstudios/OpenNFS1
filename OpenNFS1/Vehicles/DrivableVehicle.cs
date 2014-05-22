@@ -47,14 +47,13 @@ namespace OpenNFS1.Vehicles
 
 		public override void Render()
 		{
-			//RenderShadow();
 			_effect.View = Engine.Instance.Camera.View;
 			_effect.Projection = Engine.Instance.Camera.Projection;
 			_effect.World = _renderMatrix;
-			_effect.CurrentTechnique.Passes[0].Apply();
+			_effect.VertexColorEnabled = false;
 			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
+			_effect.CurrentTechnique.Passes[0].Apply();
 			_model.Render(_effect);
-			Engine.Instance.Device.RasterizerState = RasterizerState.CullCounterClockwise;
 			base.Render();			
 		}
 	}

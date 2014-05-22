@@ -37,7 +37,6 @@ namespace OpenNFS1
             _graphics.PreferredBackBufferHeight = 480;
 			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
 			_graphics.IsFullScreen = false;
-            //_graphics.GraphicsProfile = GraphicsProfile.Reach;
         }
 
         /// <summary>
@@ -49,35 +48,6 @@ namespace OpenNFS1
         protected override void Initialize()
         {
             base.Initialize();
-
-			//byte[] pal = System.IO.File.ReadAllBytes("c:\\temp\\pal2.pal");
-			//byte[] palbmp = new byte[1024];
-			//for (int i = 0; i < 168; i++ )
-			//{ 
-
-			//	//rgb -> bgr
-			//	palbmp[i * 4+2] = pal[i * 3];
-			//	palbmp[i * 4 + 1] = pal[i * 3 + 1];
-			//	palbmp[i * 4 + 1] = pal[i * 3 + 2];
-			//}
-
-			//BinaryWriter bw = new BinaryWriter(File.Open(@"C:\Games\NFSSE\FRONTEND\ART\CONTROL\SUP1\0000.bmp", FileMode.Open));
-			//bw.Seek(54, SeekOrigin.Begin);
-			//bw.Write(palbmp);
-
-			//bw.Close();
-						
-
-			
-
-			/*
-			GameConfig.SelectedVehicle = new PlayerCar(VehicleDescription.Descriptions.Find(a => a.Name == "ToyotaSupra"));
-			var trackDesc = TrackDescription.Descriptions.Find(a=> a.Name=="Transpolis");
-			TriFile tri = new TriFile(trackDesc.FileName);
-			var track = new TrackAssembler().Assemble(tri);
-			GameConfig.SelectedTrack = trackDesc;
-			Engine.Instance.Mode = new DoRaceScreen(track);      
-            */
         }
 
         /// <summary>
@@ -86,8 +56,6 @@ namespace OpenNFS1
         /// </summary>
         protected override void LoadContent()
         {
-			
-
 			Engine.Create(this, _graphics);
 
 			_renderTarget = new RenderTarget2D(Engine.Instance.Device, 640, 480, false, _graphics.GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24, 1, RenderTargetUsage.DiscardContents);

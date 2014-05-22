@@ -345,9 +345,6 @@ namespace OpenNFS1.Physics
 			foreach (VehicleWheel wheel in _wheels)
 				wheel.Update();
 
-			TyreSmokeParticleSystem.Instance.Update();
-			TyreSmokeParticleSystem.Instance.SetCamera(Engine.Instance.Camera);
-
 			_motor.Update(_speed);
 
 			if (_motor.AtRedline && !_motor.WheelsSpinning)
@@ -512,7 +509,7 @@ namespace OpenNFS1.Physics
 
 			if (!_isOnGround)
 			{
-				_position.Y -= Gravity * 1.2f * Engine.Instance.FrameTime;
+				_position.Y -= Gravity * 10f * _timeInAir * Engine.Instance.FrameTime;
 				Debug.WriteLine("inair: " + Position.Y + ", " + _direction.Y);
 				// slowly pitch the nose of the car downwards - helps to flatten out the jump and looks better
 				if (_timeInAir > 0.2f && _direction.Y > -0.5f)
@@ -560,7 +557,7 @@ namespace OpenNFS1.Physics
 			Vector3[] points = new Vector3[4];
 			float y = -_wheels[0].Size / 2;
 			float xoffset = 0.1f;
-			points[0] = _wheels[0].GetOffsetPosition(new Vector3(-xoffset,y,-2));
+			points[0] = _wheels[0].GetOffsetPosition(new Vector3(-xoffset, y, -2));
 			points[1] = _wheels[1].GetOffsetPosition(new Vector3(xoffset, y, -2));
 			points[2] = _wheels[2].GetOffsetPosition(new Vector3(-xoffset, y, 3.5f));
 			points[3] = _wheels[3].GetOffsetPosition(new Vector3(xoffset, y, 3.5f));
@@ -588,8 +585,6 @@ namespace OpenNFS1.Physics
 			carMatrix.Right = CarRight;
 			carMatrix.Up = _up;
 			carMatrix.Forward = -_direction;
-
-			TyreSmokeParticleSystem.Instance.Render();
 		}
 
 		protected void Gearbox_GearChanged(object sender, EventArgs e)

@@ -23,6 +23,7 @@ namespace OpenNFS1.Parsers
 	enum SceneryFlags
 	{
 		None = 0,
+		Unk1 = 1,
 		Animated = 4
 	}
 
@@ -288,7 +289,7 @@ namespace OpenNFS1.Parsers
 			long position = reader.BaseStream.Position;
 
 			TerrainSegment last = null;
-
+			int i = 0;
 			while (true)
 			{
 				char[] trkd = reader.ReadChars(4);  //"TRKD"
@@ -303,11 +304,12 @@ namespace OpenNFS1.Parsers
 
 				TerrainSegment terrainSegment = new TerrainSegment();
 				terrainSegment.TextureIds = reader.ReadBytes(10);
-
+				
 				terrainSegment.Rows[0] = ReadTerrainRow(reader);
 				terrainSegment.Rows[1] = ReadTerrainRow(reader);
 				terrainSegment.Rows[2] = ReadTerrainRow(reader);
 				terrainSegment.Rows[3] = ReadTerrainRow(reader);
+								
 
 				//fenceType stores the sides of the road the fence lives, and the textureId to use for it.
 				// If the top bit is set, fence on the left exists, if next bit is set, fence is on the right.  Both can also be set. 
@@ -325,6 +327,8 @@ namespace OpenNFS1.Parsers
 					//Debug.WriteLine("texture: " + terrainSegment.FenceTextureId + ", " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
 				}
 
+				//Debug.WriteLine("TRKD: " + i + ", " + terrainSegment.Rows[0].RightPoints[5] + ", fence: " + terrainSegment.FenceTextureId + " , " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
+
 				if (last != null)
 				{
 					last.Next = terrainSegment;
@@ -336,7 +340,7 @@ namespace OpenNFS1.Parsers
 				//skip to end of block (+12 to include block header)
 				position += blockLength + 12;
 				reader.BaseStream.Position = position;
-
+				i++;
 				if (reader.BaseStream.Position >= fileSize)
 				{
 					break;
@@ -354,30 +358,31 @@ namespace OpenNFS1.Parsers
 		private TerrainRow ReadTerrainRow(BinaryReader reader)
 		{
 			TerrainRow row = new TerrainRow();
-			row.RightPoints = new Vector3[NbrTerrainPointsPerSide];
-			row.LeftPoints = new Vector3[NbrTerrainPointsPerSide];
 			row.MiddlePoint = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
 
 			if (row.MiddlePoint != Vector3.Zero)
 			{
-
 			}
 
 			row.MiddlePoint *= GameConfig.TerrainScale;
 			row.RightPoints[0] = row.MiddlePoint;
- 			row.RightPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.RightPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.RightPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.RightPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.RightPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
+			row.RightPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.RightPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.RightPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.RightPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.RightPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
 
 			row.LeftPoints[0] = row.MiddlePoint;
-			row.LeftPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.LeftPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.LeftPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.LeftPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			row.LeftPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16()) * GameConfig.TerrainScale;
-			
+			row.LeftPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.LeftPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.LeftPoints[3] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.LeftPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+			row.LeftPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
+
+			for (int i = 0; i < NbrTerrainPointsPerSide; i++)
+				row.RightPoints[i] *= GameConfig.TerrainScale;
+			for (int i = 0; i < NbrTerrainPointsPerSide; i++)
+				row.LeftPoints[i] *= GameConfig.TerrainScale;
 
 			// Each point is relative to the previous point
 			for (int i = 1; i < NbrTerrainPointsPerSide; i++)

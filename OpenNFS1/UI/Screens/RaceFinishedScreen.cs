@@ -84,11 +84,11 @@ namespace OpenNFS1.UI.Screens
 			Engine.Instance.SpriteBatch.DrawString(Font, GameConfig.SelectedTrack.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
             y += 20;
             int totalSeconds = 0;
-            for (int i = 0; i < _race.LapTimes.Count; i++)
+            for (int i = 0; i < _race.PlayerStats.LapTimes.Count; i++)
             {
                 y += 40;
-                Engine.Instance.SpriteBatch.DrawString(Font, "Lap " + (i + 1) + ": " + TimeSpan.FromSeconds(_race.LapTimes[i]).ToString(), new Vector2(150, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
-                totalSeconds += _race.LapTimes[i];
+                Engine.Instance.SpriteBatch.DrawString(Font, "Lap " + (i + 1) + ": " + TimeSpan.FromSeconds(_race.PlayerStats.LapTimes[i]).ToString(), new Vector2(150, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
+                totalSeconds += _race.PlayerStats.LapTimes[i];
             }
 
             y += 50;
@@ -110,7 +110,7 @@ namespace OpenNFS1.UI.Screens
             y += 20;
                         
             y += 50;
-            Engine.Instance.SpriteBatch.DrawString(Font, "Time: " + TimeSpan.FromSeconds(_race.LapTimes[0]), new Vector2(150, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
+            Engine.Instance.SpriteBatch.DrawString(Font, "Time: " + TimeSpan.FromSeconds(_race.PlayerStats.LapTimes[0]), new Vector2(150, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.0f, SpriteEffects.None, 0);
 
             y += 100;
             

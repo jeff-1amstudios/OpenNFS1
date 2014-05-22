@@ -20,7 +20,7 @@ namespace OpenNFS1.Parsers.Track
 		public Vector2 Size;
 
 		public abstract void Initialize();
-		public virtual void Update(GameTime gameTime) { }
+		public virtual void Update() { }
 		public abstract void Render(AlphaTestEffect effect);
 	}
 
@@ -37,10 +37,11 @@ namespace OpenNFS1.Parsers.Track
 
 		public override void Initialize()
 		{
+			float aspect = (float)_texture.Width / _texture.Height;
 			if (Size.X == 0)
-				Size.X = _texture.Width * GameConfig.TerrainScale * 10000;
+				Size.X = Size.Y * aspect * GameConfig.TerrainScale * 10000;
 			if (Size.Y == 0)
-				Size.Y = _texture.Height * GameConfig.TerrainScale * 10000;
+				Size.Y = Size.X * aspect * GameConfig.TerrainScale * 10000;
 
 			_matrix = Matrix.CreateScale(Size.X, Size.Y, 1) *
 							Matrix.CreateRotationY(Orientation) *
@@ -80,9 +81,9 @@ namespace OpenNFS1.Parsers.Track
 							Matrix.CreateTranslation(Position);
 		}
 
-		public override void Update(GameTime gameTime)
+		public override void Update()
 		{
-			_textureChangeTime -= gameTime.ElapsedGameTime.TotalSeconds;
+			_textureChangeTime -= Engine.Instance.FrameTime;
 			if (_textureChangeTime < 0.0f)
 			{
 				_currentTexture++;

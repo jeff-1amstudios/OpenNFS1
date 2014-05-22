@@ -99,7 +99,7 @@ namespace NfsEngine
             _lookAt.AddValue(new Vector3(ChaseOffset, ChaseHeight, 0) + (-_chaseDirection * new Vector3(ChaseDistance, ChaseDistance, ChaseDistance)));
             Vector3 avgLookAt = _lookAt.GetAveragedValue();
             Vector3 cameraPosition = _position +avgLookAt;
-            _view = Matrix.CreateLookAt(cameraPosition, cameraPosition - avgLookAt + new Vector3(0,13,0), UpVector);
+            _view = Matrix.CreateLookAt(cameraPosition, cameraPosition - avgLookAt + new Vector3(0,13,0), Vector3.Up);
             _projection = Matrix.CreatePerspectiveFieldOfView(FieldOfView, Engine.Instance.AspectRatio, NearPlaneDistance, FarPlaneDistance);
 		}
 

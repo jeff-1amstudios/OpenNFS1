@@ -24,15 +24,16 @@ namespace OpenNFS1.Dashboards
 
         public GearboxAnimation()
         {
+			float boundX = 20, boundY = 30;
             _gearPositions = new List<Vector2>();
-            _gearPositions.Add(new Vector2(35, 35));
+            _gearPositions.Add(new Vector2(boundX, boundY));
             _gearPositions.Add(new Vector2(0, 0));
-            _gearPositions.Add(new Vector2(-35, -35));
-            _gearPositions.Add(new Vector2(-35, 35));
-            _gearPositions.Add(new Vector2(0, -35));
-            _gearPositions.Add(new Vector2(0, 35));
-            _gearPositions.Add(new Vector2(35, -35));
-            _gearPositions.Add(new Vector2(35, 35));
+            _gearPositions.Add(new Vector2(-boundX, -boundY));
+            _gearPositions.Add(new Vector2(-boundX, boundY));
+            _gearPositions.Add(new Vector2(0, -boundY));
+            _gearPositions.Add(new Vector2(0, boundY));
+            _gearPositions.Add(new Vector2(boundX, -boundY));
+            _gearPositions.Add(new Vector2(boundX, boundY));
 
             _currentPosition = _gearPositions[2];
             Current = 2;

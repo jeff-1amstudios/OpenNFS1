@@ -59,7 +59,6 @@ namespace OpenNFS1.Parsers
                     meshChunk.Offset = reader.BaseStream.Position;
                 else
                 {
-                    BitmapChunk.ResetPalette();
                     meshChunk.Read(reader);
                 }
                 _meshChunks.Add(meshChunk);

@@ -11,6 +11,7 @@ using OpenNFS1.Tracks;
 using Microsoft.Xna.Framework.Input;
 using OpenNFS1.Vehicles;
 using OpenNFS1.Vehicles.AI;
+using OpenNFS1.Physics;
 
 namespace OpenNFS1.Parsers.Track
 {
@@ -49,19 +50,12 @@ namespace OpenNFS1.Parsers.Track
 			_skybox = new TrackSkyBox(horizon);
 		}
 
-		public void AddDriver(IDriver driver)
+		public void Update()
 		{
-			driver.Vehicle.Position = StartPosition + new Vector3(0, 2, 0);
-			driver.Vehicle.Direction = Vector3.Forward;
-			driver.Vehicle.Track = this;
-		}
-
-		public void Update(GameTime gameTime)
-		{
-			_skybox.Update(gameTime);
+			_skybox.Update();
 			foreach (var item in SceneryItems)
 			{
-				item.Update(gameTime);
+				item.Update();
 			}
 		}
 
@@ -90,6 +84,8 @@ namespace OpenNFS1.Parsers.Track
 			Engine.Instance.Device.SetVertexBuffer(TerrainVertexBuffer);
 			_effect.CurrentTechnique.Passes[0].Apply();
 			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
+			
+			//Engine.Instance.Device.RasterizerState = new RasterizerState { CullMode = Microsoft.Xna.Framework.Graphics.CullMode.None, FillMode = Microsoft.Xna.Framework.Graphics.FillMode.WireFrame };// RasterizerState.CullNone;
 
 			var segment = startSegment;
 			for (int i = 0; i < GameConfig.DrawDistance; i++)
@@ -120,7 +116,6 @@ namespace OpenNFS1.Parsers.Track
 				_effect.World = Matrix.Identity;
 				_effect.CurrentTechnique.Passes[0].Apply();
 				Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
-				Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
 				segment = startSegment;
 				for (int i = 0; i < GameConfig.DrawDistance; i++)
 				{

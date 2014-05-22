@@ -141,7 +141,7 @@ namespace OpenNFS1.Tracks
 
 		}
 
-		public void Update(GameTime gameTime)
+		public void Update()
 		{
 			var pos = Engine.Instance.Camera.Position;
 			pos.Y += YOffset;
@@ -196,8 +196,6 @@ namespace OpenNFS1.Tracks
 			}
 
 			device.DepthStencilState = DepthStencilState.Default;
-
-			Engine.Instance.Device.DepthStencilState = DepthStencilState.Default;
 		}
 	}
 }

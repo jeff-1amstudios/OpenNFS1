@@ -10,11 +10,6 @@ namespace OpenNFS1
 {
     class TyreSmokeParticleSystem : ParticleSystem
     {
-        Vehicle _car;
-
-        int _wheelSwitch;
-
-
         static TyreSmokeParticleSystem _instance;
         public static TyreSmokeParticleSystem Instance
         {
@@ -34,7 +29,7 @@ namespace OpenNFS1
         {
             settings.Texture = Engine.Instance.ContentManager.Load<Texture2D>("Content/smoke");
 
-            settings.MaxParticles = 200;
+            settings.MaxParticles = 400;
             
             settings.Duration = TimeSpan.FromSeconds(0.5f);
 

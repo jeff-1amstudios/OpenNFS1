@@ -28,8 +28,8 @@ namespace OpenNFS1.Parsers
 		private void Parse(Stream contents)
 		{
 			BinaryReader br = new BinaryReader(contents);
-			BitmapChunk.ResetPalette();
 			Header = new BitmapChunk();
+			Header.EnableTextureAttachments = true;
 			Header.SkipHeader(br);
 			Header.Read(br);
 			br.Close();

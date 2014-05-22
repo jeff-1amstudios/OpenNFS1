@@ -19,7 +19,8 @@ namespace OpenNFS1.Physics
         float _rotation;
 		Texture2D _texture;
         ParticleEmitter _smokeEmitter;
-		Vector3 _renderOffset;  //we need to offset the wheel
+		Vector3 _renderOffset;  //we need to offset the wheel so that the front of the tire matches the original vertex position regardless of the tire width
+		Matrix _wheelMatrix;
 
         public float Rotation
         {
@@ -37,8 +38,9 @@ namespace OpenNFS1.Physics
 			_size = size;
 			_texture = texture;
 			_renderOffset = new Vector3(renderXOffset, 0, 0);
+			_wheelMatrix = Matrix.CreateScale(new Vector3(_size, Width, _size)) * Matrix.CreateRotationZ(MathHelper.ToRadians(-90));  //cylinder geometry faces upwards
 			if (_smokeEmitter == null)
-				_smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, BottomPosition);
+				_smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, WorldPosition);
 		}
 
 		public Vector3 WorldPosition
@@ -58,7 +60,9 @@ namespace OpenNFS1.Physics
 		{
 			get
 			{
-				return WorldPosition - new Vector3(0, Size / 2, 0);
+				var pos = WorldPosition;
+				pos.Y -= Size / 2;
+				return pos;
 			}
 		}
 
@@ -97,8 +101,7 @@ namespace OpenNFS1.Physics
 			carOrientation.Up = _car.UpVector;
 			carOrientation.Right = _car.CarRight;
 			WheelModel.Render(
-				Matrix.CreateScale(new Vector3(_size, Width, _size)) *
-				Matrix.CreateRotationZ(MathHelper.ToRadians(-90)) *  //cylinder geometry faces upwards
+				_wheelMatrix *
 				Matrix.CreateRotationX(_rotation / _size * 2f) *
 				Matrix.CreateRotationY(_steeringAngle * 1.3f) *
 				carOrientation *
