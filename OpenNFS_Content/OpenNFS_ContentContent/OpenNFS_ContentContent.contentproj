@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
-    <ProjectGuid>{DAF7D124-4943-45D2-92ED-733A48EB7715}</ProjectGuid>
+    <ProjectGuid>{E5E5EB5F-5A79-4199-8FAA-89CB564C6CF3}</ProjectGuid>
     <ProjectTypeGuids>{96E2B04D-8817-42c6-938A-82C39BA4D311};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Windows</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ContentContentContent</RootNamespace>
+    <RootNamespace>OpenNFS_ContentContentContent</RootNamespace>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <XnaFrameworkVersion>v4.0</XnaFrameworkVersion>
     <MonoGamePlatform>Windows</MonoGamePlatform>
@@ -55,13 +55,23 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Skybox.fx">
-      <Name>Skybox</Name>
+    <Compile Include="Simple3.fx">
+      <Name>Simple3</Name>
       <Importer>EffectImporter</Importer>
       <Processor>MGEffectProcessor</Processor>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArialBlack.spritefont">
+      <Name>ArialBlack</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>MGSpriteFontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(ProjectDir)..\OpenNFS_Content\bin\windows\content\*.xnb $(SolutionDir)OpenNFS1\bin\WindowsGL\Debug\Content</PostBuildEvent>
+  </PropertyGroup>
   <!--
       To modify your build process, add your task inside one of the targets below and uncomment it. 
       Other similar extension points exist, see Microsoft.Common.targets.

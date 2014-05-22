@@ -41,7 +41,7 @@ namespace OpenNFS1.Parsers
 
 			string identifer = new string(reader.ReadChars(12));
 			Identifier = identifer.Substring(0, identifer.IndexOf('\0'));
-			Debug.WriteLine("== Mesh id: " + identifer);
+			Debug.WriteLine("Loading mesh " + Identifier);
 			int textureNameCount = reader.ReadInt32();
 			int textureNameBlockOffset = reader.ReadInt32();
 

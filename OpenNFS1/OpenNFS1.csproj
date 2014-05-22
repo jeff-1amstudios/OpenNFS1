@@ -109,6 +109,7 @@
     <Compile Include="UI\Screens\TrackPoster.cs" />
     <Compile Include="UI\SpeedoControl.cs" />
     <Compile Include="VehicleController.cs" />
+    <Compile Include="VehicleEffect.cs" />
     <Compile Include="Vehicles\AIVehicle.cs" />
     <Compile Include="Vehicles\AI\AIDriver.cs" />
     <Compile Include="Vehicles\AI\IDriver.cs" />
@@ -207,36 +208,28 @@
     <Content Include="Content\Audio\Vehicles\Warrior\engine-on-high.wav" />
     <Content Include="Content\Audio\Vehicles\Warrior\engine-on-low.wav" />
     <Content Include="Content\Audio\Vehicles\Warrior\gear-change.wav" />
-    <Content Include="Content\obj\x86\Debug\Content.contentproj.FileListAbsolute.txt" />
-    <Content Include="Content\obj\x86\Debug\ContentPipeline.xml" />
-    <Content Include="Content\obj\x86\Debug\NeedForSpeedContent.contentproj.FileListAbsolute.txt" />
-    <Content Include="Content\smoke.png" />
+    <Content Include="Content\smoke.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\Audio\Win\" />
     <Folder Include="Content\Audio\Xbox\" />
-    <Folder Include="Content\bin\x86\Debug\" />
-    <Folder Include="Content\obj\x86\Debug\TempPE\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Content\ArialBlack.spritefont" />
-    <None Include="Content\Fonts\Arial_14.spritefont" />
-    <None Include="Content\obj\x86\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <None Include="Content\obj\x86\Debug\ResolveAssemblyReference.cache" />
-    <None Include="Content\ParticleEffect.fx" />
     <None Include="gameconfig.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Content\Content\Content.csproj">
-      <Project>{2f4a6e04-8a3a-4d50-a238-b27d1dbbda55}</Project>
-      <Name>Content</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Engine\NfsEngine.csproj">
       <Project>{F66B2F9A-AF38-40F9-A094-522C823D04EE}</Project>
       <Name>NfsEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenNFS_Content\OpenNFS_Content\OpenNFS_Content.csproj">
+      <Project>{860ce445-91b2-4b47-b87f-d4555b889ff4}</Project>
+      <Name>OpenNFS_Content</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

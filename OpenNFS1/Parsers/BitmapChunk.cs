@@ -156,7 +156,7 @@ namespace OpenNFS1.Parsers
 				_palette = _lastPalette;
 			}
 			TextureGenerator tg = new TextureGenerator(_palette);
-			entry.Texture = tg.Generate(_bitmaps, entry, pixelData, width, height, Index.ToString("000_"));
+			entry.Texture = tg.Generate(entry, pixelData, width, height);
 			entry.Type = BitmapEntryType.Texture;
 		}
 

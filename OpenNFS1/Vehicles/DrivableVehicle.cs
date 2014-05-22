@@ -17,6 +17,7 @@ namespace OpenNFS1.Vehicles
 	{
 		private CarMesh _model;
 		public VehicleDescription Descriptor { get; private set; }
+		private Effect _effect2;
 
 		public DrivableVehicle(VehicleDescription desc)
 			: base(desc.Mass, desc.Name)
@@ -26,6 +27,11 @@ namespace OpenNFS1.Vehicles
 			_model = (CarMesh)cfm.Mesh;		
 			
 			InitializePhysics();
+
+			if (_effect2 == null)
+			{
+				//_effect2 = Engine.Instance.ContentManager.Load<Effect>("Content/Simple3");
+			}
 		}
 
 		public void InitializePhysics()
@@ -50,10 +56,13 @@ namespace OpenNFS1.Vehicles
 			_effect.View = Engine.Instance.Camera.View;
 			_effect.Projection = Engine.Instance.Camera.Projection;
 			_effect.World = _renderMatrix;
-			_effect.VertexColorEnabled = false;
+			//_effect.VertexColorEnabled = false;
+			
+			//_effect2.Parameters["WorldViewProj"].SetValue(_renderMatrix * Engine.Instance.Camera.View * Engine.Instance.Camera.Projection);
 			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
+			Engine.Instance.Device.BlendState = BlendState.Opaque;
 			_effect.CurrentTechnique.Passes[0].Apply();
-			_model.Render(_effect);
+			_model.Render(_effect, BrakePedalInput > 0);
 			base.Render();			
 		}
 	}

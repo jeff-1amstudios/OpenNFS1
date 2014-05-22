@@ -12,7 +12,11 @@ namespace OpenNFS1.Vehicles
 	class CarMesh : Mesh
 	{
 		Polygon _rightRearWheel, _leftRearWheel, _rightFrontWheel, _leftFrontWheel;
-		Texture2D _wheelTexture;
+		Polygon _leftBrakeLight, _rightBrakeLight;
+		Texture2D _wheelTexture, _brakeOnTexture, _brakeOffTexture;
+		static Color BrakeColor = new Color(140, 248, 24); //color of brake-off light color...
+		static Color BrakeOffColor = new Color(88, 10, 5); //color of brake-off light color...
+		static Color BrakeOnColor = new Color(158, 110, 6); //color of brake-off light color...
 
 		public CarMesh(MeshChunk meshChunk, BitmapChunk bmpChunk)
 			: base(meshChunk, bmpChunk)
@@ -33,10 +37,45 @@ namespace OpenNFS1.Vehicles
 					case "lt_frnt":
 						_leftFrontWheel = poly;
 						break;
+					case "bkll":
+						_leftBrakeLight = poly;
+						break;
+					case "bklr":
+						_rightBrakeLight = poly;
+						break;
 				}
 			}
 
 			_wheelTexture = bmpChunk.FindByName("tyr1").Texture;
+
+			// This seems like it could be done in a shader but I couldn't get it to work well enough 
+			// (dealing with original palette colors doesn't work so well in a texture stretched over a polygon)
+
+			var rsidPoly = _polys.FirstOrDefault(a => a.TextureName == "rsid");
+			if (rsidPoly != null)
+			{
+				// Generate a new texture for brake lights on.  
+				Color[] pixels = new Color[rsidPoly.Texture.Width * rsidPoly.Texture.Height];
+				rsidPoly.Texture.GetData<Color>(pixels);
+				for (int i = 0; i < pixels.Length; i++)
+				{
+					if (pixels[i] == BrakeColor)
+						pixels[i] = BrakeOnColor;
+				}
+
+				_brakeOnTexture = new Texture2D(Engine.Instance.Device, rsidPoly.Texture.Width, rsidPoly.Texture.Height);
+				_brakeOnTexture.SetData<Color>(pixels);
+
+				// Generate a new texture for brake lights off.
+				for (int i = 0; i < pixels.Length; i++)
+				{
+					if (pixels[i] == BrakeOnColor)
+						pixels[i] = BrakeOffColor;
+				}
+
+				_brakeOffTexture = new Texture2D(Engine.Instance.Device, _leftBrakeLight.Texture.Width, _leftBrakeLight.Texture.Height);
+				_brakeOffTexture.SetData<Color>(pixels);
+			}
 		}
 
 		public Vector3 LeftFrontWheelPos { get { return GetWheelAxlePoint(_leftFrontWheel); } }
@@ -71,7 +110,7 @@ namespace OpenNFS1.Vehicles
 
 		public Texture2D WheelTexture { get { return _wheelTexture; } }
 
-		public override void Render(Effect effect)
+		public void Render(Effect effect, bool enableBrakeLights)
 		{
 			Engine.Instance.Device.SetVertexBuffer(_vertexBuffer);
 
@@ -82,8 +121,10 @@ namespace OpenNFS1.Vehicles
 				if (poly == _rightFrontWheel || poly == _leftFrontWheel || poly == _leftRearWheel || poly == _rightRearWheel)
 				{
 					continue;
-					Engine.Instance.Device.Textures[0] = _wheelTexture;
-					
+				}
+				else if (poly.TextureName == "rsid")
+				{
+					Engine.Instance.Device.Textures[0] = enableBrakeLights ? _brakeOnTexture : _brakeOffTexture;
 				}
 				else
 				{

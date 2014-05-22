@@ -13,7 +13,7 @@ namespace OpenNFS1.UI
         Race _race;
 
         Rectangle _backgroundRectangle;
-        Texture2D _backgroundTexture;
+       // Texture2D _backgroundTexture;
         SpriteFont _font;
 
         public RaceUI(Race race)
@@ -24,7 +24,6 @@ namespace OpenNFS1.UI
             int width = Engine.Instance.Device.Viewport.Width;
 
             _backgroundRectangle = new Rectangle(0, 0, width, 54);
-            _backgroundTexture = Engine.Instance.ContentManager.Load<Texture2D>("Content\\RaceUI-background");
             _font = Engine.Instance.ContentManager.Load<SpriteFont>("Content\\ArialBlack");
         }
 

@@ -106,7 +106,7 @@ namespace OpenNFS1.Vehicles
 				Name = "Warrior",
 				UIImageFile = "war1.qfs",
 				ModelFile = @"SIMDATA\CARFAMS\traffc.cfm",
-				Horsepower = 14,
+				Horsepower = 700,
 				Mass = 1380,
 				Redline = 7f
 			});

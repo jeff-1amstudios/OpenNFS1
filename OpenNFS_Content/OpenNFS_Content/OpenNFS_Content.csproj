@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.ContentPipeline.targets" />
   <PropertyGroup>
-    <ProjectGuid>{2F4A6E04-8A3A-4D50-A238-B27D1DBBDA55}</ProjectGuid>
+    <ProjectGuid>{860CE445-91B2-4B47-B87F-D4555B889FF4}</ProjectGuid>
     <ProjectTypeGuids>{6D335F3A-9D43-41b4-9D22-F6F17C4BE596};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <Configuration Condition=" '$(Configuration)' == '' ">Windows</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -16,7 +16,7 @@
     <OutputPath>bin\$(Configuration)</OutputPath>
     <XnaPlatform>Windows</XnaPlatform>
     <XnaProfile>HiDef</XnaProfile>
-    <XnaCrossPlatformGroupID>06e171e8-8772-4765-8762-597d11d4bbf8</XnaCrossPlatformGroupID>
+    <XnaCrossPlatformGroupID>15a7f4b1-bce7-4fa9-bf7e-0d412c44c00f</XnaCrossPlatformGroupID>
     <XnaOutputType>Library</XnaOutputType>
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -46,10 +46,9 @@
     <Reference Include="mscorlib" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ContentContent\OpenNFSContent.contentproj">
-      <Name>OpenNFSContent</Name>
+    <ProjectReference Include="..\OpenNFS_ContentContent\OpenNFS_ContentContent.contentproj">
+      <Name>OpenNFS_ContentContent</Name>
       <XnaReferenceType>Content</XnaReferenceType>
-      <Project>{DAF7D124-4943-45D2-92ED-733A48EB7715}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

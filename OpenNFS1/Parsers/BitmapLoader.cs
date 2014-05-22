@@ -17,39 +17,16 @@ namespace OpenNFS1.Parsers
             _palette = palette;
         }
 
-        public Texture2D Generate(List<BitmapEntry> entries, BitmapEntry entry, byte[] pixelData, int width, int height, string prefix)
+        public Texture2D Generate(BitmapEntry entry, byte[] pixelData, int width, int height)
         {
-            if (entry.Id == "rsid")
-            {
-                // Generate new 'braking' texture by changing palette entry #254
-                _palette[254 * 3] = 158;
-                _palette[254 * 3 + 1] = 110;
-                _palette[254 * 3 + 2] = 6;  //122,88,35
-
-                byte[] brakeLightImageData = GenerateImageData(entry.Id, pixelData, width, height);
-                BitmapEntry newEntry = new BitmapEntry();
-                newEntry.Id = "rsid_brake";
-                newEntry.Offset = entry.Offset;
-                newEntry.Type = BitmapEntryType.Texture;
-				newEntry.Texture = new Texture2D(Engine.Instance.Device, width, height);
-                newEntry.Texture.SetData<byte>(brakeLightImageData);
-                entries.Add(newEntry);
-
-                // Change palette #254 to non-braking red colour
-                _palette[254 * 3] = 88;
-                _palette[254 * 3+1] = 10;
-                _palette[254 * 3+2] = 5;
-            }
-
 			Texture2D newTexture = new Texture2D(Engine.Instance.Device, width, height);
             newTexture.SetData<byte>(GenerateImageData(entry.Id, pixelData, width, height));
-            //newTexture.Save("c:\\temp\\se\\" + prefix + entry.Id + ".png", ImageFileFormat.Png);
             return newTexture;            
         }
 
         private byte[] GenerateImageData(string id, byte[] pixelData, int width, int height)
         {
-			Vector3 mostUsed = GetMostUsedColour(id, pixelData);
+			Vector3 mostUsed = Vector3.Zero; // GetMostUsedColour(id, pixelData);
 
             int overhang = 0; // (4 - ((width * 4) % 4));
             int stride = (width * 4) + overhang;
