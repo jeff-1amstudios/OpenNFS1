@@ -89,7 +89,7 @@ namespace OpenNFS1
 
 			_track.Update();
 
-			/* so you cant reverse over the line and get 0.1sec laps */
+			/* so you cant reverse over the line  and get 0.1sec laps */
 			var node = Player.Vehicle.CurrentNode;
 			if (node.Number == _track.CheckpointNode && PlayerStats.HasPassedLapHalfwayPoint)
 			{
@@ -103,7 +103,7 @@ namespace OpenNFS1
 
 			if (SecondsTillStart <= 0 && !_started)
 			{
-				VehicleController.ForceBrake = false;
+				//VehicleController.ForceBrake = false;
 				_allDrivers.ForEach(a => a.Vehicle.Motor.Gearbox.CurrentGear = 1);
 				_raceStartTime = DateTime.Now;
 				PlayerStats.OnLapStarted();
@@ -128,8 +128,6 @@ namespace OpenNFS1
 			Engine.Instance.Device.DepthStencilState = DepthStencilState.Default;
 			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
 
-			if (_trafficController != null) _trafficController.Render();
-
 			_track.Render(Engine.Instance.Camera.Position, Player.Vehicle.CurrentNode);
 
 			foreach (var driver in _allDrivers)
@@ -144,6 +142,8 @@ namespace OpenNFS1
 					continue;
 				driver.Vehicle.Render();
 			}
+
+			if (_trafficController != null) _trafficController.Render();
 		}
 	}
 }

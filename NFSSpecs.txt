@@ -1,0 +1,1058 @@
+======================================================================
+THE UNOFFICIAL NEED FOR SPEED FILE FORMAT SPECIFICATIONS - Version 0.2
+  Copyright (c) 1995-96, Denis AUROUX (MXK) - auroux@clipper.ens.fr
+======================================================================
+
+Last updated : February 13, 1996
+
+This file is available from the following URL :
+
+     http://www.eleves.ens.fr:8080/home/auroux/nfsspecs.txt
+
+Disclaimer : NO WARRANTY of any kind comes with this file.
+
+
+Added in version 0.2 :
+- TRI files (section B.6) : all you need to write a track editor.
+
+A - GAMEDATA directory
+    ==================
+
+A.1 GAMEDATA\CONFIG\PATHS.DAT
+    -------------------------
+
+This file contains 18 null-terminated strings of 80 characters each
+(total 1440 bytes), describing the paths where NFS looks for its files.
+For minimum install, here are the contents (with hex offset):
+
+000 gamedata/config/              2D0 F:\simdata\misc\
+050 gamedata/savegame/            320 F:\simdata\trackfam\
+0A0 F:\frontend\speech\           370 F:\simdata\slides\
+0F0 F:\simdata\soundbnk\          3C0 F:\simdata\carFams\
+140 F:\frontend\music\            410 F:\simdata\soundbnk\
+190 F:\frontend\art\              460 F:\simdata\carspecs\
+1E0 gamedata/modem/               4B0 F:\simdata\dash\
+230 F:\frontend\movielow\         500 F:\simdata\misc\
+280 gamedata/replay/              550 F:\frontend\show\
+
+Note that simdata\soundbnk and simdata\misc are present twice.
+Also note that in the CD-ROM, directories whose name starts with a 'G'
+correspond to the German version of the game. Don't know why the car
+dashboards had to be translated, though :)
+
+Modify these entries if you want to copy some of the CD files to your hard
+disk, for example if you want to modify them. Remember that modifying the
+files can be hazardous, and that because the file formats are not fully
+known it is better to modify an existing file than to create one from scratch.
+
+A.2 GAMEDATA\SAVEGAME\*.SAV
+    -----------------------
+
+These are the tournament save files (840 bytes each).
+
+- Offset 0 : your name (null-terminated string followed by zeros)
+- Offset 28 : 'Opponent'               (")
+- Offset EC : 'Player 2'               (")
+- Offset 114 : 'Opponent 2'            (")
+- Offset 1D8 : name of the tournament  (")
+- Offset 20A : 'REPLAY.RPL'            (")
+- Offsets 23C-26F : ???
+- Offset 270 : name of the tournament  (")
+- Offsets 30E-337 : ???
+- Offsets 338, 33A, 33C, 33E, 340, 342, 344 : these contain 01 if the
+  corresponding race has been won, otherwise 00. The first three bytes
+  are for open-road races, while the other correspond to closed tracks.
+  For instance, in order to access the bonus track, save a tournament,
+  then set all these bytes to 01 except 33E to 00 (Rusty Springs), then
+  reload the tournament and win Rusty Springs. The odd offsets 339 to 345
+  are zeros.
+- Offsets 346-347 : ???
+
+The other offsets contains zeros.
+
+A.3 GAMEDATA\CONFIG\CONFIG.DAT
+    --------------------------
+
+This file (25552 bytes) contains all the relevant configuration data
+(current car, track, display & sound options, ...), as well as the current
+scores (best times, top speeds, laps, ...). It also describes whether you
+have access to the bonus track and the bonus car, etc...
+Anybody got anything more detailed to put here ?
+
+
+B - SIMDATA directory
+    =================
+
+B.1 SIMDATA\CARSPECS\*.PBS
+    ----------------------
+
+These files (one per player car) describe the car performance.
+Usually, installing these files to the hard disk (by editing PATHS.DAT)
+makes Need for Speed inoperable (no acceleration is possible) because the
+game modifies SIMDATA\CARSPECS\BY_R&T. However this can be prevented by
+making the check file read-only (run ATTRIB +R BY_R&T).
+
+Note that copying one of these files on top of another one will affect the
+car performance and handling, but not the engine sound. So if the max rpm's
+of the two engines are not the same, the sound can get badly altered because
+the correct sound sample is not available.
+
+These files are somehow compressed, because by modifying a single byte in
+the file one can reach various results such as : an instant system crash ;
+a car that materializes under the road and cannot move, with 11 gears (!) ;
+a car without front wheels, that keeps spinning at its initial position...
+
+B.2 SIMDATA\DASH\*.FMM
+    ------------------
+
+These small files (two per player car, corresponding to the hi-res and
+low-res dashboards) describe the shape of the car's windshield in each
+display resolution. The files are slightly different for 320x200 and 640x480.
+
+a) Low-res .FMMs (*DL.FMM) :
+
+The file structure is the following : first a 24-byte header, then four
+chunks.
+
+The header format is the following :
+
+offset len data
+------ --- ----
+00      4  'wwww'
+04      4   4     (number of chunks)
+08      4  18h    (offset of the first chunk)
+0C      4  offset of the second chunk
+10      4  offset of the third chunk
+14      4  offset of the fourth chunk
+
+The chunks in low-res .FMMs have the following header (22 bytes) :
+
+offset len data
+------ --- ----
+00      4  'BAMF'
+04      2  length of the chunk in bytes, minus two
+06      4  ? (usually equals 10000h or 8000h : maybe an image size)
+0A      2  maximum "length" value in the chunk's records
+0C      4  ? (usually equals 10000h or 8000h : maybe an image size)
+10      4  ? (usually equals 10000h or 8000h : maybe an image size)
+14      2  number of records in the chunk (length minus 18h, div 8)
+
+This header is in each chunk immediately followed by the 8-byte records.
+Each record has the following structure :
+
+offset len data
+------ --- ----
+00      4  baddr
+04      2  vaddr
+06      2  length
+
+The last record is followed by a 16-bit value (purpose unknown).
+
+The vaddr and length values are interpreted as follows : starting from
+address "vaddr" in video memory (i.e. of the form 320y+x for pixel (x,y)),
+"length" pixels do not belong to the dashboard, and must instead be drawn
+because they correspond to screen portions where the player must see the
+road through the windshield.
+The baddr field corresponds to an internal buffer offset, describing
+where the data to be displayed at "vaddr" are to be found in the buffer
+where NFS draws the view.
+
+- The first chunk corresponds to high detail : vaddr and baddr are equal,
+and each line corresponds to 320 bytes in the buffer (every pixel is stored).
+
+- The second chunk corresponds to medium detail : each line corresponds to
+320 bytes in the buffer, but only half of the pixels are stored, thus only
+the first 160 bytes contain relevant data, the following 160 being unused.
+To vaddr=320y+x corresponds baddr=320y+(x>>1) : the horizontal resolution
+is decreased.
+
+- The third chunk corresponds to low detail : two consecutive lines have the
+same baddr values, and these two lines correspond to 320 bytes in the buffer.
+As before, only half of these 320 bytes are used. Only a quarter of the
+pixels are stored. vaddr=320y+x corresponds to baddr=320.(y>>1)+(x>>1) :
+both horizontal and vertical resolutions are decreased.
+
+- The fourth chunk corresponds to the interlaced mode : only half of the
+screen lines are referenced ; as in low detail, two screen lines correspond
+to 320 bytes, half of which are unused. vaddr=320y+x still corresponds to
+baddr=320.(y>>1)+(x>>1), but only the even-numbered lines are present.
+
+b) Hi-res .FMMs (*DH.FMM) :
+
+The chunk format is slightly different because the video memory is now
+segmented in several 64K pages. (Note that the values at offsets 06, 0C and
+10 in the chunk header are now larger, e.g. 40000h and 10000h)
+
+Offset 14h in the chunk now contains, instead of the total number of records
+in the chunk, only the number of records that correspond to the first page
+of video memory (i.e. the first 64K). It is followed by the corresponding
+records.
+After these records, another 16-bit value describes the number of records
+that are located in the second page of video memory (the following 64K);
+the records for the second page follow (note that the 32-bit baddr values
+at last become useful ; only the 16 last bits of the vaddr are stored,
+since it is known to be located in the second page).
+The chunk continues with the following pages, until the number of records
+for a given page is zero. This zero value is followed by a 16-bit value
+(purpose unknown) as in the low-res files.
+
+The four chunks correspond respectively to high, medium, low and interlaced
+detail levels, as described above (but the lines are now each 640 pixels
+long ; when not in high resolution, only 320 of the 640 bytes are used).
+
+B.3 SIMDATA\DASH\*.FSH
+    ------------------
+
+These store the different bitmaps that make up the dashboard.
+The 16-byte header format is the following :
+
+offset len data
+------ --- ----
+00      4  'SHPI'
+04      4  length of the file in bytes
+08      4  number of objects in the directory
+0C      4  directory identifier string
+
+The directory identifier is 'GIMX' in .FSH dashboard files.
+
+This header is followed by the directory entries, each consisting of a
+4-byte identifier string, and a 4-byte offset inside the file pointing to
+the beginning of the corresponding data.
+
+Each entry in the directory represents a piece of the dashboard.
+There are gaps between the directory and the first bitmap, and between
+consecutive bitmaps (significance unknown).
+
+Each directory entry points to a bitmap block with the following structure :
+
+offset len data
+------ --- ----
+00      1  7Bh
+01      3  size of the block (= width x length + 10h)
+04      2  width of the bitmap in pixels
+06      2  heigth of the bitmap in pixels
+08      4  ?
+0C      2  x position to display the bitmap
+0E      2  y position to display the bitmap
+10     w.h bitmap data : 1 byte per pixel
+
+Note that the object called 'dash' in the directory takes the whole screen
+(320x200 or 640x480, at position x=0, y=0)."
+
+The various objects, depending on their 4-letter identifier, represent :
+the dashboard itself, the steering wheel in various positions, the radar
+detector lights, the gauges, and also pieces of the steering wheel to redraw
+over the gauges when necessary. Note that value FF in the bitmaps stands for
+the background : this is useful when a bitmap is drawn on top of another one.
+
+Also note that some SHPI bitmap directories contain entries that actually
+describe the palette to be used with the bitmaps. Typically, entries with
+names like '!PAL', and with bitmap dimension 256x3, correspond to palettes.
+The palette data consists of 256 3-byte records, each record containing the
+red, green and blue components of the corresponding color (1 byte each).
+
+B.4 SIMDATA\CARFAMS\*.CFM
+    ---------------------
+
+These files describe the exterior look of the cars during the race. There
+seem to be two different kinds of files :
+- full CFMs that can be used to describe any car
+- restricted CFMs that can only describe traffic or opponents - note that
+  yourself and your head-to-head opponent must have full CFMs, whereas
+  "single race" opponents can be either full or restricted CFMs.
+
+a) Full CFMs on the CD :
+  Standard cars : ANSX.CFM, CZR1.CFM, DVIPER.CFM, F512TR.CFM, LDIABL.CFM,
+                  MRX7.CFM, P911.CFM, TSUPRA.CFM, TRAFFC.CFM (Warrior)
+  More or less bugged previous versions of these cars :
+    F512M.CFM, P911T.CFM, WARIOR.CFM, WARRIOR.CFM
+
+b) Restricted CFMs on the CD :
+  Vans/jeeps/pickups : JEEP.CFM, PICKUP.CFM, RODEO.CFM, VANDURA.CFM
+  Station-wagons : AXXESS.CFM, WAGON.CFM
+  Usual cars : BMW.CFM, JETTA.CFM, LEMANS.CFM, SUNBIRD.CFM
+  Sports cars : CRX.CFM, PROBE.CFM
+  The cop's car : COPMUST.CFM
+  Restricted versions of the player cars (loaded for single race opponents):
+      MANSX.CFM, MCZR1.CFM, MDVIPER.CFM, MF512TR.CFM, MLDIABL.CFM,
+      MMRX7.CFM, MP911.CFM, MTSUPRA.CFM, MTRAFFC.CFM
+  Bugged versions of the player cars :
+      LDIABLO.CFM, MF512M.CFM, MP911T.CFM, TESTA.CFM
+
+These files are 'wwww' files containing four chunks. The header is as in
+.FMM files (see B.2). The first and second chunk correspond to high-detail
+car structure, while the third and fourth chunk correspond to low-detail.
+
+The first and third chunks have header 'ORIP', and describe how the car is
+to be drawn (position and orientation of each car element). The second
+and fourth chunks are 'SHPI' bitmap directories (see B.3), with directory
+identifier 'WRAP'. They provide the bitmaps referenced by the ORIP chunks.
+Note that the offsets specified in the bitmap directories are relative to the
+'SHPI' header.
+
+An 'ORIP' chunk consists of a header followed by nine blocks.
+The header has length 112 (70h) and the following structure :
+
+offset len data
+------ --- ----
+00      4  'ORIP'
+04      4  chunk length in bytes
+08      4  2BCh (=700)
+0C      4  0
+10      4  size of block 8 in 12-byte records
+14      4  ? the previous minus 10h
+18      4  offset of block 8 in the ORIP (in bytes)
+1C      4  size of block 2 in 8-byte records
+20      4  offset of block 2
+24      4  size of block 1 in 12-byte records
+28      4  offset of block 1 (=70h)
+2C     12  identifier string
+38      4  size of block 3 in 20-byte records
+3C      4  offset of block 3
+40      4  size of block 4 in 20-byte records
+44      4  offset of block 4
+48      4  size of block 5 in 28-byte records
+4C      4  offset of block 5
+50      4  offset of block 9
+54      4  size of block 6 in 12-byte records
+58      4  offset of block 6
+5C      4  size of block 7 in 12-byte records
+60      4  offset of block 7
+64      4  0
+68      4  70h
+6C      4  0
+
+The first block consists of 12-byte records and describes the polygons that
+are used to draw the car:
+
+offset len data
+------ --- ----
+00      1  83h for triangle, 84h for quadrangle, 8Ch when quadrangle/null
+01      1  ?
+02      1  texture number
+03      1  ?
+04      4  polygon offset for pol1
+08      4  polygon offset for pol2
+
+The texture number corresponds to a record position in block 3, which is
+converted to one of the textures in the SHPI chunk that follows the ORIP.
+The polygon offsets correspond to positions in the last block, where the
+polygons are listed consecutively (first pol2 and then pol1, for each record).
+The first polygon has pol2 starting at 0. (The polygon offsets are given
+in 4-byte units). In the last block, vertices belonging to a pol1 are
+expanded to 3D points by lookup in block 8, while vertices belonging to a
+pol2 are expanded to 2D points by lookup in block 2. The portion of the
+relevant texture corresponding to pol2 is mapped onto the 3D polygon pol1.
+
+When the first byte is 83h, pol1=pol2+3 and next polygon's pol2 equals pol1+3.
+When it is 84h, pol1=pol2+4 and next pol2 equals pol1+4. When it is 8Ch,
+pol1=pol2 and next pol2 equals pol1+4.
+
+The second block is made of 8-byte records, which describe the (x,y)
+coordinates inside the textures referenced by pol2.
+
+offset len data
+------ --- ----
+00      4  x coordinate
+04      4  y coordinate
+
+Third block (20-byte records):
+
+offset len data
+------ --- ----
+00      8  identifier string 1
+08      4  identifier string 2
+0C      8  ? 00 00 00 81 F5 00 00 00
+
+This block describes the link between the texture numbers of block 1 and
+the textures stored in the SHPI chunk. Identifier string 2, when non-void,
+corresponds to one of the SHPI directory entries.
+
+Fourth block (20-byte records):
+
+offset len data
+------ --- ----
+00      8  identifier string ('left_tur', 'right_tu')
+08      4  number of vertices
+0C      4  polygon offset (in block 9)
+10      4  ?
+
+Fifth block (28-byte records):
+
+offset len data
+------ --- ----
+00     12  identifier string ('NON-SORT', 'inside', 'surface', 'outside')
+0C      4  ?
+10      4  polygon offset (in block 9)
+14      4  number of vertices
+18      4  0
+
+Sixth and seventh blocks (12-byte records):
+
+offset len data
+------ --- ----
+00      8  identifier string
+08      4  ?
+
+The eighth block consists of 12-byte records which describe the position in
+space of each vertex (using signed long ints, centered at (0,0,0)).
+
+offset len data
+------ --- ----
+00      4  x coord. (x axis is lateral)
+04      4  z coord. (z axis is vertical, z increases when going up)
+08      4  y coord. (y axis is longitudinal, increases when going forward)
+
+The last block is a succession of long integers, each representing a vertex
+number. This block describes the vertices each polygon consists of, and is
+referenced by the index tables of the first, fourth and fifth blocks. Each
+vertex number referenced in a pol1 polygon is converted to a point in space
+using block 8, while each vertex number referenced in a pol2 polygon is
+converted to a position in a texture bitmap using block 2.
+
+B.5 SIMDATA\MISC\*.QFS, SIMDATA\SLIDES\*.QFS, ...
+    ---------------------------------------------
+
+This seems to be EAC's favorite bitmap format... Basically, it is similar
+to the .FSH files described in B.3, however the data are now compressed
+using some kind of Huffman algorithm. Outside of this compression thing,
+the file still contains a 'SHPI' header, and a directory. The directory
+itself is much shorter than in the dashboard FSH's : usually one entry
+(the bitmap itself), sometimes two (when a palette is specified).
+The big trouble is in finding the details of the decompression algorithm.
+
+The directory header is 'LN32', indicating 32768-color mode. (see C.2).
+
+B.6 SIMDATA\MISC\*.TRI
+    ------------------
+
+Don't know why these are in the MISC directory... they are quite important
+indeed ! They describe the track itself, including the shape of the road
+and the position of the scenery items. The objects are referenced by numbers
+which correspond to entries in the corresponding file in SIMDATA\TRACKFAM.
+
+Their structure is fairly complex, so I recommend you play with the files
+in order to get acquainted with their subtleties. The information contained
+in this section was used to develop the first NFS track editor, called
+TRACKED, and available at the following URL :
+
+         http://www.eleves.ens.fr:8080/home/auroux/nfs/tracked.zip
+
+In order to understand the structure of TRI files you have to know that a
+track is the superposition of three structures :
+
+- first, a 'virtual road' : this is a sequence of points in space,
+  which will be called 'nodes'. These points correspond to successive
+  positions along the track, and all the cars have to pass near each of
+  these positions. During the game, the virtual road is invisible, but
+  you have to stay close to it.
+
+- second, the scenery : this is a collection of points in space, which
+  will be called 'vertices', together with textures which are mapped onto
+  the polygons defined by consecutive vertices. These textures are used
+  to draw the road, the roadside and part of the landscape. Thus it is
+  of course preferable that the scenery remain close to the virtual road !
+
+- and last, the objects : points in space together with bitmaps, which
+  are used for road signs, buildings, trees, etc... Some of them are
+  plain 2D bitmaps, but others have a more sophisticated polygonal 3D
+  structure.
+
+The 3D coordinates x,y,z will always be used with the following meaning :
+
+- x is an axis which is transversal to the starting line. Positive x values
+  correspond to points which are on the right of the starting position.
+  (i.e. if you start looking to the north, x points to the east)
+
+- y is an axis which is parallel to the starting line. Positive y values
+  correspond to points which are ahead of the starting position.
+  (i.e. y points to the north)
+
+- z is a vertical axis. Positive z values correspond to points higher than
+  the starting position.
+
+a) TRI files begin with 12F8h bytes of headers and index tables. These are
+as follows :
+
+offset len data
+------ --- ----
+00      4   ?
+04      8   ?
+0C      4   x coordinate of the first node
+10      4   z coordinate of the first node
+14      4   y coordinate of the first node
+18      4   ?
+1C      4   ?
+20      4   ?
+24      4   length of the scenery data (in bytes : 554h per record)
+28      4   ?
+2C    960h  first index table
+98C   960h  second index table
+
+The first index table is a succession of 32-bit offsets. It follows an
+arithmetic progression by 548h as a general rule. This means the first
+value is 0, followed by 548h, A90h, etc... On closed tracks, when the
+end is reached, the offsets start again with 0, 548h, A90h, etc...
+(so that the end of a lap is connected with the beginning of the following
+one !). The table is filled to 960h bytes (600 entries) with zero values.
+This table is probably only used as a lookup table in memory during the
+game, since there are no 548h-byte structures in the file.
+
+The second index table is also a succession of 32-bit offsets, but these
+offsets are inside the TRI file. This one follows an arithmetic progression
+by 554h. It corresponds to the offsets of the successive records for
+scenery data, which starts at offset 1B000h in the scenery file. So this
+table starts with 1B000h, 1B554h, 1BAA8h, etc... until the end of the
+TRI file is reached. It is filled to 600 entries with zero values.
+
+b) The virtual road data follows, and is constituted of 36-byte records
+(one for each node). The first record is at offset 12F8h, and the last
+allowed record is at offset 16468h (this leaves room for 2400 records, and
+since a scenery block corresponds to four nodes, both capacities are equal).
+The unused records (after the last node) are filled with zero values.
+The structure of each record is the following :
+
+offset len data
+------ --- ----
+00      1  a0
+01      1  a1
+02      1  a2
+03      1  a3
+04      1  b0
+05      1  b1
+06      1  b2
+07      1  b3
+08      4  x coordinate
+0C      4  z coordinate
+10      4  y coordinate
+14      2  slope
+16      2  slant-A
+18      2  orientation
+1A      2  0
+1C      2  y-orientation
+1E      2  slant-B
+20      2  x-orientation
+22      2  0
+
+- a0,a1,a2,a3 are 8-bit values whose purpose is unknown : possibly the
+  width of the road on each side ?
+
+- b0,b1,b2,b3 are 8-bit values of unknown purpose.
+
+- x, z and y coordinates are signed long values.
+
+- slope is a value indicating the slope at the current node, i.e. the
+  difference between the z coordinates of two consecutive nodes.
+  A good approximation is : slope(i) = (z(i+1) - z(i))/152.
+  However, to complicate things, it is stored as a signed 14-bit value,
+  complemented to 4000h. This means -1 is stored as 3FFFh, -2 as 3FFEh, ...
+  So in fact you must perform a logical and with 3FFFh before storing !
+
+- slant-A is a value indicating how the road is slanted to the left or
+  to the right (as in the turns in Autumn Valley or Lost Vegas). It is
+  a signed 14-bit value, like slope. The value is positive if the road
+  is slanted to the right, negative if it is slanted to the left.
+
+- slant-B has the same purpose, but is a standard signed 16-bit value.
+  Its value is positive for the left, negative for the right.
+  The approximative relation between slant-A and slant-B is
+  slant-B = -12.3 slant-A (remember that slant-A is 14-bit, though)
+
+- orientation is a 14-bit value, and is equal to 0 for north (increasing y),
+  1000h for east (increasing x), 2000h for south (decreasing y), 3000h for
+  west (decreasing x), and back to 3FFFh for north.
+
+- y-orientation is a signed 16-bit value, which is proportional to the
+  y coordinate variation. Meanwhile, x-orientation is proportional to the
+  *opposite* of the x coordinate variation. This means that the couple
+  (-xorientation,yorientation) gives the orientation of the track.
+  The norm (square root of xorient^2+yorient^2) is usually around 32000
+  (a little less than 8000h, to avoid numeric overflows), but can fluctuate
+  with the only condition that (-xor,yor) gives the correct orientation.
+
+c) The objects data comes next. There are first several distinct zones,
+many of which seem to be unused (?) :
+
+offset len  data
+------ ---  ----
+16478  708h  3-byte records (there are 600... as many as scenery blocks ?)
+16B80   4    40h (?)
+16B84   4    3E8h = 1000 (size of the main block in records)
+16B88   4    'OBJS'
+16B8C   4    428Ch (total length of the remaining blocks)
+16B90  400h  16-byte records (unknown purpose)
+16F90   4    ?
+16F94 3E80h  object data : 1000 records of 16 bytes (one per object)
+1AE14  1ECh  0
+
+The object data itself consists of a 16-byte record per object. The record
+structure is the following :
+
+offset len data
+------ --- ----
+00      4  reference node
+04      1  bitmap number
+05      1  flip
+06      4  flags (unknown purpose)
+0A      2  relative x coordinate
+0C      2  relative z coordinate
+0E      2  relative y coordinate
+
+Each object is related to a reference node in the virtual road. The x,z,y
+coordinates are then expressed as signed 16-bit values relative to the
+coordinates of the reference node. Beware that the axes are simply translated
+but not rotated ! (i.e. the x and y axes are still pointing east and north)
+The objects are sorted in the order of increasing reference nodes.
+A reference node value of -1 indicates that the record is unused (i.e. after
+the end of the used records). Also note that the coordinates are not
+expressed in the same unit as the 32-bit absolute coordinates seen above
+(the units are much larger, so that the value fits in 16 bits).
+
+The 8-bit flip value is equal to 0 for an object that is perfectly perpendi-
+cular to the track (e.g. a road sign), larger values for objects that are
+slightly turned, until 64 for an object that is mapped along the track
+(e.g. an ad on the side of the road), then up to 128 which is the perfectly
+reversed position (since the objects have no "back", this is the common
+way of reversing a road sign for a turn in the other direction), then
+up to 192 which is again longitudinal mapping (the other way) and until
+255 which is back to the normal position.
+
+The bitmap number corresponds to a texture in the corresponding .FAM file
+(see B.8). The relevant bitmaps are in the second chunk of the .FAM file.
+Two cases can occur :
+
+- closed tracks : the second chunk is a 'wwww' structure containing a
+single subchunk which is in turn a SHPI directory where the entry corres-
+ponding to bitmap #n is called "nn00" where nn is n written in decimal.
+(e.g. bitmap #18 is "1800"). Furthermore the object called "!pal" or "!PAL",
+when it exists, is the corresponding palette (256 3-byte entries) ; FFh is
+transparent.
+
+- open roads : the second chunk contains a subchunk per bitmap, and each
+subchunk is a SHPI containing at least the object "0000" (the bitmap), and
+possibly a palette ("!pal" or "!PAL"). Object #n is then the bitmap "0000"
+in the subchunk #n (the first subchunk is #0).
+
+One must add to these 2D objects (plain bitmaps) the 3D objects described
+in the fourth chunk of the .FAM file. They usually correspond to numbers
+above the last 2D object ; however it happens, in closed tracks, that some
+of the 3D objects are given numbers inside the range used by 2D objects.
+In that case, the numbers describing 2D objects are shifted upwards.
+(i.e. the bitmap "4400" corresponds to object #45 or #46). This phenomenon
+apparently does not occur for open roads, where the 3D objects always follow
+the 2D objects.
+
+Furthermore, certain consecutive bitmaps represent successive states of an
+animated object. In that case, the game will display successively the
+relevant bitmaps. Note that if the second bitmap is given instead of the
+first, the animation does not occur.
+
+d) The scenery data starts at offset 1B000h. It is made up of records of
+size 554h, each corresponding to four nodes in the virtual road. The
+records are consecutive and the last record ends the .TRI file.
+Each record has the following structure :
+
+offset len data
+------ --- ----
+000     4   'TRKD'
+004     4   548h = length of the record contents
+008     4   number of this record (0 for the first, then 1, etc...)
+00C     2   ?
+00E    10   textures
+018    12   reference point
+024    12   ?
+030    12   point A0
+03C    12   point A1
+...    ..   ........
+09C    12   point A9
+0A8    12   point A10
+0B4    12   ?
+0C0    12   point B0
+0CC    12   point B1
+...    ..   ........
+12C    12   point B9
+138    12   point B10
+144    12   ?
+150    12   point C0
+15C    12   point C1
+...    ..   ........
+1BC    12   point C9
+1C8    12   point C10
+1D4    12   ?
+1E0    12   point D0
+1EC    12   point D1
+...    ..   ........
+24C    12   point D9
+258    12   point D10
+264    12   ?
+270    12   ?
+27C    12   point E0
+288    12   point E1
+...    ..   ........
+2E8    12   point E9
+2F4    12   point E10
+300   516   ? unused (room for 43 points)
+504    80   ? unused
+
+Each point is given by three signed 32-bit absolute coordinates (x,z,y as
+usual). The coordinates are the same as in the virtual road data.
+The reference point is unused in the game and usually equal to point A0.
+
+The points A0,...,A10 in record #n (starting with 0) correspond to the node
+#4n (starting with 0) in the virtual road data. B0,...,B10 correspond to
+node #4n+1, C0...C10 to node #4n+2, D0...D10 to node #4n+3 and E0...E10 to
+node #4n+4. Thus the points E0...E10 are identical to the points A0...A10
+of the following record.
+
+The eleven point series (0 to 10) are arranged as follows : A0-E0 are near
+the middle of the road, and thus close to the corresponding nodes.
+A1-E1 are a little to the right, A2-E2 further right, ... until A5-E5.
+A6-E6 are a little to the left, A7-E7 further left, ... until A10-E10.
+(In tunnels, the points A5-E5 and A10-E10 get back to the center, consti-
+tuting the ceiling).
+
+To each record correspond ten textures (coded at the beginning), each given
+by a 8-bit value, T1,T2,...,T10. T1 is used between A0-E0 and A1-E1,
+T2 between A1-E1 and A2-E2, ..., T5 between A4-E4 and A5-E5 ; meanwhile,
+T6 is used between A0-E0 and A6-E6, T7 between A6-E6 and A7-E7, ...,
+T10 between A9-E9 and A10-E10. This is summarized on the following diagram :
+
+E10---E9---E8---E7---E6---E0---E1---E2---E3---E4---E5  node 4n+4
+ |    |    |    |    |    ||    |    |    |    |    |
+ |    |    |    |    |    ||    |    |    |    |    |
+D10   D9   D8   D7   D6   D0   D1   D2   D3   D4   D5  node 4n+3
+ |  T |  T |  T |  T |  T || T  | T  | T  | T  | T  |
+ |    |    |    |    |    ||    |    |    |    |    |
+C10   C9   C8   C7   C6   C0   C1   C2   C3   C4   C5  node 4n+2
+ | 10 |  9 |  8 |  7 |  6 || 1  | 2  | 3  | 4  | 5  |
+ |    |    |    |    |    ||    |    |    |    |    |
+B10   B9   B8   B7   B6   B0   B1   B2   B3   B4   B5  node 4n+1
+ |    |    |    |    |    ||    |    |    |    |    |
+ |    |    |    |    |    ||    |    |    |    |    |
+A10---A9---A8---A7---A6---A0---A1---A2---A3---A4---A5  node 4n
+                          ^
+       the nodes are here |
+
+The texture numbers are converted to bitmaps in the first chunk of the
+.FAM file (see B.8). There are two different cases :
+
+- closed tracks : the first chunk is a 'wwww' structure which contains a 
+single subchunk which is in turn a SHPI bitmap directory, possibly with a 
+palette '!PAL' or '!pal'. There is also often a bitmap called 'ga00' or 
+'GA00' (unknown interpretation). The names have the structure "xxls", where 
+xx is a decimal value indicating the texture group, l is 'A', 'B' or 'C', 
+and s indicates a scale ('0' is the largest, while '3'&'4' are very small). 
+The various scales are here to speed up the texture-mapping algorithm,
+anyway the only texture that is always present is with s=0.
+The xx and l values correspond to a texture number n in the following way :
+n=3xx if l='A', 3xx+1 if l='B' and 3xx+2 if l='C'. Note that there are holes
+in the numbering : many numbers do not have a bitmap.
+Examples : bitmap "03C0" corresponds to texture #11 (3x3+2) at the largest
+scale; bitmap "14A1" corresponds to texture #42 (3x14) at the second scale
+available.
+
+- open roads : the first chunk contains a subchunk per texture group (i.e.
+the xx value is now the number of the subchunk, starting with 0). Each
+subchunk is a SHPI directory containing potentially a palette, and bitmaps
+labelled "l00s", where l is 'A','B' or 'C' and s is the scale.
+As before, n=3xx if l='A', 3xx+1 if l='B', 3xx+2 if l='C', and there are
+holes in the numbering.
+Examples : texture #11 at scale '0' is now the bitmap "C000" in subchunk #3.
+Texture #42 at scale '1' is now the bitmap called "A001" in subchunk #14.
+
+B.7 SIMDATA\SOUNDBNK\*.BNK
+    ----------------------
+
+These file store the sound samples for the engines, the crashes, etc...
+The filenames ending with 'W' correspond to 16-bit sound, while 'B' stands
+for 8-bit sound. Logically, 'S' should stand for stereo and 'M' for mono,
+but it seems that, at least for cars, the file that gets loaded in 8-bit
+mono mode is the one whose name ends with 'SB'. I don't know why. I'm
+beginning to think that EAC recruited Microsoft programmers ;-)
+
+Also remember that the 8 bit sound samples are signed data. If you plan to
+use WAV files as samples, don't forget to change this.
+
+The file format is the following :
+
+- the first 512 bytes contain 128 long integers, which are either zero if
+the corresponding sample is not present, or the offset of a sample header.
+Car files contain four samples with header offsets 200h, 248h, 290h and 2D8h,
+declared at offsets 04, 08, 0C and 80h respectively. The two first samples
+are the engine sound, the third is the car horn, the fourth is the sound
+that gets produced when you change gears.
+
+- each sample header consists of 72 bytes (48h). The format is the following:
+
+offset len data
+------ --- ----
+00      4  ? flags (for 8-bit car sounds, these are 1, 2, 4000h and 10h)
+04      4  header's offset + 28h (i.e. offset of the 'EACS' marker)
+08      4  ? (0 for cars)
+0C      4  ? (0 for cars except gear change)
+10      4  ? (0 for cars)
+14      1  ?
+15      1  ? (80h for cars)
+16      1  ? (0 for cars)
+17      1  ?
+18      4  ? (7F40h for cars)
+1C      4  ? (0 for cars)
+20      4  ? (0 for cars)
+24      4  ? (0 for cars)
+28      4  'EACS'
+2C      4  3E80h (sampling rate : 16 kHz)
+30      1  8/16 bit flag : 1 for 8-bit, 2 for 16-bit
+31      1  mono/stereo flag : 1 for mono, 2 for stereo
+32      1  ? (0 for cars)
+33      1  ? (FFh for cars)
+34      4  beginning of the repeat loop (in samples : 1, 2 or 4 bytes)
+38      4  length of the repeat loop (in samples)
+3C      4  length of the sound (in samples)
+40      4  offset of the raw sound data in the .BNK file
+44      4  ? (0 for cars)
+
+B.8 SIMDATA\TRACKFAM\*.FAM
+    ----------------------
+
+These files contain the bitmaps that are used for displaying the correspon-
+ding track or track segment. They make use of the 'wwww' file format, using
+the usual header (see B.2) : first 'wwww', then the number of chunks (as a
+long integer), then the offsets of each chunk header (long integers).
+
+The .FAM file itself is a 'wwww' file containing four chunks. The first chunk
+corresponds to the background bitmaps, making up the terrain and the road,
+while the second chunk is devoted to foreground bitmaps (road signs, etc...)
+Each of these two chunks is itself in 'wwww' format, containing sub-chunks.
+Note that the offsets of the sub-chunks listed in the headers are relative
+to the beginning of the chunks. In the open road .FAM's, the chunks are very
+subdivided and contain many small subchunks, while in the closed tracks,
+there is only one big subchunk.
+
+Now the subchunks in each of the first two chunks are themselves 'SHPI'
+bitmap directories (see B.3), whose elements are a palette and several
+bitmaps. Keep in mind that the offsets in the directories are relative to
+the beginning of the subchunk (i.e. the 'SHPI' header).
+
+The third chunk of the .FAM file is a SHPI file describing the horizon :
+the SHPI directory contains two entries, one for the palette and one for
+the bitmap itself.
+
+The fourth chunk describes the three-dimensional objects in the scenery.
+It is a 'wwww' structure, containing a subchunk per object. Now each of
+these subchunks is quite similar to a .CFM file (see B.4) : it is itself a
+'wwww' structure containing two subsubchunks ! The first subsubchunk is an
+'ORIP' structure describing the shape of the object, while the second is
+a 'SHPI' structure containing the bitmaps referenced by the 'ORIP' part.
+
+If you didn't catch everything, don't worry... look at NFSVIEW.PAS (see D.1)
+
+
+C - FRONTEND directory
+    ==================
+
+C.1 FRONTEND\ART\*.QFS, FRONTEND\SHOW\*.QFS : see B.5
+    ---------------------------------------
+
+C.2 FRONTEND\ART\*.INV
+    ------------------
+
+These files describe how to reduce the palette from hi-color mode to 256
+colors. The corresponding .QFS files (compressed SHPI bitmaps) have directory
+identifier 'LN32', indicating the bitmaps are in 32768-color mode (each
+red, blue and green component is coded on 5 bits (0 to 31), and the 15 bits
+describing the color are stored in a 16-bit word). Since many video cards do
+not support these modes, information is provided for palette reduction to
+256-color modes. This information is partly stored as a palette object in the
+QFS file, describing the RGB components of the 256 colors. In order to help
+Need for Speed with the palette conversion, the .INV file (length 32768 bytes)
+stores, for each 15-bit value, which palette entry is relevant.
+
+Displaying the 'LN32' bitmaps in 256-color is thus done by first expanding
+the .QFS file, then setting the specified palette, and converting each
+15-bit pixel in the bitmap to the 8-bit value located at the corresponding
+offset in the .INV file.
+
+C.3 FRONTEND\MUSIC\*.ASF
+    --------------------
+
+These files contain the music for the front end. The 40-byte header is as
+follows (note a consistency with the EACS structures described in B.7) :
+
+offset len data
+------ --- ----
+00      4  '1SNh'
+04      4  ?
+08      4  'EACS'
+0C      4  3E80h (sampling rate 16 kHz)
+10      1  2 (16-bit mode flag)
+11      1  2 (stereo mode flag)
+12      1  ? (0 usually)
+13      1  ? (0 usually)
+14      4  length of the wave data (expressed in 4-byte samples)
+18      4  beginning of the repeat loop (in samples)
+1C      4  length of the repeat loop (in samples)
+20      4  0 (the start offset is not specified : should be 28h)
+24      4  ?
+
+Signed 16-bit stereo wave data follows.
+
+C.4 FRONTEND\SPEECH\*.EAS
+    ---------------------
+
+These file contain the speeches, as an EACS structure (see B.7 and C.3).
+The 32-byte header is now as follows :
+
+offset len data
+------ --- ----
+00      4  'EACS'
+04      4  3E80h (sampling rate 16 kHz)
+08      1  1 (8-bit mode flag)
+09      1  1 (mono mode flag)
+0A      1  ? (0 usually)
+0B      1  ? (FFh usually)
+0C      4  length of wave data (expressed in 1-byte units)
+10      4  FFFFFFFFh (no repeat loop)
+14      4  0 (no repeat length)
+18      4  20h (offset of the wave data)
+1C      4  ?
+
+Signed 8-bit mono wave data follows.
+
+
+D - Appendix
+    ========
+
+D.1 NFSVIEW.PAS
+    -----------
+
+{NFS file viewer : recurse into 'wwww' structures and view 'SHPI' bitmaps}
+
+uses crt;
+var f:file;
+    scr:array[0..199,0..319] of byte absolute $A000:0;
+    pal:array[0..767] of byte;
+    s:string[5];
+
+procedure setpalette; assembler;
+asm
+   mov dx,3c8h
+   xor cl,cl
+   mov si,offset pal
+   cld
+@bcl:
+   mov al,cl
+   out dx,al
+   inc dx
+   lodsb
+   out dx,al
+   lodsb
+   out dx,al
+   lodsb
+   out dx,al
+   dec dx
+   inc cl
+   jnz @bcl
+end;
+
+function st(x:longint):string;
+var s:string[20];
+begin
+     str(x,s);
+     st:=s;
+end;
+
+procedure viewshpi(pre:string;off:longint); {process a SHPI}
+var ni,i:integer;
+    w,h,xp,yp,y:word;
+    l:longint;
+    foundpal:boolean;
+begin
+     seek(f,off+8);
+     blockread(f,ni,2);
+     writeln(pre,'SHPI ',ni,' bitmaps'#10#13'Looking for a palette...');
+     foundpal:=false;
+     for i:=0 to ni-1 do begin {look for a palette}
+       seek(f,off+20+8*i);
+       blockread(f,l,4);
+       seek(f,off+l+4);
+       blockread(f,w,2);
+       blockread(f,h,2);
+       if (w=256) and (h=3) then begin
+        blockread(f,pal,8);
+        blockread(f,pal,768);
+        foundpal:=true;
+       end;
+     end;
+     if foundpal then writeln('Found !') else writeln('No palette.');
+     readkey;
+     asm
+      mov ax,13h
+      int 10h
+     end;
+     if foundpal then setpalette;
+     for i:=0 to ni-1 do begin    {display the bitmaps}
+       fillchar(scr,64000,0);
+       seek(f,off+20+8*i);
+       blockread(f,l,4);
+       seek(f,off+l+4);
+       blockread(f,w,2);
+       blockread(f,h,2);
+       blockread(f,l,4);
+       blockread(f,xp,2);
+       blockread(f,yp,2);
+       if (w<>256) or (h<>3) then begin
+        if (xp+w>320) or (yp+h>200) then begin yp:=0; xp:=0; end;
+        for y:=yp to yp+h-1 do
+         blockread(f,scr[y,xp],w);
+        readkey; end;
+     end;
+     asm
+      mov ax,3
+      int 10h
+     end;
+end;
+
+procedure viewwwww(pre:string;off:longint); {process a wwww block}
+var n,i:integer;
+    l:longint;
+    s:string[5];
+begin
+     seek(f,off+4);
+     blockread(f,n,2);
+     for i:=1 to n do begin {process each chunk}
+      seek(f,off+4+4*i);
+      blockread(f,l,4);
+      s[0]:=#4;
+      seek(f,off+l);
+      blockread(f,s[1],4);  {read 4-char id}
+      if s='wwww' then
+        viewwwww(pre+'chunk '+st(i)+'/'+st(n)+' sub',off+l)
+      else if s='SHPI' then
+        viewshpi(pre+'chunk '+st(i)+'/'+st(n)+' ',off+l)
+      else begin
+       writeln(pre,'chunk ',i,'/',n,' unrecognized header ',s);
+       readkey;
+      end;
+     end;
+end;
+
+begin
+     if paramcount=0 then begin
+       writeln('Need For Speed wwww/SHPI Viewer 1.0 (c) Denis Auroux 1995');
+       writeln('Syntax : NFSVIEW filename'#10#13);
+       exit;
+     end;
+     clrscr;
+     assign(f,paramstr(1));
+     reset(f,1);
+     s[0]:=#4;
+     blockread(f,s[1],4); {read 4-char id}
+     if s='wwww' then viewwwww('',0)
+     else if s='SHPI' then viewshpi('',0)
+     else writeln('Unrecognized header ',s,#10#13);
+     close(f);
+end.
+
+============================================================================
+For any comments and additions to this file, mail to auroux@clipper.ens.fr.
+============================================================================

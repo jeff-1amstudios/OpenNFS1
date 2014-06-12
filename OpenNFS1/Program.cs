@@ -1,19 +1,24 @@
+#region Using Statements
 using System;
+using System.Collections.Generic;
+using System.Linq;
+#endregion
 
 namespace OpenNFS1
 {
-    static class Program
+    /// <summary>
+    /// The main class.
+    /// </summary>
+    public static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main(string[] args)
+        [STAThread]
+        static void Main()
         {
-            using (Game1 game = new Game1())
-            {
+            using (var game = new Game1())
                 game.Run();
-            }
         }
     }
 }
-

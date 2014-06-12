@@ -44,7 +44,7 @@ namespace OpenNFS1.Vehicles.AI
 			var distFromRoadCenter = Vector3.Distance(closestPoint, pos);
 			if (distFromRoadCenter > 30)
 			{
-				GameConsole.WriteLine("off_road", 4);
+				//GameConsole.WriteLine("off_road", 4);
 				float angle = Utility.GetSignedAngleBetweenVectors(_vehicle.Direction, node.Next.Next.Position - pos, true);
 				if (angle < 0)
 					_vehicle.SteeringInput = 0.3f;
@@ -73,14 +73,14 @@ namespace OpenNFS1.Vehicles.AI
 			if (Math.Abs(node.Orientation - node.Next.Next.Orientation) > 30 && _vehicle.ThrottlePedalInput == 0.8f)
 			{
 				//Debug.WriteLine("braking for upcoming corner");
-				GameConsole.WriteLine("braking for corner", 3);
+				//GameConsole.WriteLine("braking for corner", 3);
 				if (_vehicle.Speed > 100)
 				{
 					_vehicle.BrakePedalInput = 1;
 				}
 			}
 
-			GameConsole.WriteLine("steering output: " + Math.Round(_vehicle.SteeringInput, 4), 5);
+			//GameConsole.WriteLine("steering output: " + Math.Round(_vehicle.SteeringInput, 4), 5);
 
 			_vehicle.Update();
 		}

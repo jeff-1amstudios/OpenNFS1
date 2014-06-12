@@ -55,6 +55,9 @@ namespace OpenNFS1.Parsers
 		
 		public bool EnableTextureAttachments { get; set; }  //fsh files use an extension to store detail alongside bitmaps, such as palettes etc.
 
+		public delegate void TextureGeneratedHandler(BitmapEntry entry, byte[] palette, byte[] pixelData);
+		public event TextureGeneratedHandler TextureGenerated;
+
 		public static byte[] _palette;
 		private static byte[] _lastPalette;  //some files don't have their own palettes, in that case, use the last palette we loaded
 
@@ -156,8 +159,9 @@ namespace OpenNFS1.Parsers
 				_palette = _lastPalette;
 			}
 			TextureGenerator tg = new TextureGenerator(_palette);
-			entry.Texture = tg.Generate(entry, pixelData, width, height);
+			entry.Texture = tg.Generate(pixelData, width, height);
 			entry.Type = BitmapEntryType.Texture;
+			if (TextureGenerated != null) TextureGenerated(entry, _palette, pixelData);
 		}
 
 

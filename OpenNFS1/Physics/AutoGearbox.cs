@@ -17,25 +17,17 @@ namespace OpenNFS1.Physics
         {
         }
 
-        public override void Update(float motorRpmPercent)
+        public override void Update(float motorRpmPercent, GearboxAction action)
         {
+			if (_motor.Rpm < 2 && (_currentGear == GEAR_NEUTRAL || _currentGear == GEAR_1) && action == GearboxAction.GearDown)
+			{
+				GearDown();
+			}
+			if ((_currentGear == GEAR_REVERSE || _currentGear == GEAR_NEUTRAL) && action == GearboxAction.GearUp)
+			{
+				GearUp();
+			}
             
-            if (_motor.Rpm < 2 && _currentGear == GEAR_NEUTRAL || _currentGear == GEAR_1)
-            {
-                if (VehicleController.GearDown)
-                {
-                    GearDown();
-                }
-            }
-            if (_currentGear == GEAR_REVERSE || _currentGear == GEAR_NEUTRAL)
-            {
-                if (VehicleController.GearUp)
-                {
-                    GearUp();
-                }
-            }
-            
-
             if (!_motor.WheelsSpinning)
             {
                 
@@ -52,7 +44,7 @@ namespace OpenNFS1.Physics
                 }
             }
 
-            base.Update(motorRpmPercent);
+            base.Update(motorRpmPercent, action);
         }
     }
 }

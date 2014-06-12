@@ -13,6 +13,13 @@ namespace OpenNFS1.Physics
         public float TimeTillEngaged;
     }
 
+	enum GearboxAction
+	{
+		None,
+		GearUp,
+		GearDown
+	}
+
     abstract class BaseGearbox
     {
         public const int GEAR_REVERSE = 0;
@@ -110,7 +117,7 @@ namespace OpenNFS1.Physics
         /// </summary>
         /// <param name="motorRpmPercent">0..1 where 1 is max rpms</param>
         /// <param name="gameTime"></param>
-        public virtual void Update(float motorRpmPercent)
+        public virtual void Update(float motorRpmPercent, GearboxAction action)
         {
             if (_gearChange != null)
             {

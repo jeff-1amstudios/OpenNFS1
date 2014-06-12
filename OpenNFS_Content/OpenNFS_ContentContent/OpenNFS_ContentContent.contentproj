@@ -72,6 +72,7 @@
   <PropertyGroup>
     <PostBuildEvent>copy $(ProjectDir)..\OpenNFS_Content\bin\windows\content\*.xnb $(SolutionDir)OpenNFS1\bin\WindowsGL\Debug\Content</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\..\packages\MonoGame.Binaries.3.2.0\build\net40\MonoGame.Binaries.targets" Condition="Exists('..\..\packages\MonoGame.Binaries.3.2.0\build\net40\MonoGame.Binaries.targets')" />
   <!--
       To modify your build process, add your task inside one of the targets below and uncomment it. 
       Other similar extension points exist, see Microsoft.Common.targets.

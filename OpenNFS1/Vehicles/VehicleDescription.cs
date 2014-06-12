@@ -8,7 +8,6 @@ namespace OpenNFS1.Vehicles
 	class VehicleDescription
 	{
 		public string Name;
-		public string Description;
 		public string UIImageFile;
 		public string ModelFile;
 		public int Horsepower;

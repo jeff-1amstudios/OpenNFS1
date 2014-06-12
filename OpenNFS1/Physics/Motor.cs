@@ -91,7 +91,7 @@ namespace OpenNFS1.Physics
 		}
 
 
-        public void Update(float carSpeed)
+        public void Update(float carSpeed, GearboxAction action)
         {
             _prevRpm = _rpm;
             _lastCarSpeed = carSpeed;
@@ -138,7 +138,7 @@ namespace OpenNFS1.Physics
                 _rpmLimiter = 0.2f;
             }
 
-            _gearbox.Update(_rpm / _redlineRpm);
+            _gearbox.Update(_rpm / _redlineRpm, action);
         }
 
         public float GetPowerAtRpmForGear(float rpm, int gear)

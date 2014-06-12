@@ -17,16 +17,16 @@ namespace OpenNFS1.Parsers
             _palette = palette;
         }
 
-        public Texture2D Generate(BitmapEntry entry, byte[] pixelData, int width, int height)
-        {
+		public Texture2D Generate(byte[] pixelData, int width, int height)
+		{
 			Texture2D newTexture = new Texture2D(Engine.Instance.Device, width, height);
-            newTexture.SetData<byte>(GenerateImageData(entry.Id, pixelData, width, height));
-            return newTexture;            
-        }
+			newTexture.SetData<byte>(GenerateImageData(pixelData, width, height));
+			return newTexture;
+		}
 
-        private byte[] GenerateImageData(string id, byte[] pixelData, int width, int height)
+        private byte[] GenerateImageData(byte[] pixelData, int width, int height)
         {
-			Vector3 mostUsed = Vector3.Zero; // GetMostUsedColour(id, pixelData);
+			Vector3 mostUsed = Vector3.Zero;
 
             int overhang = 0; // (4 - ((width * 4) % 4));
             int stride = (width * 4) + overhang;

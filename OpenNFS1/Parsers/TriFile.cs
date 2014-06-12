@@ -359,12 +359,7 @@ namespace OpenNFS1.Parsers
 		{
 			TerrainRow row = new TerrainRow();
 			row.MiddlePoint = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
-
-			if (row.MiddlePoint != Vector3.Zero)
-			{
-			}
-
-			row.MiddlePoint *= GameConfig.TerrainScale;
+			
 			row.RightPoints[0] = row.MiddlePoint;
 			row.RightPoints[1] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
 			row.RightPoints[2] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
@@ -379,6 +374,7 @@ namespace OpenNFS1.Parsers
 			row.LeftPoints[4] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
 			row.LeftPoints[5] = new Vector3(reader.ReadInt16(), reader.ReadInt16(), -reader.ReadInt16());
 
+			row.MiddlePoint *= GameConfig.TerrainScale;
 			for (int i = 0; i < NbrTerrainPointsPerSide; i++)
 				row.RightPoints[i] *= GameConfig.TerrainScale;
 			for (int i = 0; i < NbrTerrainPointsPerSide; i++)

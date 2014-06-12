@@ -1,0 +1,500 @@
+
+============================================================================
+THE UNOFFICIAL NEED FOR SPEED - SE FILE FORMAT SPECIFICATIONS - Version 0.2
+ Copyright(c)1996, Ian Brown - 101735.527@compuserve.com
+ Portions Copyright(c)1995-1996, Dennis Auroux (MXK) - auroux@clipper.ens.fr
+============================================================================
+
+This file forms an addendum to the original NFS File Format specifications,
+available from the following URL:
+
+	http://www.eleves.ens.fr:8080/home/auroux/nfsspecs.txt
+
+The most recent version of this file is available from:
+
+	http://ourworld.compuserve.com/homepages/ianbrown/nfsse_sp.txt
+
+
+E - APPENDIX  -- NFS-SE changes
+    ===========================
+
+E.1 GAMEDATA\CONFIG\PATHS.DAT
+    -------------------------
+
+This file is essentially the same as for TNFS except for one addition. The
+Track FAM files in NFSSE now come in 2 varieties, a normal file in
+\simdata\ntrackfam and an internationalised file \simdata\etrackfam (English)
+or \simdata\gtrackfam (German). The pattern of entries, then, is now as follows:
+
+000 gamedata/config/              2D0 F:\simdata\misc\
+050 gamedata/savegame/            320 F:\simdata\etrackfam\
+0A0 F:\frontend\speech\           370 F:\simdata\gtrackfam\
+0F0 F:\simdata\soundbnk\          3C0 F:\simdata\slides\
+140 F:\frontend\music\            410 F:\simdata\carfams\
+190 F:\frontend\art\              460 F:\simdata\soundbnk\
+1E0 gamedata/modem/               4B0 F:\simdata\carspecs\
+230 F:\frontend\movielow\         500 F:\simdata\dash\
+280 gamedata/replay/              550 F:\frontend\misc\
+				  5A0 F:\frontend\show\
+
+
+E.2 SIMDATA\MISC\*.TRI
+    ------------------
+
+These files describe the track itself, including the shape of the road
+and the position of the scenery items. The objects are referenced by numbers
+which correspond to entries in the corresponding files in SIMDATA\ETRACKFAM,
+and SIMDATA\NTRACKFAM.
+
+
+In order to understand the structure of TRI files you have to know that a
+track is the superposition of three structures :
+
+- first, a 'virtual road' : this is a sequence of points in space,
+  which will be called 'nodes'. These points correspond to successive
+  positions along the track, and all the cars have to pass near each of
+  these positions. During the game, the virtual road is invisible, but
+  you have to stay close to it.
+
+- second, the scenery : this is a collection of points in space, which
+  will be called 'vertices', together with textures which are mapped onto
+  the polygons defined by consecutive vertices. These textures are used
+  to draw the road, the roadside and part of the landscape. Thus it is
+  of course preferable that the scenery remain close to the virtual road !
+
+- and last, the objects : points in space together with bitmaps, which
+  are used for road signs, buildings, trees, etc... Some of them are
+  plain 2D bitmaps, but others have a more sophisticated polygonal 3D
+  structure.
+
+The 3D coordinates x,y,z will always be used with the following meaning :
+
+- x is an axis which is transversal to the starting line. Positive x values
+  correspond to points which are on the right of the starting position.
+  (i.e. if you start looking to the north, x points to the east)
+
+- y is an axis which is parallel to the starting line. Positive y values
+  correspond to points which are ahead of the starting position.
+  (i.e. y points to the north)
+
+- z is a vertical axis. Positive z values correspond to points higher than
+  the starting position.
+
+a) TRI files begin with 98Ch bytes of headers and index tables. These are
+as follows :
+
+offset len data
+------ --- ----
+00      4   ?
+04      8   ?
+0C      4   x coordinate of the first node
+10      4   z coordinate of the first node
+14      4   y coordinate of the first node
+18      4   ?
+1C      4   ?
+20      4   ?
+24      4   length of the scenery data (in bytes : 120h per record)
+28      4   ?
+2C    960h  first index table
+
+The first index table is a succession of 32-bit offsets. It follows an
+arithmetic progression by 120h as a general rule. This means the first
+value is 0, followed by 548h, A90h, etc... On closed tracks, when the
+end is reached, the offsets start again with 0, 548h, A90h, etc...
+(so that the end of a lap is connected with the beginning of the following
+one !). The table is filled to 960h bytes (600 entries) with zero values.
+These offsets are added to the base address of the scenery data to get an
+absolute offset into the file.
+
+
+b) The virtual road data follows, and is constituted of 36-byte records
+(one for each node). The first record is at offset 98Ch, and the last
+allowed record is at offset 15B0Ch (this leaves room for 2400 records, and
+since a scenery block corresponds to four nodes, both capacities are equal).
+The unused records (after the last node) are filled with zero values.
+The structure of each record is the following :
+
+offset len data
+------ --- ----
+00      1  a0
+01      1  a1
+02      1  a2
+03      1  a3
+04      1  b0
+05      1  b1
+06      1  b2
+07      1  b3
+08      4  x coordinate
+0C      4  z coordinate
+10      4  y coordinate
+14      2  slope
+16      2  slant-A
+18      2  orientation
+1A      2  0
+1C      2  y-orientation
+1E      2  slant-B
+20      2  x-orientation
+22      2  0
+
+- a0,a1,a2,a3 are 8-bit values which specify the width of the main road,
+  and the width of the finging area.
+
+        a0 = distance from the virtual road to the left hand verge
+        a1 = distance from the virtual road to the right hand verge
+        a2 = distance from virtual road to the absolute left hand edge
+        a3 = distanec from virtual road to the absolute right hand edge  
+
+- b0,b1,b2,b3 are 8-bit values of unknown purpose.
+
+- x, z and y coordinates are signed long values.
+
+- slope is a value indicating the slope at the current node, i.e. the
+  difference between the z coordinates of two consecutive nodes.
+  A good approximation is : slope(i) = (z(i+1) - z(i))/152.
+  However, to complicate things, it is stored as a signed 14-bit value,
+  complemented to 4000h. This means -1 is stored as 3FFFh, -2 as 3FFEh, ...
+  So in fact you must perform a logical and with 3FFFh before storing !
+
+- slant-A is a value indicating how the road is slanted to the left or
+  to the right (as in the turns in Autumn Valley or Lost Vegas). It is
+  a signed 14-bit value, like slope. The value is positive if the road
+  is slanted to the right, negative if it is slanted to the left.
+
+- slant-B has the same purpose, but is a standard signed 16-bit value.
+  Its value is positive for the left, negative for the right.
+  The approximative relation between slant-A and slant-B is
+  slant-B = -12.3 slant-A (remember that slant-A is 14-bit, though)
+
+- orientation is a 14-bit value, and is equal to 0 for north (increasing y),
+  1000h for east (increasing x), 2000h for south (decreasing y), 3000h for
+  west (decreasing x), and back to 3FFFh for north.
+
+- y-orientation is a signed 16-bit value, which is proportional to the
+  y coordinate variation. Meanwhile, x-orientation is proportional to the
+  *opposite* of the x coordinate variation. This means that the couple
+  (-xorientation,yorientation) gives the orientation of the track.
+  The norm (square root of xorient^2+yorient^2) is usually around 32000
+  (a little less than 8000h, to avoid numeric overflows), but can fluctuate
+  with the only condition that (-xor,yor) gives the correct orientation.
+
+c) The objects data comes next. There are first several distinct zones,
+many of which seem to be unused (?) :
+
+offset len  data
+------ ---  ----
+15B0C  708h  3-byte records (there are 600... as many as scenery blocks ?)
+16214   4    40h (?)
+16218   4    3E8h = 1000 (size of the main block in records)
+1621C   4    'SJOB'
+16220   4    428Ch (total length of the remaining blocks)
+16224  400h  16-byte records (unknown purpose)
+16624   4    ?
+16628 3E80h  object data : 1000 records of 16 bytes (one per object)
+
+The object data itself consists of a 16-byte record per object. The record
+structure is the following :
+
+offset len data
+------ --- ----
+00      4  reference node
+04      1  bitmap number
+05      1  flip
+06      4  flags (unknown purpose)
+0A      2  relative x coordinate
+0C      2  relative z coordinate
+0E      2  relative y coordinate
+
+Each object is related to a reference node in the virtual road. The x,z,y
+coordinates are then expressed as signed 16-bit values relative to the
+coordinates of the reference node. Beware that the axes are simply translated
+but not rotated ! (i.e. the x and y axes are still pointing east and north)
+The objects are sorted in the order of increasing reference nodes.
+A reference node value of -1 indicates that the record is unused (i.e. after
+the end of the used records). Also note that the coordinates are not
+expressed in the same unit as the 32-bit absolute coordinates seen above
+(the units are much larger, so that the value fits in 16 bits).
+
+The 8-bit flip value is equal to 0 for an object that is perfectly perpendi-
+cular to the track (e.g. a road sign), larger values for objects that are
+slightly turned, until 64 for an object that is mapped along the track
+(e.g. an ad on the side of the road), then up to 128 which is the perfectly
+reversed position (since the objects have no "back", this is the common
+way of reversing a road sign for a turn in the other direction), then
+up to 192 which is again longitudinal mapping (the other way) and until
+255 which is back to the normal position.
+
+The bitmap number corresponds to a texture in the corresponding .FAM file
+(see B.8). The relevant bitmaps are in the second chunk of the .FAM file.
+Two cases can occur :
+
+- closed tracks : the second chunk is a 'wwww' structure containing a
+single subchunk which is in turn a SHPI directory where the entry corres-
+ponding to bitmap #n is called "nn00" where nn is n written in decimal.
+(e.g. bitmap #18 is "1800"). Furthermore the object called "!pal" or "!PAL",
+when it exists, is the corresponding palette (256 3-byte entries) ; FFh is
+transparent.
+
+- open roads : the second chunk contains a subchunk per bitmap, and each
+subchunk is a SHPI containing at least the object "0000" (the bitmap), and
+possibly a palette ("!pal" or "!PAL"). Object #n is then the bitmap "0000"
+in the subchunk #n (the first subchunk is #0).
+
+One must add to these 2D objects (plain bitmaps) the 3D objects described
+in the fourth chunk of the .FAM file. They usually correspond to numbers
+above the last 2D object ; however it happens, in closed tracks, that some
+of the 3D objects are given numbers inside the range used by 2D objects.
+In that case, the numbers describing 2D objects are shifted upwards.
+(i.e. the bitmap "4400" corresponds to object #45 or #46). This phenomenon
+apparently does not occur for open roads, where the 3D objects always follow
+the 2D objects.
+
+Furthermore, certain consecutive bitmaps represent successive states of an
+animated object. In that case, the game will display successively the
+relevant bitmaps. Note that if the second bitmap is given instead of the
+first, the animation does not occur.
+
+d) The scenery data starts at offset 1A4A8h. It is made up of records of
+size 120h, each corresponding to four nodes in the virtual road. The
+records are consecutive and the last record ends the .TRI file.
+Each record has the following structure :
+
+offset len data
+------ --- ----
+000     4   'TRKD'
+004     4   114h = length of the record contents
+008     4   00000000h
+00C     2   ?
+00E    10   textures
+018    12   reference point
+024     6   point A0
+02A     6   point A1
+...    ..   ........
+05C     6   point A9
+060     6   point A10
+066     6   point B0
+06C     6   point B1
+...    ..   ........
+09E     6   point B9
+0A2     6   point B10
+0A8     6   point C0
+0AE     6   point C1
+...    ..   ........
+0DE     6   point C9
+0E4     6   point C10
+0EA     6   point D0
+0F0     6   point D1
+...    ..   ........
+120     6   point D9
+126     6   point D10
+12C     6   point E0
+130     6   point E1
+...    ..   ........
+162     6   point E9
+168     6   point E10
+
+Each point is given by three signed 16-bit relative coordinates (x,z,y as
+usual). The coordinates are in the same reference frame as in the virtual
+road data. The coordinates are relative to the virtual track point as given
+in the virtual track data.
+
+The points A0,...,A10 in record #n (starting with 0) correspond to the node
+#4n (starting with 0) in the virtual road data. B0,...,B10 correspond to
+node #4n+1, C0...C10 to node #4n+2, D0...D10 to node #4n+3 and E0...E10 to
+node #4n+4. Thus the points E0...E10 are identical to the points A0...A10
+of the following record.
+
+The eleven point series (0 to 10) are arranged as follows : A0-E0 are near
+the middle of the road, and thus close to the corresponding nodes.
+A1-E1 are a little to the right, A2-E2 further right, ... until A5-E5.
+A6-E6 are a little to the left, A7-E7 further left, ... until A10-E10.
+(In tunnels, the points A5-E5 and A10-E10 get back to the center, consti-
+tuting the ceiling).
+
+To each record correspond ten textures (coded at the beginning), each given
+by a 8-bit value, T1,T2,...,T10. T1 is used between A0-E0 and A1-E1,
+T2 between A1-E1 and A2-E2, ..., T5 between A4-E4 and A5-E5 ; meanwhile,
+T6 is used between A0-E0 and A6-E6, T7 between A6-E6 and A7-E7, ...,
+T10 between A9-E9 and A10-E10. This is summarized on the following diagram :
+
+E10---E9---E8---E7---E6---E0---E1---E2---E3---E4---E5  node 4n+4
+ |    |    |    |    |    ||    |    |    |    |    |
+ |    |    |    |    |    ||    |    |    |    |    |
+D10   D9   D8   D7   D6   D0   D1   D2   D3   D4   D5  node 4n+3
+ |  T |  T |  T |  T |  T || T  | T  | T  | T  | T  |
+ |    |    |    |    |    ||    |    |    |    |    |
+C10   C9   C8   C7   C6   C0   C1   C2   C3   C4   C5  node 4n+2
+ | 10 |  9 |  8 |  7 |  6 || 1  | 2  | 3  | 4  | 5  |
+ |    |    |    |    |    ||    |    |    |    |    |
+B10   B9   B8   B7   B6   B0   B1   B2   B3   B4   B5  node 4n+1
+ |    |    |    |    |    ||    |    |    |    |    |
+ |    |    |    |    |    ||    |    |    |    |    |
+A10---A9---A8---A7---A6---A0---A1---A2---A3---A4---A5  node 4n
+                          ^
+       the nodes are here |
+
+The texture numbers are converted to bitmaps in the first chunk of the
+.FAM file (see B.8). There are two different cases :
+
+- closed tracks : the first chunk is a 'wwww' structure which contains a 
+single subchunk which is in turn a SHPI bitmap directory, possibly with a 
+palette '!PAL' or '!pal'. There is also often a bitmap called 'ga00' or 
+
+'GA00' (unknown interpretation). The names have the structure "xxls", where 
+xx is a decimal value indicating the texture group, l is 'A', 'B' or 'C', 
+and s indicates a scale ('0' is the largest, while '3'&'4' are very small). 
+The various scales are here to speed up the texture-mapping algorithm,
+anyway the only texture that is always present is with s=0.
+The xx and l values correspond to a texture number n in the following way :
+n=3xx if l='A', 3xx+1 if l='B' and 3xx+2 if l='C'. Note that there are holes
+in the numbering : many numbers do not have a bitmap.
+Examples : bitmap "03C0" corresponds to texture #11 (3x3+2) at the largest
+scale; bitmap "14A1" corresponds to texture #42 (3x14) at the second scale
+available.
+
+- open roads : the first chunk contains a subchunk per texture group (i.e.
+the xx value is now the number of the subchunk, starting with 0). Each
+subchunk is a SHPI directory containing potentially a palette, and bitmaps
+labelled "l00s", where l is 'A','B' or 'C' and s is the scale.
+As before, n=3xx if l='A', 3xx+1 if l='B', 3xx+2 if l='C', and there are
+holes in the numbering.
+Examples : texture #11 at scale '0' is now the bitmap "C000" in subchunk #3.
+Texture #42 at scale '1' is now the bitmap called "A001" in subchunk #14.
+
+F - APPENDIX  -- Compression Formats
+    ================================
+
+Compressed data files start with a 5 byte header.
+
+offset len  data
+------ ---  ----
+000     1   Pack Code Hi byte
+001     1   Pack Code Lo byte		(== FBh or 32h)
+002     1   Expanded length Hi byte
+003     1   Expanded length Mid byte
+004     1   Expanded length Lo byte
+
+If bit 0 of the pack code Hi byte (ie Offset 0 & 0x01) is set, then there
+are now 3 padding bytes to allow the data to begin on a 32 bit boundary.
+Otherwise, the data starts at offset 5. The interpretation of the data is
+different for different pack codes. In the description that follows, it is
+assumed that bit zero of the pack code Hi byte has been cleared.
+
+
+F.1  Pack code == 10FBh, or 1032h
+     ----------------------------
+
+This is the pack code used by the .QFS files, and it indicates LZ77
+compression has been used.
+
+To decode, we read and decode chunks as per the following C code:
+
+/*************************************************************************
+
+  Function:  ReadPackFile (CFile&)
+
+   Purpose:  Reads in and unpacks the specified file
+
+   Returns:  A pointer to the unpacked data if successful.
+
+  Comments:  A null pointer is returned on error
+
+*************************************************************************/
+
+#include "stdafx.h"
+#include "pack.h"
+
+// Note that we rely here on the characteristics of an
+// overlapping 'copy up' of bytes. Hence we cannot use
+// the memcpy library function.
+unsigned char* ReadPackFile(CFile& file)
+{
+	int filesize = file.GetLength();
+	unsigned char *pSourceData = (unsigned char *)malloc(filesize);
+	if (NULL == pSourceData) return(NULL);
+
+	int bytesread = file.Read(pSourceData, filesize);
+	if (bytesread != filesize){
+		free(pSourceData);
+		return(NULL);
+	}
+
+	int PackCode = (pSourceData[0]&0xfe)*256 + pSourceData[1];
+	if (PackCode != 0x10fb){
+		free(pSourceData);
+		return(NULL);			// Invalid pack code
+	}
+	int ExpandedLength = (pSourceData[2] << 16) + (pSourceData[3] << 8) + pSourceData[4];
+	int filepos = 5;
+	int TargetOffset = 0;
+	if (pSourceData[0] & 0x01) filepos = 8;		// align if necessary.
+
+	unsigned char *pExpandedData = (unsigned char *)malloc(ExpandedLength);
+	if (pExpandedData){
+		while(filepos < filesize && pSourceData[filepos] < 0xfc){
+			unsigned char pack_byte = pSourceData[filepos];
+			int a = pSourceData[filepos+1];
+			int b = pSourceData[filepos+2];
+			if (!(pack_byte & 0x80)){
+				int len = pack_byte&0x03;
+				unsigned char *pDest = pExpandedData+TargetOffset;
+				unsigned char *pSrc = pSourceData+filepos+2;
+				TargetOffset += len;
+				filepos += (len+2);
+				while (len--) *pDest++ = *pSrc++;
+				len = ((pack_byte & 0x1c)>>2) + 3;
+				int offset = (pack_byte >> 5) + a + 1;
+				pDest = pExpandedData + TargetOffset;
+				pSrc = pDest-offset;
+				TargetOffset += len;
+				while (len--) *pDest++ = *pSrc++;
+			}
+			else if (!(pack_byte & 0x40)){
+				int len = (a >> 6) &0x03; 
+				unsigned char *pDest = pExpandedData + TargetOffset;
+				unsigned char *pSrc = pSourceData+filepos+3;
+				filepos += (len+3);
+				TargetOffset += len;
+				while (len--) *pDest++ = *pSrc++;
+				int offset = (a&0x3f)*256 + b + 1;
+				pDest = pExpandedData + TargetOffset;
+				pSrc = pDest-offset;
+				len = (pack_byte & 0x3f)+4;
+				TargetOffset += len;
+				while (len--) *pDest++ = *pSrc++;
+			}
+			else if (!(pack_byte & 0x20)){
+				int c = pSourceData[filepos+3];
+				int len = (pack_byte & 0x03);
+				unsigned char *pDest = pExpandedData + TargetOffset;
+				unsigned char *pSrc = pSourceData+filepos+4;
+				filepos += (len+4);
+				TargetOffset += len;
+				while (len--) *pDest++ = *pSrc++;
+				int offset = ((pack_byte & 0x10)<<0x0c) + 256*a + b + 1;
+				pDest = pExpandedData + TargetOffset;
+				pSrc = pDest-offset;
+				len = ((pack_byte >> 2)&0x03)*256+c+5;
+				TargetOffset += len;
+				while (len--) *pDest++ = *pSrc++;
+			}
+			else {
+				int len = (pack_byte&0x1f)*4+4;
+				unsigned char *pDest = pExpandedData + TargetOffset;
+				unsigned char *pSrc = pSourceData+filepos+1;
+				filepos += (len+1);
+				TargetOffset += len;
+				while (len--) *pDest++ = *pSrc++;
+			}
+		}
+		if (filepos < filesize && TargetOffset < ExpandedLength){
+				unsigned char *pDest = pExpandedData + TargetOffset;
+				unsigned char *pSrc = pSourceData+filepos+1;
+				int len = pSourceData[filepos]&0x03;
+				while (len--) *pDest++ = *pSrc++;
+		}
+	}
+	free(pSourceData);
+	return(pExpandedData);
+}
+
+

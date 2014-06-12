@@ -120,6 +120,7 @@ namespace OpenNFS1.Physics
 
 		// inputs
 		public float ThrottlePedalInput, BrakePedalInput, SteeringInput;
+		public bool GearUpInput, GearDownInput;
 
 		public Vehicle(float mass, string name)
 		{
@@ -222,7 +223,9 @@ namespace OpenNFS1.Physics
 				if (Math.Abs(_speed) < 1)
 					_rotationChange = 0;
 				else if (Math.Abs(_speed) < 20.0f && _rotationChange != 0)
-					_rotationChange *= (0.06f * Math.Abs(_speed));
+				{
+					_rotationChange *= (0.08f * Math.Abs(_speed));
+				}
 				else
 				{
 					if (_rotationChange != 0)
@@ -239,9 +242,12 @@ namespace OpenNFS1.Physics
 					}
 				}
 
-				if (_isOnGround && BrakePedalInput > 0.5f && Math.Abs(_speed) > 5)
+				if (_isOnGround && BrakePedalInput > 0.5f && Math.Abs(_speed) > 10)
 				{
-					_wheels[0].IsSkidding = _wheels[1].IsSkidding = _wheels[2].IsSkidding = _wheels[3].IsSkidding = true;
+					if (_speed < 50)
+					{
+						_wheels[0].IsSkidding = _wheels[1].IsSkidding = _wheels[2].IsSkidding = _wheels[3].IsSkidding = true;
+					}
 					_audioProvider.PlaySkid(true);
 				}
 				else if (_isOnGround && Math.Abs(_steeringWheel) > 0.25f && _slipFactor > 0.43f)
@@ -275,7 +281,7 @@ namespace OpenNFS1.Physics
 
 			if (_isOnGround)
 			{
-				float drag = 6000f * BrakePedalInput / (_speed * 2f);  //we should slow more quickly as our speed drops
+				float drag = 7000f * BrakePedalInput / (Math.Abs(_speed) * 3f);  //we should slow more quickly as our speed drops
 				float inertia = _mass;
 				drag += Math.Abs(_steeringWheel) * 10f;
 				if (Math.Abs(_speed) > 30)
@@ -283,17 +289,13 @@ namespace OpenNFS1.Physics
 					drag += _wheelsOutsideRoad * 5f;
 				}
 
-				drag += _motor.CurrentFriction * 0.5f;
+				drag += _motor.CurrentFriction * 4f;
 
 				if (drag < 0) drag = 0;
 
 				if (Math.Abs(_speed) < 1)
 					drag = 0;
 
-				
-
-				//_force -= _direction * drag * 100 * elapsedSeconds;
-				
 				if (_speed > 0)
 				{
 					_speed -= drag * elapsedSeconds;
@@ -310,7 +312,7 @@ namespace OpenNFS1.Physics
 				float speedChange = _speed - _previousSpeed;
 
 				BodyPitch.ChangePosition(speedChange * 0.6f);
-				BodyRoll.ChangePosition(_steeringWheel * -0.05f * Math.Min(1, _speed / 30));
+				BodyRoll.ChangePosition(_steeringWheel * -0.05f * Math.Min(1, Math.Abs(_speed) / 30));
 
 				BodyPitch.Simulate(_moveFactorPerSecond);
 				BodyRoll.Simulate(_moveFactorPerSecond);
@@ -345,7 +347,10 @@ namespace OpenNFS1.Physics
 			foreach (VehicleWheel wheel in _wheels)
 				wheel.Update();
 
-			_motor.Update(_speed);
+			GearboxAction action = GearboxAction.None;
+			if (GearUpInput) action = GearboxAction.GearUp;
+			else if (GearDownInput) action = GearboxAction.GearDown;
+			_motor.Update(_speed, action);
 
 			if (_motor.AtRedline && !_motor.WheelsSpinning)
 			{
@@ -415,11 +420,11 @@ namespace OpenNFS1.Physics
 			//GameConsole.WriteLine("inAir: " + !_isOnGround + ", " + _direction.Y, 3);
 			//GameConsole.WriteLine("slope: " + CurrentNode.Slope + ", " + nextNode.Slope, 4);
 			//GameConsole.WriteLine("slope delta: " + (CurrentNode.Slope - nextNode.Slope), 5);
-			if ((CurrentNode.Slope - nextNode.Slope > 50 && _speed > 100) || Engine.Instance.Input.WasPressed(Keys.Space))
+			if ((CurrentNode.Slope - nextNode.Slope > 50 && _speed > 100 && _isOnGround) || Engine.Instance.Input.WasPressed(Keys.Space))
 			{
 				_isOnGround = false;
 				_upVelocity = -0.5f;
-				_position.Y += 0.2f;
+				//_position.Y += 0.05f;
 			}
 
 			var closestPoint1 = Utility.GetClosestPointOnLine(CurrentNode.GetLeftBoundary(), CurrentNode.GetRightBoundary(), _position);
@@ -512,9 +517,11 @@ namespace OpenNFS1.Physics
 				_position.Y -= Gravity * 10f * _timeInAir * Engine.Instance.FrameTime;
 				Debug.WriteLine("inair: " + Position.Y + ", " + _direction.Y);
 				// slowly pitch the nose of the car downwards - helps to flatten out the jump and looks better
-				if (_timeInAir > 0.2f && _direction.Y > -0.5f)
+				if (_timeInAir > 0.3f && _direction.Y > -0.3f)
+				{
 					_direction.Y -= _timeInAir * 0.006f;
-				_direction = Vector3.Normalize(_direction);
+					_direction = Vector3.Normalize(_direction);
+				}
 			}
 
 			if (_isOnGround && !wasOnGround)

@@ -39,11 +39,16 @@ namespace OpenNFS1
 			//_car.AudioEnabled = true;
 
 			_race = new Race(3, _track, _playerDriver);
-			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
-			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
-			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
-			//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
-			_playerUI = new PlayerUI(_car);
+			for (int i = 0; i < 10; i++)
+			{
+				int j = Engine.Instance.Random.Next(VehicleDescription.Descriptions.Count);
+				_race.AddDriver(new AIDriver(VehicleDescription.Descriptions[j]));
+			}
+				//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
+				//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
+				//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
+				//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
+				_playerUI = new PlayerUI(_car);
 			/*
 			d = new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "911"));
 			_aiDrivers.Add(d);

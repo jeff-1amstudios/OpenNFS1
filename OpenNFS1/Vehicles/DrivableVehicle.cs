@@ -17,7 +17,6 @@ namespace OpenNFS1.Vehicles
 	{
 		private CarMesh _model;
 		public VehicleDescription Descriptor { get; private set; }
-		private Effect _effect2;
 
 		public DrivableVehicle(VehicleDescription desc)
 			: base(desc.Mass, desc.Name)
@@ -28,15 +27,11 @@ namespace OpenNFS1.Vehicles
 			
 			InitializePhysics();
 
-			if (_effect2 == null)
-			{
-				//_effect2 = Engine.Instance.ContentManager.Load<Effect>("Content/Simple3");
-			}
 		}
 
 		public void InitializePhysics()
 		{
-			float offset = VehicleWheel.Width / 2;
+			float offset = VehicleWheel.Width / 2 - 0.1f;
 			_wheels[0] = new VehicleWheel(this, _model.LeftFrontWheelPos, _model.FrontWheelSize, _model.WheelTexture, offset);
 			_wheels[1] = new VehicleWheel(this, _model.RightFrontWheelPos, _model.FrontWheelSize, _model.WheelTexture, -offset);
 			_wheels[2] = new VehicleWheel(this, _model.LeftRearWheelPos, _model.RearWheelSize, _model.WheelTexture, offset);
@@ -56,9 +51,7 @@ namespace OpenNFS1.Vehicles
 			_effect.View = Engine.Instance.Camera.View;
 			_effect.Projection = Engine.Instance.Camera.Projection;
 			_effect.World = _renderMatrix;
-			//_effect.VertexColorEnabled = false;
 			
-			//_effect2.Parameters["WorldViewProj"].SetValue(_renderMatrix * Engine.Instance.Camera.View * Engine.Instance.Camera.Projection);
 			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
 			Engine.Instance.Device.BlendState = BlendState.Opaque;
 			_effect.CurrentTechnique.Passes[0].Apply();

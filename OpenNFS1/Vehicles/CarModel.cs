@@ -14,11 +14,11 @@ namespace OpenNFS1.Vehicles
 		Polygon _rightRearWheel, _leftRearWheel, _rightFrontWheel, _leftFrontWheel;
 		Polygon _leftBrakeLight, _rightBrakeLight;
 		Texture2D _wheelTexture, _brakeOnTexture, _brakeOffTexture;
-		static Color BrakeColor = new Color(140, 248, 24); //color of brake-off light color...
+		
 		static Color BrakeOffColor = new Color(88, 10, 5); //color of brake-off light color...
 		static Color BrakeOnColor = new Color(158, 110, 6); //color of brake-off light color...
 
-		public CarMesh(MeshChunk meshChunk, BitmapChunk bmpChunk)
+		public CarMesh(MeshChunk meshChunk, BitmapChunk bmpChunk, Color brakeColor)
 			: base(meshChunk, bmpChunk)
 		{
 			foreach (var poly in _polys)
@@ -49,8 +49,8 @@ namespace OpenNFS1.Vehicles
 			_wheelTexture = bmpChunk.FindByName("tyr1").Texture;
 
 			// This seems like it could be done in a shader but I couldn't get it to work well enough 
-			// (dealing with original palette colors doesn't work so well in a texture stretched over a polygon)
-
+			// (dealing with original paletted colors doesn't work so well in a texture stretched over a polygon)
+			
 			var rsidPoly = _polys.FirstOrDefault(a => a.TextureName == "rsid");
 			if (rsidPoly != null)
 			{
@@ -59,7 +59,7 @@ namespace OpenNFS1.Vehicles
 				rsidPoly.Texture.GetData<Color>(pixels);
 				for (int i = 0; i < pixels.Length; i++)
 				{
-					if (pixels[i] == BrakeColor)
+					if (pixels[i] == brakeColor)
 						pixels[i] = BrakeOnColor;
 				}
 

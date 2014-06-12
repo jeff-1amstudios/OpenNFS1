@@ -21,6 +21,8 @@ namespace OpenNFS1.Vehicles.AI
 			_vehicle.ThrottlePedalInput = VehicleController.Acceleration;
 			_vehicle.BrakePedalInput = VehicleController.Brake;
 			_vehicle.SteeringInput= VehicleController.Turn;
+			_vehicle.GearDownInput = VehicleController.GearDown;
+			_vehicle.GearUpInput = VehicleController.GearUp;
 			_vehicle.Update();
 		}
 

@@ -1,0 +1,53 @@
+2  left lane /
+1 nothing
+0 left lane \
+3 nothing (default)
+
+Lost Vegas:
+Inside (ambient noise): 17,17,0,4
+Normal: 17,0,0,3
+Cobbled road: 17,0,0,5
+Twisty section: 17,1,0,3
+
+Alpine:
+Normal: 17,17,34,3
+Some bits: 17,1,34,3
+Lane change: 17,17,34,0
+Wide lane: 	18,17,34,1 ... some 18,17,34,1
+Uphill wide lane: 18,17,34,16
+In tunnel: 17,0,0,4
+
+Coastal 1 node 288 - 18,17,2,1
+
+x,x,0,<sound id>  soundid:14 is waterfall
+x,x,0,0 move A6-A8 verts 1 to the right if the associated terrainRow is #1 in its segment
+x,x,0,1 no effect
+x,x,0,2 move A6-A8 verts 1 to the right if the associated terrainRow is last in its segment
+x,x,0,3 no effect
+x,x,0,4+ play tunnel sound effect
+	  5 cobbled road sound effect (Lost Vegas)
+      6 no effect
+	  7 tunnel take last right strip and put it between A2-A9
+x,x,0,8 .. left wall appeared to move across the track - snapped back as we got closer
+x,x,0,9 tunnel (vertigo track) take last left strip and put it between A7-A4
+x,x,0,10 no effect
+x,x,0,11 no effect
+x,x,0,12 tunnel (vertigo track) take last left strip and put it between A8-A4
+x,x,0,13 tunnel - take last left strip and put it between A8-A5
+	  14 waterfall (autumn valley) left channel
+	  15 waterfall (autumn valley) right channel
+x,x,0,16 no effect
+	  17 water left channel
+      18 water right channel
+x,x,0,32 crash
+
+20,x,x,x - distance cars should drive from boundary?
+10 - cars going forwards all in center of road, no cars going backwards
+5 - same as 10
+
+Tunnels:
+
+Not based on vertex locations
+Not based on textureId
+
+Appears to join the last / 2nd last left to second-last right A8 - A4

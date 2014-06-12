@@ -14,14 +14,14 @@ namespace OpenNFS1.Physics
         { }
 
 
-        public override void Update(float motorRpmPercent)
+        public override void Update(float motorRpmPercent, GearboxAction action)
         {
-            if (Engine.Instance.Input.WasPressed(Keys.A) && _currentGear < Ratios.Count - 1)
+            if (action == GearboxAction.GearUp && _currentGear < Ratios.Count - 1)
                 GearUp();
-            if (Engine.Instance.Input.WasPressed(Keys.Z) && CurrentGear > -1 && _motor.CanChangeDown)
+            if (action == GearboxAction.GearDown && CurrentGear > -1 && _motor.CanChangeDown)
                 GearDown();
 
-            base.Update(motorRpmPercent);
+            base.Update(motorRpmPercent, action);
         }
     }
 }
