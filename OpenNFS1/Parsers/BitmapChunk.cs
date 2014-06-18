@@ -192,10 +192,7 @@ namespace OpenNFS1.Parsers
 
 		public BitmapEntry FindByName(string name)
 		{
-			return _bitmaps.Find(delegate(BitmapEntry entry)
-			{
-				return entry.Id == name;
-			});
+			return _bitmaps.Find(a => a.Id.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 		}
 	}
 }

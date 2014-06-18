@@ -1,11 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
+using NfsEngine;
 using OpenNFS1.Parsers.Track;
-using NfsEngine;
-using NfsEngine;
-using Microsoft.Xna.Framework.Graphics;
 using OpenNFS1.Tracks;
 
 namespace OpenNFS1.Views
@@ -37,7 +33,7 @@ namespace OpenNFS1.Views
             get { return false; }
         }
 
-		public bool ShouldRenderPlayer { get { return true; } }
+		public bool ShouldRenderPlayer { get { return false; } }
 
         public void Update(GameTime gameTime)
         {

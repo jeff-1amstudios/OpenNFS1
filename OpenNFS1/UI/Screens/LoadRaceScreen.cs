@@ -1,33 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NfsEngine;
+using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenNFS1.Parsers;
-using OpenNFS1.Parsers.Track;
-using Microsoft.Xna.Framework.Input;
 using NfsEngine;
 using OpenNFS1.Loaders;
-using OpenNFS1.UI;
-using OpenNFS1.Vehicles;
-using OpenNFS1.Physics;
-using System.Diagnostics;
-using OpenNFS1.UI.Screens;
-using System.Threading;
 using OpenNFS1.Parsers;
+using OpenNFS1.Parsers.Track;
+using OpenNFS1.UI.Screens;
 
 
 namespace OpenNFS1
 {
     class LoadRaceScreen : BaseUIScreen, IGameScreen
     {
-        private Track _track;
 		float _loadingTime;
 		int _nbrDots = 0;
 
         public LoadRaceScreen() : base(false)
         {
+			if (GameConfig.CurrentTrack != null)
+			{
+				GameConfig.CurrentTrack.Dispose();
+				GameConfig.CurrentTrack = null;
+			}
             new Thread(LoadTrack).Start();
         }
 
@@ -35,11 +30,9 @@ namespace OpenNFS1
 
         public void Update(GameTime gameTime)
         {
-			//LoadTrack();
-
-            if (_track != null)
+			if (GameConfig.CurrentTrack != null)
             {
-                Engine.Instance.Mode = new DoRaceScreen(_track);
+				Engine.Instance.Mode = new DoRaceScreen(GameConfig.CurrentTrack);
             }
 			_loadingTime += Engine.Instance.FrameTime;
 			if (_loadingTime > 0.1f)
@@ -51,10 +44,8 @@ namespace OpenNFS1
 
         public void Draw()
         {
-            Engine.Instance.SpriteBatch.Begin();
-
-			
-            Engine.Instance.SpriteBatch.DrawString(Font, String.Format("Loading {0}" + new string('.', _nbrDots), GameConfig.SelectedTrack.Name), new Vector2(50, 200), Color.WhiteSmoke, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
+            Engine.Instance.SpriteBatch.Begin();			
+            Engine.Instance.SpriteBatch.DrawString(Font, String.Format("Loading {0}" + new string('.', _nbrDots), GameConfig.SelectedTrackDescription.Name), new Vector2(50, 200), Color.WhiteSmoke, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
             Engine.Instance.SpriteBatch.End();
         }
 
@@ -62,9 +53,9 @@ namespace OpenNFS1
 
         private void LoadTrack()
         {
-			TriFile tri = new TriFile(GameConfig.SelectedTrack.FileName);
-            _track = new TrackAssembler().Assemble(tri);
-			_track.Description = GameConfig.SelectedTrack;
+			TriFile tri = new TriFile(GameConfig.SelectedTrackDescription.FileName);
+			GameConfig.CurrentTrack = new TrackAssembler().Assemble(tri);
+			GameConfig.CurrentTrack.Description = GameConfig.SelectedTrackDescription;
             
         }
     }

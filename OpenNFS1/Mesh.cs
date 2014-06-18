@@ -90,5 +90,10 @@ namespace OpenNFS1
 			}
 			return bb;
 		}
+
+		public void Dispose()
+		{
+			_vertexBuffer.Dispose();
+		}
 	}
 }

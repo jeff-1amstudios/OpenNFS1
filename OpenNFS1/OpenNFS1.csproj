@@ -38,17 +38,16 @@
     <Compile Include="Audio\EnvironmentAudioProvider.cs" />
     <Compile Include="Audio\VehicleAudioProvider.cs" />
     <Compile Include="AverageValue.cs" />
-    <Compile Include="Constants.cs" />
     <Compile Include="Dashboards\Dashboard.cs" />
     <Compile Include="Dashboards\DashboardDescription.cs" />
     <Compile Include="Dashboards\GearboxAnimation.cs" />
-    <Compile Include="PlayerRaceStats.cs" />
+    <Compile Include="Race\PlayerRaceStats.cs" />
     <Compile Include="PlayerUI.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="GameConfig.cs" />
-    <Compile Include="Loaders\OpenRoadTextureProvider.cs" />
+    <Compile Include="Parsers\OpenRoadTrackfamFile.cs" />
     <Compile Include="Tracks\TrackAssembler.cs" />
-    <Compile Include="Loaders\TrackTextureProvider.cs" />
+    <Compile Include="Parsers\TrackfamFile.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="ObjectShadow.cs" />
     <Compile Include="Parsers\Audio\BnkFileParser.cs" />
@@ -60,7 +59,7 @@
     <Compile Include="Parsers\FshFile.cs" />
     <Compile Include="Parsers\HeaderChunk.cs" />
     <Compile Include="Parsers\MeshChunk.cs" />
-    <Compile Include="Parsers\Polygon.cs" />
+    <Compile Include="Polygon.cs" />
     <Compile Include="Parsers\QfsFile.cs" />
     <Compile Include="Parsers\TriFile.cs" />
     <Compile Include="Physics\AutoGearbox.cs" />
@@ -74,8 +73,7 @@
     <Compile Include="Physics\VehicleWheel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Race.cs" />
-    <Compile Include="Tracks\RenderingSceneryObject.cs" />
+    <Compile Include="Race\Race.cs" />
     <Compile Include="Tracks\SceneryObject.cs" />
     <Compile Include="Tracks\TerrainRow.cs" />
     <Compile Include="Tracks\TerrainSegment.cs" />
@@ -86,7 +84,7 @@
     <Compile Include="Tracks\TrackObjectDescriptor.cs" />
     <Compile Include="Tracks\TrackSegment.cs" />
     <Compile Include="Tracks\TrackSkybox.cs" />
-    <Compile Include="TyreSmokeParticleSystem.cs" />
+    <Compile Include="Vehicles\TyreSmokeParticleSystem.cs" />
     <Compile Include="UIController.cs" />
     <Compile Include="UI\RaceUI.cs" />
     <Compile Include="UI\Screens\AboutScreen.cs" />
@@ -95,12 +93,10 @@
     <Compile Include="UI\Screens\ChooseTrackScreen.cs" />
     <Compile Include="UI\Screens\ControlsScreen.cs" />
     <Compile Include="UI\Screens\DoRaceScreen.cs" />
-    <Compile Include="UI\Screens\HomeScreen.cs" />
     <Compile Include="UI\Screens\LoadRaceScreen.cs" />
-    <Compile Include="UI\Screens\HomeScreen2.cs" />
+    <Compile Include="UI\Screens\HomeScreen.cs" />
     <Compile Include="UI\Screens\RaceFinishedScreen.cs" />
     <Compile Include="UI\Screens\RacePausedScreen.cs" />
-    <Compile Include="UI\SpeedoControl.cs" />
     <Compile Include="VehicleController.cs" />
     <Compile Include="Vehicles\AIVehicle.cs" />
     <Compile Include="Vehicles\AI\AIDriver.cs" />
@@ -118,10 +114,11 @@
     <Compile Include="Views\ChaseView.cs" />
     <Compile Include="Views\DashboardView.cs" />
     <Compile Include="Views\DebugView.cs" />
+    <Compile Include="Views\DropCameraView.cs" />
     <Compile Include="Views\IView.cs" />
     <Compile Include="Views\TelevisionView.cs" />
     <Compile Include="Views\TrackFlybyView.cs" />
-    <Compile Include="WheelModel.cs" />
+    <Compile Include="Vehicles\WheelModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

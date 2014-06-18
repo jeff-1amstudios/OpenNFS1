@@ -1,15 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
 using NfsEngine;
-using NfsEngine;
-using Microsoft.Xna.Framework.Graphics;
-using OpenNFS1.UI;
 using OpenNFS1.Physics;
-using System.Diagnostics;
-using OpenNFS1.Parsers;
-using OpenNFS1.Parsers;
 
 namespace OpenNFS1.Views
 {

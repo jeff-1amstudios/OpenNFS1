@@ -23,7 +23,7 @@ namespace OpenNFS1
 		Track _track;
 		public PlayerDriver Player { get; private set; }
 		TrafficController _trafficController;
-		List<IDriver> _allDrivers = new List<IDriver>();
+		public List<IDriver> Drivers {get; private set; }
 		public PlayerRaceStats PlayerStats { get; private set; }
 
 		public Race(int nbrLaps, Track track, PlayerDriver player)
@@ -32,6 +32,7 @@ namespace OpenNFS1
 			Player = player;
 			_track = track;
 			PlayerStats = new PlayerRaceStats();
+			Drivers = new List<IDriver>();
 			AddDriver(player);
 			if (track.Description.IsOpenRoad)
 			{
@@ -60,7 +61,7 @@ namespace OpenNFS1
 		{
 			VehicleController.ForceBrake = false;
 			_countdownStartTime = DateTime.Now;
-			_allDrivers.ForEach(a=> a.Vehicle.Motor.Gearbox.CurrentGear = 0);
+			Drivers.ForEach(a=> a.Vehicle.Motor.Gearbox.CurrentGear = 0);
 		}
 
 		public bool HasFinished
@@ -76,16 +77,16 @@ namespace OpenNFS1
 		{
 			d.Vehicle.Track = _track;
 			Vector3 pos = _track.StartPosition;
-			pos.Z -= _allDrivers.Count * 30;
-			pos.X += _allDrivers.Count % 2 == 0 ? 20 : -20;
+			pos.Z -= Drivers.Count * 30;
+			pos.X += Drivers.Count % 2 == 0 ? 20 : -20;
 			d.Vehicle.Position = pos;
-			_allDrivers.Add(d);
+			Drivers.Add(d);
 		}
 
 		public void Update()
 		{
-			foreach (var driver in _allDrivers)
-				driver.Update();
+			foreach (var driver in Drivers)
+				driver.Update(Drivers);
 
 			_track.Update();
 
@@ -104,7 +105,7 @@ namespace OpenNFS1
 			if (SecondsTillStart <= 0 && !_started)
 			{
 				//VehicleController.ForceBrake = false;
-				_allDrivers.ForEach(a => a.Vehicle.Motor.Gearbox.CurrentGear = 1);
+				Drivers.ForEach(a => a.Vehicle.Motor.Gearbox.CurrentGear = 1);
 				_raceStartTime = DateTime.Now;
 				PlayerStats.OnLapStarted();
 				_started = true;
@@ -130,13 +131,13 @@ namespace OpenNFS1
 
 			_track.Render(Engine.Instance.Camera.Position, Player.Vehicle.CurrentNode);
 
-			foreach (var driver in _allDrivers)
+			foreach (var driver in Drivers)
 			{
 				if (!renderPlayerVehicle && driver is PlayerDriver)
 					continue;
 				driver.Vehicle.RenderShadow();
 			}
-			foreach (var driver in _allDrivers)
+			foreach (var driver in Drivers)
 			{
 				if (!renderPlayerVehicle && driver is PlayerDriver)
 					continue;

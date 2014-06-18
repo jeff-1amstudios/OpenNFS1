@@ -1,20 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using NfsEngine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using OpenNFS1.Parsers;
-using OpenNFS1.Parsers.Track;
-using Microsoft.Xna.Framework.Input;
 using NfsEngine;
-using OpenNFS1.Loaders;
+using OpenNFS1.Parsers.Track;
 using OpenNFS1.UI;
-using OpenNFS1.Vehicles;
-using OpenNFS1.Physics;
-using System.Diagnostics;
 using OpenNFS1.UI.Screens;
-using OpenNFS1;
+using OpenNFS1.Vehicles;
 using OpenNFS1.Vehicles.AI;
 
 
@@ -39,7 +29,7 @@ namespace OpenNFS1
 			//_car.AudioEnabled = true;
 
 			_race = new Race(3, _track, _playerDriver);
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 30; i++)
 			{
 				int j = Engine.Instance.Random.Next(VehicleDescription.Descriptions.Count);
 				_race.AddDriver(new AIDriver(VehicleDescription.Descriptions[j]));

@@ -13,7 +13,6 @@ namespace OpenNFS1.Parsers.Track
 
 	abstract class SceneryItem
 	{
-		public SceneryObject2 SceneryObject2;
 		public int SegmentRef;
 		public Vector3 Position;
 		public float Orientation;
@@ -24,13 +23,13 @@ namespace OpenNFS1.Parsers.Track
 		public abstract void Render(AlphaTestEffect effect);
 	}
 
-	class BillboardScenery : SceneryItem
+	class BillboardSceneryItem : SceneryItem
 	{
 		protected Matrix _matrix;
 		protected Texture2D _texture;
 
-		public BillboardScenery() { }
-		public BillboardScenery(Texture2D texture)
+		public BillboardSceneryItem() { }
+		public BillboardSceneryItem(Texture2D texture)
 		{
 			_texture = texture;
 		}
@@ -57,13 +56,13 @@ namespace OpenNFS1.Parsers.Track
 		}
 	}
 
-	class AnimatedBillboardScenery : BillboardScenery
+	class AnimatedBillboardSceneryItem : BillboardSceneryItem
 	{
 		List<Texture2D> _textures;
 		int _currentTexture;
 		double _textureChangeTime;
 
-		public AnimatedBillboardScenery(List<Texture2D> textures)
+		public AnimatedBillboardSceneryItem(List<Texture2D> textures)
 		{
 			_textures = textures;
 			_textureChangeTime = Engine.Instance.Random.NextDouble();
@@ -94,12 +93,12 @@ namespace OpenNFS1.Parsers.Track
 		}
 	}
 
-	class TwoSidedBillboardScenery : SceneryItem
+	class TwoSidedBillboardSceneryItem : SceneryItem
 	{
 		Texture2D _texture1, _texture2;
 		Matrix _matrix1, _matrix2;
 
-		public TwoSidedBillboardScenery(Texture2D texture1, Texture2D texture2)
+		public TwoSidedBillboardSceneryItem(Texture2D texture1, Texture2D texture2)
 		{
 			_texture1 = texture1;
 			_texture2 = texture2;
@@ -133,12 +132,12 @@ namespace OpenNFS1.Parsers.Track
 		}
 	}
 
-	class ModelScenery : SceneryItem
+	class ModelSceneryItem : SceneryItem
 	{
 		Mesh _mesh;
 		Matrix _matrix;
 
-		public ModelScenery(Mesh mesh)
+		public ModelSceneryItem(Mesh mesh)
 		{
 			_mesh = mesh;
 		}

@@ -32,7 +32,7 @@ namespace OpenNFS1.UI.Screens
         {
             if (UIController.Back)
             {
-                Engine.Instance.Mode = new HomeScreen2();
+                Engine.Instance.Mode = new HomeScreen();
             }
 
             if (UIController.Up && _selectedOption > 0)
@@ -43,16 +43,16 @@ namespace OpenNFS1.UI.Screens
             if (UIController.Ok)
             {
                 if (_selectedOption == 0)
-                    Engine.Instance.Mode = new HomeScreen2();
+                    Engine.Instance.Mode = new HomeScreen();
                 else
                 {
-					if (!GameConfig.SelectedTrack.IsOpenRoad)
+					if (!GameConfig.SelectedTrackDescription.IsOpenRoad)
                         Engine.Instance.Mode = new DoRaceScreen(_raceTrack);
                     else
                     {
-                        GameConfig.SelectedTrack = TrackDescription.GetNextOpenRoadStage(GameConfig.SelectedTrack);
-                        if (GameConfig.SelectedTrack == null)
-                            Engine.Instance.Mode = new HomeScreen2();
+                        GameConfig.SelectedTrackDescription = TrackDescription.GetNextOpenRoadStage(GameConfig.SelectedTrackDescription);
+                        if (GameConfig.SelectedTrackDescription == null)
+                            Engine.Instance.Mode = new HomeScreen();
                         else
                             Engine.Instance.Mode = new LoadRaceScreen();
                     }
@@ -66,7 +66,7 @@ namespace OpenNFS1.UI.Screens
 
             Engine.Instance.SpriteBatch.Draw(_background, Vector2.Zero, new Color(255, 255, 255, 100));
 
-			if (GameConfig.SelectedTrack.IsOpenRoad)
+			if (GameConfig.SelectedTrackDescription.IsOpenRoad)
                 DrawOpenRoadResult();
             else
                 DrawCircuitResult();
@@ -81,7 +81,7 @@ namespace OpenNFS1.UI.Screens
             int y = 80;
             Engine.Instance.SpriteBatch.DrawString(Font, "Race completed!", new Vector2(50, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
             y += 70;
-			Engine.Instance.SpriteBatch.DrawString(Font, GameConfig.SelectedTrack.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
+			Engine.Instance.SpriteBatch.DrawString(Font, GameConfig.SelectedTrackDescription.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
             y += 20;
             int totalSeconds = 0;
             for (int i = 0; i < _race.PlayerStats.LapTimes.Count; i++)
@@ -106,7 +106,7 @@ namespace OpenNFS1.UI.Screens
             int y = 80;
             Engine.Instance.SpriteBatch.DrawString(Font, "Stage completed!", new Vector2(50, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.3f, SpriteEffects.None, 0);
             y += 70;
-			Engine.Instance.SpriteBatch.DrawString(Font, GameConfig.SelectedTrack.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
+			Engine.Instance.SpriteBatch.DrawString(Font, GameConfig.SelectedTrackDescription.Name, new Vector2(100, y), Color.WhiteSmoke, 0, Vector2.Zero, 1.1f, SpriteEffects.None, 0);
             y += 20;
                         
             y += 50;
@@ -114,7 +114,7 @@ namespace OpenNFS1.UI.Screens
 
             y += 100;
             
-            if (TrackDescription.GetNextOpenRoadStage(GameConfig.SelectedTrack) != null)
+            if (TrackDescription.GetNextOpenRoadStage(GameConfig.SelectedTrackDescription) != null)
             {
                 Engine.Instance.SpriteBatch.DrawString(Font, " Main menu", new Vector2(200, y), _selectedOption == 0 ? Color.Yellow : Color.WhiteSmoke, 0, Vector2.Zero, 1.2f, SpriteEffects.None, 0);
                 y += 50;

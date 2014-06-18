@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework.Audio;
 using NfsEngine;
-using NfsEngine;
 using Microsoft.Xna.Framework;
 using OpenNFS1.Physics;
 using System.Diagnostics;
@@ -18,7 +17,7 @@ namespace OpenNFS1
         string _soundName;
 
         SoundEffectInstance _engineOnLow, _engineOnHigh, _engineOffLow, _engineOffHigh, _skidInstance, _offRoadInstance;
-        SoundEffect _gearChange, _horn;
+        SoundEffect _gearChange;
         List<SoundEffect> _skids = new List<SoundEffect>();
         Random _random;
 		bool _isActive = false;
@@ -141,12 +140,6 @@ namespace OpenNFS1
         {
 			if (!_isActive) return;
             _gearChange.Play();
-        }
-
-        public void BeepHorn()
-        {
-			if (!_isActive) return;
-            _horn.Play();
         }
 
         public void HitGround()

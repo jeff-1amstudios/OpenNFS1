@@ -47,7 +47,7 @@ namespace OpenNFS1.UI.Screens
                 }
                 else
                 {
-                    Engine.Instance.Mode = new HomeScreen2();
+                    Engine.Instance.Mode = new HomeScreen();
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace OpenNFS1.UI.Screens
 
             y += 200;
             Engine.Instance.SpriteBatch.DrawString(Font, " Continue", new Vector2(200, y), _selectedOption == 0 ? Color.Yellow : Color.WhiteSmoke, 0, Vector2.Zero, 1.2f, SpriteEffects.None, 0);
-            y += 25;
+            y += 50;
             Engine.Instance.SpriteBatch.DrawString(Font, " Main Menu", new Vector2(200, y), _selectedOption == 1 ? Color.Yellow : Color.WhiteSmoke, 0, Vector2.Zero, 1.2f, SpriteEffects.None, 0);
 
             Engine.Instance.SpriteBatch.End();

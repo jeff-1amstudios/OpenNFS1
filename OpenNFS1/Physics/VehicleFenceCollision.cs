@@ -1,14 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
-using OpenNFS1.Parsers.Track;
 using NfsEngine;
-using System.Diagnostics;
-using NfsEngine;
-using Microsoft.Xna.Framework.Audio;
 using OpenNFS1.Audio;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace OpenNFS1.Physics
 {

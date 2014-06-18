@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using OpenNFS1.Physics;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using OpenNFS1.Parsers;
-using NfsEngine;
-using OpenNFS1.Dashboards;
-using NfsEngine;
 using Microsoft.Xna.Framework.Graphics;
+using NfsEngine;
+using OpenNFS1.Parsers;
 
 namespace OpenNFS1.Vehicles
 {

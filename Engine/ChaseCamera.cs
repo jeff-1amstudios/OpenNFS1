@@ -25,7 +25,7 @@ namespace NfsEngine
 		private Vector3 _velocity;
 		private float _fieldOfView = MathHelper.ToRadians(45.0f);
 		private float _nearPlaneDistance = 1.0f;
-		private float _farPlaneDistance = 150.0f;
+		private float _farPlaneDistance = 15000.0f;
 		private Matrix _view;
 		private Matrix _projection;
 

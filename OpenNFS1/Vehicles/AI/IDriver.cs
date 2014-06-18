@@ -9,7 +9,7 @@ namespace OpenNFS1.Vehicles.AI
 	interface IDriver
 	{
 		DrivableVehicle Vehicle { get; }
-		void Update();
+		void Update(List<IDriver> otherDrivers);
 		void Render();
 	}
 }

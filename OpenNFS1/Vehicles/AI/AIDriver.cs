@@ -28,17 +28,16 @@ namespace OpenNFS1.Vehicles.AI
 			_vehicle.SteeringSpeed = 10;
 		}
 
-		public void Update()
+		public void Update(List<IDriver> otherDrivers)
 		{
-			_vehicle.ThrottlePedalInput = 0.8f;
+			_vehicle.ThrottlePedalInput = 1f;
 			_vehicle.SteeringInput = 0;
 			_vehicle.BrakePedalInput = 0;
 
 			var node = _vehicle.CurrentNode;
 			var pos = _vehicle.Position;
 			
-			var closestPoint = Utility.GetClosestPointOnLine(node.Position, node.Next.Position, _vehicle.Position);
-			
+			var closestPoint = Utility.GetClosestPointOnLine(node.Position, node.Next.Position, _vehicle.Position);			
 
 			// if we get too far off the racing line, bring us back quickly
 			var distFromRoadCenter = Vector3.Distance(closestPoint, pos);
@@ -80,7 +79,25 @@ namespace OpenNFS1.Vehicles.AI
 				}
 			}
 
-			//GameConsole.WriteLine("steering output: " + Math.Round(_vehicle.SteeringInput, 4), 5);
+			foreach (var driver in otherDrivers)
+			{
+				if (driver == this) continue;
+				var progressDist = driver.Vehicle.TrackProgress - _vehicle.TrackProgress;
+				// if we are slightly behind another driver (less than 2 nodes back) then consider them a possible danger
+				if (progressDist > 0 && progressDist < 2f)
+				{
+					float positionDist = Vector3.Distance(driver.Vehicle.Position, _vehicle.Position);
+					if (positionDist < 20)
+					{
+						_vehicle.Speed = driver.Vehicle.Speed * 0.8f;
+					}
+					if (positionDist < 50)
+					{
+						//_vehicle.SteeringInput = -0.2f;
+						break;
+					}
+				}
+			}
 
 			_vehicle.Update();
 		}

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using OpenNFS1.Parsers;
 using OpenNFS1.Parsers.Track;
 
 namespace OpenNFS1.Tracks
@@ -10,6 +12,7 @@ namespace OpenNFS1.Tracks
 	// A terrainSegment holds a group of 4 TerrainRow's and defines properties common to those rows (fence, textures etc)
 	class TerrainSegment
 	{
+		public int Number;
 		public Texture2D[] Textures = new Texture2D[10];
 		public bool HasLeftFence, HasRightFence;
 		public int FenceTextureId;
@@ -19,5 +22,8 @@ namespace OpenNFS1.Tracks
 		public int FenceBufferIndex;
 		public int TerrainBufferIndex;
 		public TerrainSegment Next, Prev;
+
+		// used for frustum culling calculation
+		public BoundingBox BoundingBox;
 	}
 }

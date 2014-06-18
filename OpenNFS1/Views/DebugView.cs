@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Xna.Framework;
 using NfsEngine;
-using NfsEngine;
-using OpenNFS1.Views;
-using OpenNFS1.Dashboards;
-using Microsoft.Xna.Framework;
-using OpenNFS1.Physics;
-using Microsoft.Xna.Framework.Graphics;
 using OneAmEngine;
+using OpenNFS1.Physics;
+using OpenNFS1.Views;
 
 namespace OpenNFS1
 {
@@ -27,7 +21,7 @@ namespace OpenNFS1
 
 		public bool Selectable
 		{
-			get { return true; }
+			get { return false; }
 		}
 
 		public bool ShouldRenderPlayer { get { return true; } }

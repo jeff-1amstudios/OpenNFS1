@@ -39,8 +39,7 @@ namespace OpenNFS1.Physics
 			_texture = texture;
 			_renderOffset = new Vector3(renderXOffset, 0, 0);
 			_wheelMatrix = Matrix.CreateScale(new Vector3(_size, Width, _size)) * Matrix.CreateRotationZ(MathHelper.ToRadians(-90));  //cylinder geometry faces upwards
-			if (_smokeEmitter == null)
-				_smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, WorldPosition);
+			_smokeEmitter = new ParticleEmitter(TyreSmokeParticleSystem.Instance, 20, WorldPosition);
 		}
 
 		public Vector3 WorldPosition

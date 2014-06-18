@@ -16,7 +16,7 @@ namespace OpenNFS1.Vehicles.AI
 			_vehicle = vehicle;
 		}
 
-		public void Update()
+		public void Update(List<IDriver> otherDrivers)
 		{
 			_vehicle.ThrottlePedalInput = VehicleController.Acceleration;
 			_vehicle.BrakePedalInput = VehicleController.Brake;

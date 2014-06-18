@@ -118,6 +118,8 @@ namespace OpenNFS1.Physics
 		
 		public TrackNode CurrentNode { get; private set; }
 
+		public float TrackProgress { get; set; }
+
 		// inputs
 		public float ThrottlePedalInput, BrakePedalInput, SteeringInput;
 		public bool GearUpInput, GearDownInput;
@@ -433,6 +435,7 @@ namespace OpenNFS1.Physics
 			var dist = Vector3.Distance(closestPoint1, closestPoint2);
 			var carDist = Vector3.Distance(closestPoint1, _position);
 			float ratio = Math.Min(carDist / dist, 1.0f);
+			TrackProgress = CurrentNode.Number + ratio;
 
 			if (_isOnGround)
 			{

@@ -19,8 +19,6 @@ namespace OpenNFS1.Parsers.Track
 	class Track
 	{
 		AlphaTestEffect _effect;
-		Vector3 _startPosition;
-		VertexBuffer _physicalRoadVertexBuffer;
 		TrackSkyBox _skybox;
 		BasicEffect _physicalRoadEffect;
 
@@ -30,6 +28,7 @@ namespace OpenNFS1.Parsers.Track
 		public List<TerrainSegment> TerrainSegments { get; set; }
 		public VertexBuffer TerrainVertexBuffer { get; set; }
 		public VertexBuffer FenceVertexBuffer { get; set; }
+		public TrackfamFile TrackFam { get; set; }
 		public Vector3 StartPosition { get; set; }
 		public int CheckpointNode { get; set; }
 		public bool IsOpenRoad { get; set; }
@@ -45,9 +44,9 @@ namespace OpenNFS1.Parsers.Track
 			_physicalRoadEffect = new BasicEffect(Engine.Instance.Device);
 		}
 
-		public void SetHorizonTexture(Texture2D horizon)
+		public void Initialize()
 		{
-			_skybox = new TrackSkyBox(horizon);
+			_skybox = new TrackSkyBox(TrackFam.HorizonTexture);
 		}
 
 		public void Update()
@@ -67,44 +66,39 @@ namespace OpenNFS1.Parsers.Track
 			_effect.World = Matrix.Identity;
 
 			int segmentIndex = currentNode.Number / 4;
-			
-			// Draw from 1 segment behind ourselves
-			segmentIndex -= 1;
-			if (segmentIndex < 0)
-			{
-				if (IsOpenRoad) segmentIndex = 0;
-				else
-					segmentIndex = TerrainSegments.Count + (segmentIndex - 1);  //wrap around
-			}				
-
 			var startSegment = TerrainSegments[segmentIndex];
 
-			List<int> renderedSegments = new List<int>();
+			var renderedSegments = new List<TerrainSegment>();
 
 			Engine.Instance.Device.SetVertexBuffer(TerrainVertexBuffer);
 			_effect.CurrentTechnique.Passes[0].Apply();
 			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
-			
-			//Engine.Instance.Device.RasterizerState = new RasterizerState { CullMode = Microsoft.Xna.Framework.Graphics.CullMode.None, FillMode = Microsoft.Xna.Framework.Graphics.FillMode.WireFrame };// RasterizerState.CullNone;
 
+			var frustum = new BoundingFrustum(Engine.Instance.Camera.View * Engine.Instance.Camera.Projection);
+			
+			// draw segments from the player vehicle forwards. Stop when a segment is out of view
 			var segment = startSegment;
 			for (int i = 0; i < GameConfig.DrawDistance; i++)
 			{
-				int vertexIndex = segment.TerrainBufferIndex;
-
-				DrawTerrainStrip(ref vertexIndex, 0, segment.Textures[0]);
-				DrawTerrainStrip(ref vertexIndex, 1, segment.Textures[1]);
-				DrawTerrainStrip(ref vertexIndex, 2, segment.Textures[2]);
-				DrawTerrainStrip(ref vertexIndex, 3, segment.Textures[3]);
-				DrawTerrainStrip(ref vertexIndex, 4, segment.Textures[4]);
-				DrawTerrainStrip(ref vertexIndex, 5, segment.Textures[5]);
-				DrawTerrainStrip(ref vertexIndex, 6, segment.Textures[6]);
-				DrawTerrainStrip(ref vertexIndex, 7, segment.Textures[7]);
-				DrawTerrainStrip(ref vertexIndex, 8, segment.Textures[8]);
-				DrawTerrainStrip(ref vertexIndex, 9, segment.Textures[9]);
-
-				renderedSegments.Add((segmentIndex + i) % TerrainSegments.Count);
+				if (!frustum.Intersects(segment.BoundingBox))
+					break;
+				
+				RenderSegment(segment);
+				renderedSegments.Add(segment);
 				segment = segment.Next;
+				if (segment == null) break;
+			}
+
+			// draw segments from the player vehicle backwards. Stop when a segment is out of view
+			segment = startSegment;
+			for (int i = 0; i < GameConfig.DrawDistance; i++)
+			{
+				if (!frustum.Intersects(segment.BoundingBox))
+					break;
+
+				RenderSegment(segment);
+				renderedSegments.Add(segment);
+				segment = segment.Prev;
 				if (segment == null) break;
 			}
 
@@ -116,12 +110,9 @@ namespace OpenNFS1.Parsers.Track
 				_effect.World = Matrix.Identity;
 				_effect.CurrentTechnique.Passes[0].Apply();
 				Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
-				segment = startSegment;
-				for (int i = 0; i < GameConfig.DrawDistance; i++)
+				foreach (var renderedSegment in renderedSegments)
 				{
-					DrawFenceStrips(segment);
-					segment = segment.Next;
-					if (segment == null) break;
+					DrawFenceStrips(renderedSegment);
 				}
 			}
 
@@ -150,6 +141,22 @@ namespace OpenNFS1.Parsers.Track
 			}			
 		}
 
+		private void RenderSegment(TerrainSegment segment)
+		{
+			int vertexIndex = segment.TerrainBufferIndex;
+
+			DrawTerrainStrip(ref vertexIndex, 0, segment.Textures[0]);
+			DrawTerrainStrip(ref vertexIndex, 1, segment.Textures[1]);
+			DrawTerrainStrip(ref vertexIndex, 2, segment.Textures[2]);
+			DrawTerrainStrip(ref vertexIndex, 3, segment.Textures[3]);
+			DrawTerrainStrip(ref vertexIndex, 4, segment.Textures[4]);
+			DrawTerrainStrip(ref vertexIndex, 5, segment.Textures[5]);
+			DrawTerrainStrip(ref vertexIndex, 6, segment.Textures[6]);
+			DrawTerrainStrip(ref vertexIndex, 7, segment.Textures[7]);
+			DrawTerrainStrip(ref vertexIndex, 8, segment.Textures[8]);
+			DrawTerrainStrip(ref vertexIndex, 9, segment.Textures[9]);
+		}
+
 		private void DrawTerrainStrip(ref int vertexIndex, int stripNumber, Texture2D texture)
 		{
 			if (texture != null)
@@ -176,7 +183,7 @@ namespace OpenNFS1.Parsers.Track
 			}
 		}
 
-		private void DrawScenery(List<int> renderedSegments)
+		private void DrawScenery(List<TerrainSegment> renderedSegments)
 		{
 			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
 			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointClamp;
@@ -184,28 +191,28 @@ namespace OpenNFS1.Parsers.Track
 			if (GameConfig.Render2dScenery)
 			{
 				TrackBillboardModel.BeginBatch();
-				foreach (SceneryItem billboard in SceneryItems)
+				foreach (SceneryItem scenery in SceneryItems)
 				{
-					if (!renderedSegments.Contains(billboard.SegmentRef))
+					if (!renderedSegments.Exists(a=> a.Number == scenery.SegmentRef))
 						continue;
 
-					if (billboard is BillboardScenery || billboard is TwoSidedBillboardScenery)
+					if (scenery is BillboardSceneryItem || scenery is TwoSidedBillboardSceneryItem)
 					{
-						billboard.Render(_effect);
+						scenery.Render(_effect);
 					}
 				}
 			}
 
 			if (GameConfig.Render3dScenery)
 			{
-				foreach (SceneryItem billboard in SceneryItems)
+				foreach (SceneryItem model in SceneryItems)
 				{
-					if (!renderedSegments.Contains(billboard.SegmentRef))
-						continue;
-
-					if (billboard is ModelScenery)
+					if (model is ModelSceneryItem)
 					{
-						billboard.Render(_effect);
+						if (!renderedSegments.Exists(a => a.Number == model.SegmentRef))
+							continue;
+
+						model.Render(_effect);
 					}
 				}
 			}
@@ -233,6 +240,14 @@ namespace OpenNFS1.Parsers.Track
 			{
 				return -9999;
 			}
+		}
+
+		public void Dispose()
+		{
+			_effect.Dispose();
+			TerrainVertexBuffer.Dispose();
+			FenceVertexBuffer.Dispose();
+			TrackFam.Dispose();
 		}
 	}
 }

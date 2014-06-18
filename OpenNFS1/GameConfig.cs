@@ -8,13 +8,15 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using Microsoft.Xna.Framework;
 using OpenNFS1.Vehicles;
+using OpenNFS1.Parsers.Track;
 
 namespace OpenNFS1
 {
     static class GameConfig
     {
         public static DrivableVehicle SelectedVehicle;
-        public static TrackDescription SelectedTrack;
+        public static TrackDescription SelectedTrackDescription;
+		public static Track CurrentTrack;
 
 		public static string CdDataPath { get; set; }
         public static bool Render2dScenery = true, Render3dScenery = true;

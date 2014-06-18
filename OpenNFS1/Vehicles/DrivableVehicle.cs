@@ -51,6 +51,8 @@ namespace OpenNFS1.Vehicles
 			_effect.View = Engine.Instance.Camera.View;
 			_effect.Projection = Engine.Instance.Camera.Projection;
 			_effect.World = _renderMatrix;
+
+			//GameConsole.WriteLine(TrackProgress, 0);
 			
 			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
 			Engine.Instance.Device.BlendState = BlendState.Opaque;

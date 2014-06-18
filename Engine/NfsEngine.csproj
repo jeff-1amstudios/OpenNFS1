@@ -44,7 +44,6 @@
     <Compile Include="FixedChaseCamera.cs" />
     <Compile Include="FPSCamera.cs" />
     <Compile Include="FPSCounter.cs" />
-    <Compile Include="Game1.cs" />
     <Compile Include="GameConsole.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="GraphicsUtilities.cs" />
@@ -57,7 +56,6 @@
     <Compile Include="ParticleSystem\ParticleSettings.cs" />
     <Compile Include="ParticleSystem\ParticleSystem.cs" />
     <Compile Include="ParticleSystem\ParticleVertex.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreenEffects.cs" />
     <Compile Include="SimpleCamera.cs" />

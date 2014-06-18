@@ -61,11 +61,7 @@ namespace OpenNFS1.Parsers
             {
                 return;
             }
-			if (bmpEntry.Id == "dkfr")
-			{
-				Color[] px = new Color[bmpEntry.Texture.Width * bmpEntry.Texture.Height];
-				bmpEntry.Texture.GetData(px);
-			}
+			
             Texture = bmpEntry.Texture;
             if (_computeUvs)  //don't need to scale our uvs based on the texture size
                 return;

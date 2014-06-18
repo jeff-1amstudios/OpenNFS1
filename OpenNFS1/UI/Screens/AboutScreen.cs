@@ -39,7 +39,7 @@ namespace OpenNFS1.UI.Screens
         {
             if (UIController.Back || UIController.Ok)
             {
-                Engine.Instance.Mode = new HomeScreen2();
+                Engine.Instance.Mode = new HomeScreen();
             }
         }
 

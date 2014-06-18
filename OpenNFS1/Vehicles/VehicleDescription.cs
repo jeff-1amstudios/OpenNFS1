@@ -42,7 +42,7 @@ namespace OpenNFS1.Vehicles
 
 			Descriptions.Add(new VehicleDescription
 			{
-				Name = "ToyotaSupra",
+				Name = "Supra",
 				UIImageFile = "sup1.qfs",
 				ModelFile = @"SIMDATA\CARFAMS\tsupra.cfm",
 				Horsepower = 320,  // was 6 (x46)

@@ -37,7 +37,7 @@ namespace OpenNFS1.Parsers
 		public int AnimationFrameCount;
 	}
 
-	class SceneryObject2
+	class SceneryObject
 	{
 		public SceneryObjectDescriptor Descriptor;
 		public int ReferenceNode;
@@ -52,9 +52,9 @@ namespace OpenNFS1.Parsers
 		public const int NbrRowsPerSegment = 4;
 
 		public List<TrackNode> Nodes { get; private set; }
-		public List<SceneryObject2> Scenery { get; private set; }
+		public List<SceneryObject> Scenery { get; private set; }
 		public List<SceneryObjectDescriptor> ObjectDescriptors { get; private set; }
-		public List<TerrainSegment> Terrain { get; private set; }
+		public List<TerrainSegment> Segments { get; private set; }
 		public bool IsOpenRoad { get; private set; }
 		public string FileName { get; private set; }
 		public int FenceTextureId { get; private set; }
@@ -73,8 +73,8 @@ namespace OpenNFS1.Parsers
 
 			Nodes = new List<TrackNode>();
 			ObjectDescriptors = new List<SceneryObjectDescriptor>();
-			Scenery = new List<SceneryObject2>();
-			Terrain = new List<TerrainSegment>();
+			Scenery = new List<SceneryObject>();
+			Segments = new List<TerrainSegment>();
 
 			ParseTrackNodesBlock(reader);
 			ParseSceneryObjectsBlock(reader);
@@ -267,7 +267,7 @@ namespace OpenNFS1.Parsers
 
 				}
 
-				SceneryObject2 obj = new SceneryObject2();
+				SceneryObject obj = new SceneryObject();
 				obj.ReferenceNode = referenceNode % Nodes.Count;  //why do some tracks reference nodes above the node count?
 				int descriptorRef = reader.ReadByte();
 				obj.Descriptor = ObjectDescriptors[descriptorRef];
@@ -289,11 +289,11 @@ namespace OpenNFS1.Parsers
 			long position = reader.BaseStream.Position;
 
 			TerrainSegment last = null;
-			int i = 0;
+			
 			while (true)
 			{
 				char[] trkd = reader.ReadChars(4);  //"TRKD"
-				if (trkd[0] == 'C')
+				if (trkd[0] == 'C')  //Strange format un-used AL22.TRI
 				{
 					return;
 				}
@@ -303,13 +303,13 @@ namespace OpenNFS1.Parsers
 				byte fenceType = reader.ReadByte();
 
 				TerrainSegment terrainSegment = new TerrainSegment();
+				terrainSegment.Number = Segments.Count;
 				terrainSegment.TextureIds = reader.ReadBytes(10);
 				
 				terrainSegment.Rows[0] = ReadTerrainRow(reader);
 				terrainSegment.Rows[1] = ReadTerrainRow(reader);
 				terrainSegment.Rows[2] = ReadTerrainRow(reader);
-				terrainSegment.Rows[3] = ReadTerrainRow(reader);
-								
+				terrainSegment.Rows[3] = ReadTerrainRow(reader);								
 
 				//fenceType stores the sides of the road the fence lives, and the textureId to use for it.
 				// If the top bit is set, fence on the left exists, if next bit is set, fence is on the right.  Both can also be set. 
@@ -324,7 +324,11 @@ namespace OpenNFS1.Parsers
 
 					// Ignore the top 2 bits to find the texture to use
 					terrainSegment.FenceTextureId = fenceType & (0xff >> 2);
-					//Debug.WriteLine("texture: " + terrainSegment.FenceTextureId + ", " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
+					Debug.WriteLine("fence: " + fenceType + ", texture: " + terrainSegment.FenceTextureId + ", " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
+					if (!terrainSegment.HasLeftFence && !terrainSegment.HasRightFence)
+					{
+
+					}
 				}
 
 				//Debug.WriteLine("TRKD: " + i + ", " + terrainSegment.Rows[0].RightPoints[5] + ", fence: " + terrainSegment.FenceTextureId + " , " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
@@ -335,12 +339,12 @@ namespace OpenNFS1.Parsers
 					terrainSegment.Prev = last;
 				}
 				last = terrainSegment;
-				Terrain.Add(terrainSegment);
+				Segments.Add(terrainSegment);
 
 				//skip to end of block (+12 to include block header)
 				position += blockLength + 12;
 				reader.BaseStream.Position = position;
-				i++;
+				
 				if (reader.BaseStream.Position >= fileSize)
 				{
 					break;
@@ -350,8 +354,8 @@ namespace OpenNFS1.Parsers
 			// If this is a circuit track, hook the last segment up to the first
 			if (!IsOpenRoad)
 			{
-				last.Next = Terrain[0];
-				Terrain[0].Prev = last;
+				last.Next = Segments[0];
+				Segments[0].Prev = last;
 			}
 		}
 
@@ -398,7 +402,7 @@ namespace OpenNFS1.Parsers
 		{
 			var segmentIndex = 0;
 			var nodeIndex = 0;
-			foreach (var segment in Terrain)
+			foreach (var segment in Segments)
 			{
 
 				if (segmentIndex == 48)

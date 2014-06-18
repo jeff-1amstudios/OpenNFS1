@@ -12,14 +12,6 @@ using OpenNFS1.Tracks;
 
 namespace OpenNFS1.Loaders
 {
-	class SceneryObjectDescriptor
-	{
-		public float Width, Height;
-		public SceneryType Type;
-		public int Image1Id, Image2Id;
-		public int AnimationFrames;
-	}
-
 	class TrackAssembler
 	{
 		//public static readonly int TRIANGLES_PER_ROW = 12;
@@ -30,14 +22,14 @@ namespace OpenNFS1.Loaders
 		public const int NbrVerticesPerSegment = 10 * NbrVerticesPerTerrainStrip;
 		public const int NbrNodesPerSegment = 4;
 
-		private TrackTextureProvider _textureProvider;
+		private TrackfamFile _trackFam;
 		private TriFile _tri;
 
 		public Track Assemble(TriFile tri)
 		{
 			_tri = tri;
-			_textureProvider = tri.IsOpenRoad ? new OpenRoadTextureProvider(tri.FileName) : new TrackTextureProvider(tri.FileName);
-			AssembleTrackSegmentTextures();
+			_trackFam = tri.IsOpenRoad ? new OpenRoadTrackfamFile(tri.FileName) : new TrackfamFile(tri.FileName);
+			AssembleTrackSegments();
 
 			Vector3 startPos = tri.Nodes[0].Position + new Vector3(0, 0, -2);
 			
@@ -45,10 +37,10 @@ namespace OpenNFS1.Loaders
 			track.StartPosition = startPos;
 			track.RoadNodes = _tri.Nodes;
 			track.SceneryItems = AssembleSceneryItems();
-			track.TerrainSegments = _tri.Terrain;
+			track.TerrainSegments = _tri.Segments;
 			track.TerrainVertexBuffer = AssembleTerrainVertices();
 			track.FenceVertexBuffer = AssembleFenceVertices();
-			track.SetHorizonTexture(_textureProvider.HorizonTexture);
+			track.TrackFam = _trackFam;
 			track.IsOpenRoad = _tri.IsOpenRoad;
 
 			// Find checkpoint scenery object and use it to mark the end of the track.
@@ -67,8 +59,9 @@ namespace OpenNFS1.Loaders
 			else
 			{
 				track.CheckpointNode = _tri.Nodes.Count - 2;
-			}			
+			}
 
+			track.Initialize();
 			return track;
 		}
 
@@ -91,22 +84,15 @@ namespace OpenNFS1.Loaders
 							for (int i = 0; i < obj.Descriptor.AnimationFrameCount; i++)
 							{
 								var nextBitmap = _tri.ObjectDescriptors[obj.Descriptor.Id + i];
-								var texture = _textureProvider.GetSceneryTextureForId(nextBitmap.ResourceId);
-								if (texture != null)
-								{
-									textures.Add(texture);
-								}
-								else
-								{
-
-								}
+								var texture = _trackFam.GetSceneryTexture(nextBitmap.ResourceId);
+								textures.Add(texture);
 							}
-							renderObject = new AnimatedBillboardScenery(textures);
+							renderObject = new AnimatedBillboardSceneryItem(textures);
 						}
 						else
 						{
 							bitmapId = obj.Descriptor.ResourceId;
-							renderObject = new BillboardScenery(_textureProvider.GetSceneryTextureForId(bitmapId));
+							renderObject = new BillboardSceneryItem(_trackFam.GetSceneryTexture(bitmapId));
 						}
 						break;
 
@@ -114,20 +100,19 @@ namespace OpenNFS1.Loaders
 
 						bitmapId = obj.Descriptor.ResourceId;
 						int bitmap2Id = obj.Descriptor.Resource2Id;
-						renderObject = new TwoSidedBillboardScenery(_textureProvider.GetSceneryTextureForId(bitmapId),
-																	_textureProvider.GetSceneryTextureForId(bitmap2Id));
+						renderObject = new TwoSidedBillboardSceneryItem(_trackFam.GetSceneryTexture(bitmapId),
+																	_trackFam.GetSceneryTexture(bitmap2Id));
 						break;
 
 					case SceneryType.Model:
 						int modelId = obj.Descriptor.ResourceId;
-						renderObject = new ModelScenery(_textureProvider.GetMesh(modelId));
+						renderObject = new ModelSceneryItem(_trackFam.GetMesh(modelId));
 						break;
 
 					default:
 						throw new NotImplementedException();
 				}
 
-				renderObject.SceneryObject2 = obj;
 				if (obj.Descriptor.Width == 0 && obj.Descriptor.Height == 0)
 				{
 
@@ -149,9 +134,9 @@ namespace OpenNFS1.Loaders
 		{
 			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
 
-			for (int segmentIndex = 0; segmentIndex < _tri.Terrain.Count; segmentIndex++)
+			for (int segmentIndex = 0; segmentIndex < _tri.Segments.Count; segmentIndex++)
 			{
-				var segment = _tri.Terrain[segmentIndex];
+				var segment = _tri.Segments[segmentIndex];
 				segment.TerrainBufferIndex = vertices.Count;
 
 				//Ground textures are rotated 90 degrees, so we swap u,v coordinates around
@@ -204,17 +189,17 @@ namespace OpenNFS1.Loaders
 		// Fences are defined by the TerrainSegment. If fence is enabled, we draw a fence from row0 to row2, then row2 to row4.
 		VertexBuffer AssembleFenceVertices()
 		{
-			Vector3 fenceHeight = new Vector3(0, GameConfig.TerrainScale * 130000, 0);
+			Vector3 fenceHeight = new Vector3(0, GameConfig.TerrainScale * 100000, 0);
 
 			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
 
-			for (int i = 0; i < _tri.Terrain.Count; i++)
+			for (int i = 0; i < _tri.Segments.Count; i++)
 			{
-				var segment = _tri.Terrain[i];
+				var segment = _tri.Segments[i];
 				if (!(segment.HasLeftFence | segment.HasRightFence)) continue;
 
 				segment.FenceBufferIndex = vertices.Count;
-				segment.FenceTexture = _textureProvider.GetFenceTexture(segment.FenceTextureId);
+				segment.FenceTexture = _trackFam.GetFenceTexture(segment.FenceTextureId);
 				var node0 = _tri.Nodes[i * NbrNodesPerSegment];
 				var node2 = node0.Next.Next;
 				var node4 = node2.Next.Next;
@@ -246,17 +231,25 @@ namespace OpenNFS1.Loaders
 			return vertexBuffer;
 		}
 
-		void AssembleTrackSegmentTextures()
+		void AssembleTrackSegments()
 		{
 			const int textureCount = 10;
-			foreach (var segment in _tri.Terrain)
+			foreach (var segment in _tri.Segments)
 			{
 				segment.Textures = new Texture2D[textureCount];
 				for (int i = 0; i < textureCount; i++)
 				{
-					segment.Textures[i] = _textureProvider.GetGroundTextureForNbr(segment.TextureIds[i]);
+					segment.Textures[i] = _trackFam.GetGroundTexture(segment.TextureIds[i]);
 				}
+
+				// calculate bounding size for this segment
+				Vector3 a = segment.Rows[0].LeftPoints[TriFile.NbrTerrainPointsPerSide - 1];
+				Vector3 b = segment.Rows[TriFile.NbrRowsPerSegment - 1].RightPoints[TriFile.NbrTerrainPointsPerSide - 1];
+				Vector3 min = new Vector3(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z));
+				Vector3 max = new Vector3(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z));
+				segment.BoundingBox = new BoundingBox(min, max);
 			}
+		
 		}
 
 		public List<Triangle> GeneratePhysicalVertices(List<TrackNode> nodes)
@@ -279,22 +272,11 @@ namespace OpenNFS1.Loaders
 
 				float zPos = node.Position.Z - nextNode.Position.Z;
 				
-				Vector3 prevLeft = GetRoadOffsetPosition(node, -node.DistanceToLeftBarrier); // node.Position + Utility.RotatePoint(new Vector2(-node.DistanceToLeftBarrier, zPos), node.Orientation);
-				Vector3 prevRight = GetRoadOffsetPosition(node, node.DistanceToRightBarrier); // node.Position + Utility.RotatePoint(new Vector2(node.DistanceToRightBarrier, zPos), node.Orientation);
+				Vector3 prevLeft = GetRoadOffsetPosition(node, -node.DistanceToLeftBarrier);
+				Vector3 prevRight = GetRoadOffsetPosition(node, node.DistanceToRightBarrier);
 
 				Vector3 currentLeft = nextNode.Position + Utility.RotatePoint(new Vector2(-node.DistanceToLeftBarrier, 0), -node.Orientation);
 				Vector3 currentRight = nextNode.Position + Utility.RotatePoint(new Vector2(node.DistanceToRightBarrier, 0), -node.Orientation);
-				
-
-				//Road slanting
-				float slantScale = 0.179f * GameConfig.TerrainScale;
-				if (Math.Abs(node.Slant) > 0)
-				{
-					//currentLeft.Y -= node.Slant * node.DistanceToLeftBarrier * slantScale;
-					//currentRight.Y += node.Slant * node.DistanceToRightBarrier * slantScale;
-					//prevLeft.Y -= node.Slant * node.DistanceToLeftBarrier * slantScale;
-					//prevRight.Y += node.Slant * node.DistanceToRightBarrier * slantScale;
-				}
 
 				var t = new Triangle(nextNode.GetLeftBoundary(), node.GetLeftBoundary(), node.GetRightBoundary());
 				var t2 = new Triangle(nextNode.GetLeftBoundary(), node.GetRightBoundary(), nextNode.GetRightBoundary());

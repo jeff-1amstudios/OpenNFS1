@@ -55,13 +55,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Simple3.fx">
-      <Name>Simple3</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>MGEffectProcessor</Processor>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="ArialBlack.spritefont">
       <Name>ArialBlack</Name>
       <Importer>FontDescriptionImporter</Importer>
