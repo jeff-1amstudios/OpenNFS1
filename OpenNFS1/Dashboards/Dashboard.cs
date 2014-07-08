@@ -10,12 +10,13 @@ using NfsEngine;
 using OpenNFS1.Physics;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Input;
+using OpenNFS1.Vehicles;
 
 namespace OpenNFS1.Dashboards
 {
 	class Dashboard
 	{
-        protected Vehicle _car;
+        protected DrivableVehicle _car;
         //protected Texture2D _instrumentLine;
         GearboxAnimation _gearBoxAnimation;
         public bool IsVisible { get; set; }
@@ -26,7 +27,7 @@ namespace OpenNFS1.Dashboards
 
 		static Texture2D _tachLineTexture;
 
-		public Dashboard(Vehicle car, DashboardDescription descriptor)
+		public Dashboard(DrivableVehicle car, DashboardDescription descriptor)
         {
             _car = car;
 			_descriptor = descriptor;
@@ -148,7 +149,7 @@ namespace OpenNFS1.Dashboards
 
         public void RenderSteeringWheel()
         {
-            float steeringFactor = _car._steeringWheel / _car.MaxSteeringLock;
+            float steeringFactor = _car._steeringWheel / Vehicle.MaxSteeringLock;
 
             if (steeringFactor < -0.8f)
                 Engine.Instance.SpriteBatch.Draw(Wl45.Texture, Wl45.GetDisplayAt(), Color.White);

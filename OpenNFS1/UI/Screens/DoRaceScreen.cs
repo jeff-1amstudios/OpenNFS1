@@ -1,7 +1,9 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using NfsEngine;
 using OpenNFS1.Parsers.Track;
+using OpenNFS1.Physics;
 using OpenNFS1.UI;
 using OpenNFS1.UI.Screens;
 using OpenNFS1.Vehicles;
@@ -23,16 +25,16 @@ namespace OpenNFS1
 		public DoRaceScreen(Track track)
 		{
 			_track = track;
-			_car = GameConfig.SelectedVehicle;
+			_car = new DrivableVehicle(GameConfig.SelectedVehicle);
 
 			_playerDriver = new PlayerDriver(_car);
-			//_car.AudioEnabled = true;
+			_car.AudioEnabled = true;
 
-			_race = new Race(3, _track, _playerDriver);
-			for (int i = 0; i < 30; i++)
+			_race = new Race(_track.IsOpenRoad ? 1 : 3, _track, _playerDriver);
+			for (int i = 0; i < 0; i++)
 			{
 				int j = Engine.Instance.Random.Next(VehicleDescription.Descriptions.Count);
-				_race.AddDriver(new AIDriver(VehicleDescription.Descriptions[j]));
+				_race.AddDriver(new RacingAIDriver(VehicleDescription.Descriptions[j]));
 			}
 				//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
 				//_race.AddDriver(new AIDriver(VehicleDescription.Descriptions.Find(a => a.Name == "Viper")));
@@ -81,7 +83,7 @@ namespace OpenNFS1
 			if (_race.HasFinished)
 			{
 				_car.AudioEnabled = false;
-				Engine.Instance.Mode = new RaceFinishedScreen(_race, _track);
+				Engine.Instance.Screen = new RaceFinishedScreen(_race, _track);
 				return;
 			}
 
@@ -91,6 +93,11 @@ namespace OpenNFS1
 				return;
 			}
 
+			if (Engine.Instance.Input.WasPressed(Keys.R))
+			{
+				_car.Reset();
+			}
+
 			TyreSmokeParticleSystem.Instance.SetCamera(Engine.Instance.Camera);
 			Engine.Instance.Camera.Update(gameTime);
 		}
@@ -98,7 +105,7 @@ namespace OpenNFS1
 		public void Pause()
 		{
 			_car.AudioEnabled = false;
-			Engine.Instance.Mode = new RacePausedScreen(this);
+			Engine.Instance.Screen = new RacePausedScreen(this);
 		}
 
 		public void Resume()
@@ -114,9 +121,10 @@ namespace OpenNFS1
 			TyreSmokeParticleSystem.Instance.Render();
 
 			Engine.Instance.Device.Viewport = _uiViewport;
-
 			_raceUI.Render();
 			_playerUI.Render();
+
+			Engine.Instance.Device.Viewport = _raceViewport;
 		}
 
 		#endregion

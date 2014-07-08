@@ -73,8 +73,8 @@ namespace OpenNFS1
 		private BoundingBox GetBoundingBox()
 		{
 			BoundingBox bb = new BoundingBox();
-			bb.Min = new Microsoft.Xna.Framework.Vector3(999, 999, 999);
-			bb.Max = new Microsoft.Xna.Framework.Vector3(-999, -999, -999);
+			bb.Min = new Microsoft.Xna.Framework.Vector3(float.MaxValue);
+			bb.Max = new Microsoft.Xna.Framework.Vector3(-float.MaxValue);
 			foreach (var poly in _polys)
 			{
 				foreach (var vert in poly.Vertices)

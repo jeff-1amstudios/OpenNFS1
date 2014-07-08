@@ -62,6 +62,7 @@ namespace NfsEngine
 
         public void Update(GameTime gameTime)
         {
+			if (Engine.Instance.Camera == null) return;
             SetViewMatrix(Engine.Instance.Camera.View);
             SetProjectionMatrix(Engine.Instance.Camera.Projection);
         }

@@ -8,12 +8,12 @@ namespace OpenNFS1.Views
 
     class ChaseView : BaseExternalView, IView
     {
-        Vehicle _car;
+        DrivableVehicle _car;
         FixedChaseCamera _camera;
 		
 		public bool ShouldRenderPlayer { get { return true; } }
         
-        public ChaseView(Vehicle car, int distance, int height, int offset)
+        public ChaseView(DrivableVehicle car, int distance, int height, int offset)
         {
             _car = car;
             _camera = new FixedChaseCamera();
@@ -45,7 +45,7 @@ namespace OpenNFS1.Views
         {
             _camera.Position = _car.Position;
 			_camera.ChaseDirection = _car.Direction;
-			_camera.UpVector = _car.UpVector;
+			_camera.UpVector = _car.Up;
         }
 
         public void Render()

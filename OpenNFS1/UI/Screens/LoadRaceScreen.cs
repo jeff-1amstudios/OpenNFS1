@@ -16,7 +16,7 @@ namespace OpenNFS1
 		float _loadingTime;
 		int _nbrDots = 0;
 
-        public LoadRaceScreen() : base(false)
+        public LoadRaceScreen() : base()
         {
 			if (GameConfig.CurrentTrack != null)
 			{
@@ -32,7 +32,7 @@ namespace OpenNFS1
         {
 			if (GameConfig.CurrentTrack != null)
             {
-				Engine.Instance.Mode = new DoRaceScreen(GameConfig.CurrentTrack);
+				Engine.Instance.Screen = new DoRaceScreen(GameConfig.CurrentTrack);
             }
 			_loadingTime += Engine.Instance.FrameTime;
 			if (_loadingTime > 0.1f)
@@ -42,12 +42,13 @@ namespace OpenNFS1
 			}
         }
 
-        public void Draw()
-        {
-            Engine.Instance.SpriteBatch.Begin();			
-            Engine.Instance.SpriteBatch.DrawString(Font, String.Format("Loading {0}" + new string('.', _nbrDots), GameConfig.SelectedTrackDescription.Name), new Vector2(50, 200), Color.WhiteSmoke, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
-            Engine.Instance.SpriteBatch.End();
-        }
+		public override void Draw()
+		{
+			base.Draw();
+			WriteLine(GameConfig.SelectedTrackDescription.Name, Color.White, 20, 30, TitleSize);
+			WriteLine(String.Format("Loading {0}", new string('.', _nbrDots)));
+			Engine.Instance.SpriteBatch.End();
+		}
 
         #endregion
 

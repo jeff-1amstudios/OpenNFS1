@@ -45,7 +45,9 @@ namespace OpenNFS1.Parsers
 		public Vector3 RelativePosition;
 	}
 
-
+	/// <summary>
+	/// Tri files contain the track vertices, physical road data, scenery item placement
+	/// </summary>
 	class TriFile
 	{
 		public const int NbrTerrainPointsPerSide = 6;  //includes the middle-point (duplicated on both sides)
@@ -108,7 +110,8 @@ namespace OpenNFS1.Parsers
 				node.b = reader.ReadBytes(4);
 
 				// unused trackNodes are filled with zeroes, so stop when we have a node with a zero position
-				if (node.b[1] == 0 && node.b[3] == 0)
+				if (node.DistanceToLeftVerge == 0 && node.DistanceToRightVerge == 0
+					&& node.DistanceToLeftBarrier == 0 && node.DistanceToRightBarrier == 0)
 				{
 					break;
 				}
@@ -225,34 +228,12 @@ namespace OpenNFS1.Parsers
 				{
 					sd.AnimationFrameCount = bytes[8];
 				}
-				//Debug.WriteLine(String.Format("sc: Tex: {0} {1} {2} {3} {4}", (sd.ResourceId / 4).ToString("00") + "00", sd.ResourceId, sd.Resource2Id, sd.AnimationFrameCount, sd.Type));
-
-				//foreach (var b in bytes)
-				//{
-				//	Debug.Write(b.ToString("000") + " ");
-				//}
-
-				if (bytes[0] != 4 && bytes[0] != 0)
-				{
-
-				}
-
-				if (bytes[0] == 4 && bytes[8] == 0)
-				{
-
-				}
-				if (bytes[0] == 0 && bytes[8] > 0)
-				{
-
-				}
-
+				
 				sd.Id = ObjectDescriptors.Count;
 				ObjectDescriptors.Add(sd);
 			}
 
 			long currentPos = reader.BaseStream.Position;
-
-			Random random = new Random();
 
 			for (int i = 0; i < objectCount; i++)
 			{
@@ -260,11 +241,6 @@ namespace OpenNFS1.Parsers
 				if (referenceNode == -1)
 				{
 					break;
-				}
-				
-				if (referenceNode > Nodes.Count)
-				{
-
 				}
 
 				SceneryObject obj = new SceneryObject();

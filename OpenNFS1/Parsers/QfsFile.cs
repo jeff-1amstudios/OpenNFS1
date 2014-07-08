@@ -16,8 +16,6 @@ namespace OpenNFS1.Parsers
 		{
 			filename = Path.Combine(GameConfig.CdDataPath, filename);
 			byte[] decompressedData = Decompress(filename);
-			File.WriteAllBytes("c:\\temp\\output.fsh", decompressedData);
-
 			Fsh = new FshFile(decompressedData);
 		}
 		

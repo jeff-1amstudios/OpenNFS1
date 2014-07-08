@@ -7,9 +7,9 @@ namespace OpenNFS1.Views
 	class TelevisionView : BaseExternalView, IView
     {
         ChaseCamera _camera = new ChaseCamera();
-        Vehicle _car;
+        DrivableVehicle _car;
 
-        public TelevisionView(Vehicle car)
+        public TelevisionView(DrivableVehicle car)
         {
             _car = car;
 			_camera.FieldOfView = GameConfig.FOV;

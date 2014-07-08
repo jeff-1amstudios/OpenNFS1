@@ -19,12 +19,11 @@ In tunnel: 17,0,0,4
 
 Coastal 1 node 288 - 18,17,2,1
 
-x,x,0,<sound id>  soundid:14 is waterfall
 x,x,0,0 move A6-A8 verts 1 to the right if the associated terrainRow is #1 in its segment
 x,x,0,1 no effect
 x,x,0,2 move A6-A8 verts 1 to the right if the associated terrainRow is last in its segment
 x,x,0,3 no effect
-x,x,0,4+ play tunnel sound effect
+x,x,0,4 play tunnel sound effect
 	  5 cobbled road sound effect (Lost Vegas)
       6 no effect
 	  7 tunnel take last right strip and put it between A2-A9
@@ -32,8 +31,8 @@ x,x,0,8 .. left wall appeared to move across the track - snapped back as we got 
 x,x,0,9 tunnel (vertigo track) take last left strip and put it between A7-A4
 x,x,0,10 no effect
 x,x,0,11 no effect
-x,x,0,12 tunnel (vertigo track) take last left strip and put it between A8-A4
-x,x,0,13 tunnel - take last left strip and put it between A8-A5
+x,x,0,12 tunnel (vertigo track) take last left strip and put it between A9-A4
+x,x,0,13 tunnel - take last left strip and put it between A9-A5
 	  14 waterfall (autumn valley) left channel
 	  15 waterfall (autumn valley) right channel
 x,x,0,16 no effect

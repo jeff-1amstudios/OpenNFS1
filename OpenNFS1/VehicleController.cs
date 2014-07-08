@@ -87,5 +87,15 @@ namespace OpenNFS1
                 return false;
             }
         }
+
+		public static bool Handbrake
+		{
+			get
+			{
+				if (Engine.Instance.Input.IsKeyDown(Keys.Space))
+					return true;
+				return false;
+			}
+		}
     }
 }

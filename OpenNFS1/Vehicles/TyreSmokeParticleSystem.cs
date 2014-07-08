@@ -29,18 +29,20 @@ namespace OpenNFS1
         {
             settings.Texture = Engine.Instance.ContentManager.Load<Texture2D>("Content/smoke");
 
-            settings.MaxParticles = 400;
+            settings.MaxParticles = 800;
             
             settings.Duration = TimeSpan.FromSeconds(0.5f);
+			settings.DurationRandomness = 1f;
 
             settings.MinHorizontalVelocity = 0;
-            settings.MaxHorizontalVelocity = 15;
+            settings.MaxHorizontalVelocity = 5;
 
-            settings.MinVerticalVelocity = 5;
-            settings.MaxVerticalVelocity = 10;
+			settings.EmitterVelocitySensitivity = 0.5f;
 
-            // Create a wind effect by tilting the gravity vector sideways.
-            settings.Gravity = new Vector3(0, -3, 0);
+            settings.MinVerticalVelocity = 1;
+            settings.MaxVerticalVelocity = 7;
+
+            settings.Gravity = new Vector3(0, -2, 0);
 
             settings.EndVelocity = 0.75f;
 
@@ -50,8 +52,8 @@ namespace OpenNFS1
 			settings.MinStartSize = 1;
 			settings.MaxStartSize = 4;
 
-			settings.MinEndSize = 3;
-			settings.MaxEndSize = 7;
+			settings.MinEndSize = 10;
+			settings.MaxEndSize = 30;
         }
     }
 }

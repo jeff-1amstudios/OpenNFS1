@@ -126,6 +126,7 @@ namespace OpenNFS1.Parsers
 
 				if (shapeId != 3 && shapeId != 4)
 				{
+					// something in Burnt Sienna has a value of 2.  Haven't investigated yet.
 					continue;
 				}	
 
@@ -188,7 +189,7 @@ namespace OpenNFS1.Parsers
 					}
 					else
 					{
-
+						throw new NotImplementedException();
 					}
 				}
 

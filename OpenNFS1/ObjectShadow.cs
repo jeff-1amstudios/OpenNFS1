@@ -39,6 +39,7 @@ namespace OpenNFS1
 
 			device.DepthStencilState = DepthStencilState.None;
 			device.BlendState = BlendState.AlphaBlend;
+			device.RasterizerState = RasterizerState.CullCounterClockwise;
 
 			_effect.CurrentTechnique.Passes[0].Apply();
 
@@ -47,6 +48,7 @@ namespace OpenNFS1
 			//device.RenderState.AlphaBlendEnable = false;
 			device.BlendState = BlendState.Opaque;
 			device.DepthStencilState = DepthStencilState.Default;
+			device.RasterizerState = RasterizerState.CullNone;
 		}
 
 		public static void Render(Vector3[] points)

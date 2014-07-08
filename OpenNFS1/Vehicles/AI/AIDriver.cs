@@ -7,100 +7,99 @@ using Microsoft.Xna.Framework;
 using NfsEngine;
 using OpenNFS1.Parsers.Track;
 using OpenNFS1.Physics;
+using OpenNFS1.Tracks;
 
 namespace OpenNFS1.Vehicles.AI
 {
-	enum AIDriverState
-	{
-		Default,
-		TooFarFromCenter
-	}
 
-	class AIDriver : IDriver
+	abstract class AIDriver : IDriver
 	{
-		DrivableVehicle _vehicle;
-		AIDriverState _state = AIDriverState.Default;
-		public DrivableVehicle Vehicle { get { return _vehicle; } }
+		public int VirtualLane { get; set; }
+		public Vehicle Vehicle { get; protected set; }
 
-		public AIDriver(VehicleDescription vehicleDescriptor)
+		protected const int MaxVirtualLanes = 4;
+
+		public virtual Vector3 GetNextTarget()
 		{
-			_vehicle = new DrivableVehicle(vehicleDescriptor);
-			_vehicle.SteeringSpeed = 10;
+			return Vector3.Lerp(Vehicle.CurrentNode.Next.Next.GetLeftVerge2(), Vehicle.CurrentNode.Next.Next.GetRightVerge2(), VirtualLane * (1f / MaxVirtualLanes));
+		}
+				
+		protected void FollowTrack()
+		{
+			float angle = Utility.GetSignedAngleBetweenVectors(Vehicle.Direction, GetNextTarget() - Vehicle.Position, true);
+			if (angle < -0.1f)
+			{
+				Vehicle.SteeringInput = 0.5f;
+				GameConsole.WriteLine("turning right", 5);
+			}
+			else if (angle > 0.1f)
+			{
+				Vehicle.SteeringInput = -0.5f;
+				GameConsole.WriteLine("turning left", 5);
+			}
+			else
+			{
+				Vehicle.SteeringInput = 0;
+			}
 		}
 
-		public void Update(List<IDriver> otherDrivers)
+		public abstract void Update(List<IDriver> otherDrivers);
+
+	}
+
+	class RacingAIDriver : AIDriver
+	{		
+		private float _firstLaneChangeAllowed;  //avoid all racers changing lanes immediately
+		private DrivableVehicle _vehicle;
+
+		public RacingAIDriver(VehicleDescription vehicleDescriptor)
 		{
-			_vehicle.ThrottlePedalInput = 1f;
-			_vehicle.SteeringInput = 0;
+			_vehicle = new DrivableVehicle(vehicleDescriptor);
+			_vehicle.SteeringSpeed = 7;
+			Vehicle = _vehicle;
+			_firstLaneChangeAllowed = Engine.Instance.Random.Next(5, 40);
+		}
+
+		public override void Update(List<IDriver> otherDrivers)
+		{
+			_vehicle.ThrottlePedalInput = 0.7f;
 			_vehicle.BrakePedalInput = 0;
 
 			var node = _vehicle.CurrentNode;
 			var pos = _vehicle.Position;
+
+			if (node.Next == null || node.Next.Next == null)
+			{
+				_vehicle.ThrottlePedalInput = 0;
+				_vehicle.BrakePedalInput = 1;
+				return;
+			}
+
+			FollowTrack();
 			
-			var closestPoint = Utility.GetClosestPointOnLine(node.Position, node.Next.Position, _vehicle.Position);			
-
-			// if we get too far off the racing line, bring us back quickly
-			var distFromRoadCenter = Vector3.Distance(closestPoint, pos);
-			if (distFromRoadCenter > 30)
-			{
-				//GameConsole.WriteLine("off_road", 4);
-				float angle = Utility.GetSignedAngleBetweenVectors(_vehicle.Direction, node.Next.Next.Position - pos, true);
-				if (angle < 0)
-					_vehicle.SteeringInput = 0.3f;
-				else if (angle > 0)
-					_vehicle.SteeringInput = -0.3f;
-				
-				//_vehicle.SteeringInput *= 2;
-				if (_vehicle.Speed > 100 && Math.Abs(angle) > 0.6f)
-				{
-					_vehicle.ThrottlePedalInput = 0.0f;
-					_vehicle.BrakePedalInput = 0.8f;
-				}
-			}
-			else
-			{
-				//GameConsole.WriteLine("NOT off_road", 4);
-
-				float angle = Utility.GetSignedAngleBetweenVectors(_vehicle.Direction, node.Next.Position - node.Position, true);
-				if (Math.Abs(angle) > 0.01f)
-				{
-					_vehicle.SteeringInput = -angle * 1.6f;
-				}
-			}
-			
-
-			if (Math.Abs(node.Orientation - node.Next.Next.Orientation) > 30 && _vehicle.ThrottlePedalInput == 0.8f)
-			{
-				//Debug.WriteLine("braking for upcoming corner");
-				//GameConsole.WriteLine("braking for corner", 3);
-				if (_vehicle.Speed > 100)
-				{
-					_vehicle.BrakePedalInput = 1;
-				}
-			}
-
 			foreach (var driver in otherDrivers)
 			{
 				if (driver == this) continue;
+				if (!(driver is AIDriver)) continue;
+				// if I am not in the same lane, ignore
+				if (driver is AIDriver && ((AIDriver)driver).VirtualLane != VirtualLane) continue;
+				// if I am going slower than the other driver, ignore
+				if (Vehicle.Speed < driver.Vehicle.Speed) continue;
+
 				var progressDist = driver.Vehicle.TrackProgress - _vehicle.TrackProgress;
-				// if we are slightly behind another driver (less than 2 nodes back) then consider them a possible danger
+				// if we are only slightly behind another driver (less than 2 nodes back) then consider them a possible danger
 				if (progressDist > 0 && progressDist < 2f)
 				{
-					float positionDist = Vector3.Distance(driver.Vehicle.Position, _vehicle.Position);
-					if (positionDist < 20)
+					// pick a new lane
+					if (Vehicle.CurrentNode.Number > _firstLaneChangeAllowed)
 					{
-						_vehicle.Speed = driver.Vehicle.Speed * 0.8f;
-					}
-					if (positionDist < 50)
-					{
-						//_vehicle.SteeringInput = -0.2f;
-						break;
+						VirtualLane = Engine.Instance.Random.Next(Math.Max(0, VirtualLane - 1), Math.Min(MaxVirtualLanes - 1, VirtualLane + 1) + 1);
 					}
 				}
 			}
 
 			_vehicle.Update();
-		}
+		}		
 
 		public void Render()
 		{

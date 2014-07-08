@@ -17,6 +17,14 @@ namespace OpenNFS1.Tracks
 		public Vector3[] LeftPoints = new Vector3[TriFile.NbrTerrainPointsPerSide];
 		public Vector3[] RightPoints = new Vector3[TriFile.NbrTerrainPointsPerSide];
 
+		public Vector3 GetPoint(int pointIndex)
+		{
+			if (pointIndex >= TriFile.NbrTerrainPointsPerSide)
+				return LeftPoints[(pointIndex - TriFile.NbrTerrainPointsPerSide)];
+			else
+				return RightPoints[pointIndex];
+		}
+
 		public void RelativizeTo(Vector3 position)
 		{
 			MiddlePoint = position + MiddlePoint * TerrainPositionScale;

@@ -11,6 +11,7 @@ namespace OpenNFS1
 		DateTime _currentLapStartTime = DateTime.MinValue;
 		public List<int> LapTimes = new List<int>();
 		public bool HasPassedLapHalfwayPoint;
+		public int Position { get; set; }
 
 		public void OnLapStarted()
 		{

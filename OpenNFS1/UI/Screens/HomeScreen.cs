@@ -40,10 +40,9 @@ namespace OpenNFS1.UI.Screens
 		Track
 	}
 
-	class HomeScreen : BaseUIScreen, IGameScreen
+	class HomeScreen : IGameScreen
 	{
 		BitmapEntry _background, _vehicleSelection, _trackSelection, _raceButtonSelection;
-		SimpleCamera _camera;
 
 		const int VehicleSelected = 0;
 		const int TrackSelected = 1;
@@ -55,8 +54,9 @@ namespace OpenNFS1.UI.Screens
 		int _currentTrack = 4;
 		int _selectedControl = RaceButtonSelected;
 
-		
-		public HomeScreen() : base(false)
+
+		public HomeScreen()
+			: base()
 		{
 			QfsFile qfs = new QfsFile(@"FRONTEND\ART\control\central.qfs");
 			_background = qfs.Fsh.Header.FindByName("bgnd");
@@ -77,9 +77,12 @@ namespace OpenNFS1.UI.Screens
 				}
 			}
 
-			_camera = new SimpleCamera();
-			_camera.LookAt = Vector3.Forward;
-			Engine.Instance.Camera = _camera;
+			if (GameConfig.SelectedTrackDescription != null)
+				_currentTrack = _track.FindIndex(a => a.Descriptor == GameConfig.SelectedTrackDescription);
+			if (GameConfig.SelectedVehicle != null)
+				_currentVehicle = _vehicles.FindIndex(a => a.Descriptor == GameConfig.SelectedVehicle);
+
+			if (_currentTrack == -1) _currentTrack = 0;
 		}
 
 		public void Update(GameTime gameTime)
@@ -105,16 +108,19 @@ namespace OpenNFS1.UI.Screens
 			{
 				_selectedControl++; _selectedControl %= 3;
 			}
-			if (Engine.Instance.Input.WasPressed(Keys.Up))
+			else if (Engine.Instance.Input.WasPressed(Keys.Up))
 			{
 				_selectedControl--; if (_selectedControl < 0) _selectedControl = 2;
 			}
-
-			if (Engine.Instance.Input.WasPressed(Keys.Enter) && _selectedControl == RaceButtonSelected)
+			else if (Engine.Instance.Input.WasPressed(Keys.Enter) && _selectedControl == RaceButtonSelected)
 			{
-				GameConfig.SelectedVehicle = new DrivableVehicle(_vehicles[_currentVehicle].Descriptor);
+				GameConfig.SelectedVehicle = _vehicles[_currentVehicle].Descriptor;
 				GameConfig.SelectedTrackDescription = _track[_currentTrack].Descriptor;
-				Engine.Instance.Mode = new LoadRaceScreen();
+				Engine.Instance.Screen = new RaceOptionsScreen();
+			}
+			else if (Engine.Instance.Input.WasPressed(Keys.Escape))
+			{
+				Engine.Instance.Game.Exit();
 			}
 		}
 

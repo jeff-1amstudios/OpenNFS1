@@ -8,7 +8,7 @@ namespace OpenNFS1.Physics
     
     class VehicleFenceCollision
     {
-        public static void Handle(Vehicle car)
+        public static void Handle(DrivableVehicle car)
         {
 			var leftBound1 = car.CurrentNode.GetLeftBoundary();
 			var leftBound2 = car.CurrentNode.Next.GetLeftBoundary();
@@ -27,14 +27,14 @@ namespace OpenNFS1.Physics
 				if (Utility.IsLeftOfLine(leftBound2, leftBound1, wheel.WorldPosition))
 				{
 					fenceNormal = Vector3.Cross(Vector3.Normalize(leftBound2 - leftBound1), car.CurrentNode.Up);
-					collisionAngle = Vector3Helper.GetAngleBetweenVectors(car.CarRight, fenceNormal);
+					collisionAngle = Vector3Helper.GetAngleBetweenVectors(car.Right, fenceNormal);
 					collision = true;
 					direction = -1;
 				}
 				else if (!Utility.IsLeftOfLine(rightBound2, rightBound1, wheel.WorldPosition))
 				{
 					fenceNormal = Vector3.Cross(car.CurrentNode.Up, Vector3.Normalize(rightBound2 - rightBound1));
-					collisionAngle = Vector3Helper.GetAngleBetweenVectors(-car.CarRight, fenceNormal);
+					collisionAngle = Vector3Helper.GetAngleBetweenVectors(-car.Right, fenceNormal);
 					collision = true;
 					direction = 1;
 				}
@@ -67,7 +67,7 @@ namespace OpenNFS1.Physics
 			}
         }
 
-        public static int GetWheelsOutsideRoadVerge(Vehicle car)
+        public static int GetWheelsOutsideRoadVerge(DrivableVehicle car)
         {
 			var leftVerge1 = car.CurrentNode.GetLeftVerge();
 			var leftVerge2 = car.CurrentNode.Next.GetLeftVerge();
@@ -95,9 +95,9 @@ namespace OpenNFS1.Physics
         }
     
 
-        private static void SlideAlongFence(Vehicle car, int wheel, float collisionAngle, float direction)
+        private static void SlideAlongFence(DrivableVehicle car, int wheel, float collisionAngle, float direction)
         {
-			if (car.AudioEnabled)
+			if (car.AudioEnabled && Math.Abs(collisionAngle) > MathHelper.ToRadians(30))
 			{
 				EnvironmentAudioProvider.Instance.PlayVehicleFenceCollision();
 			}
@@ -116,7 +116,7 @@ namespace OpenNFS1.Physics
             }
         }
 
-        private static void HandleHeadOnCrash(Vehicle car, int wheel, float collisionAngle)
+        private static void HandleHeadOnCrash(DrivableVehicle car, int wheel, float collisionAngle)
         {
 			if (car.AudioEnabled)
 			{
@@ -128,7 +128,7 @@ namespace OpenNFS1.Physics
             if (Math.Abs(collisionAngle) < MathHelper.Pi / 3.0f)
                 car.RotateCarAfterCollision = +collisionAngle / 3.0f;
 
-            // Just stop car!
+			//bounce back a little
 			car.Speed *= -0.15f;
         }
     }

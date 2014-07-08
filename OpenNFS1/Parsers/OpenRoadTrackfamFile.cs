@@ -8,8 +8,8 @@ namespace OpenNFS1.Parsers
 {
 	class OpenRoadTrackfamFile : TrackfamFile
 	{
-		public OpenRoadTrackfamFile(string trackFile)
-			: base(trackFile)
+		public OpenRoadTrackfamFile(string trackFile, bool alternateTimeOfDay)
+			: base(trackFile, alternateTimeOfDay)
 		{
 		}
 

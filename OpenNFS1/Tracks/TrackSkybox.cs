@@ -98,23 +98,23 @@ namespace OpenNFS1.Tracks
 
 			//left
 			data[16].Position = new Vector3(-vExtents.X, vExtents.Y, -vExtents.Z);
-			data[16].TextureCoordinate.X = 1f; data[16].TextureCoordinate.Y = 0.0f;
+			data[16].TextureCoordinate.X = 0f; data[16].TextureCoordinate.Y = 0.0f;
 			data[17].Position = new Vector3(-vExtents.X, vExtents.Y, vExtents.Z);
-			data[17].TextureCoordinate.X = 0f; data[17].TextureCoordinate.Y = 0.0f;
+			data[17].TextureCoordinate.X = 1f; data[17].TextureCoordinate.Y = 0.0f;
 			data[18].Position = new Vector3(-vExtents.X, -vExtents.Y * y, vExtents.Z);
-			data[18].TextureCoordinate.X = 0f; data[18].TextureCoordinate.Y = 1.0f;
+			data[18].TextureCoordinate.X = 1f; data[18].TextureCoordinate.Y = 1.0f;
 			data[19].Position = new Vector3(-vExtents.X, -vExtents.Y * y, -vExtents.Z);
-			data[19].TextureCoordinate.X = 1f; data[19].TextureCoordinate.Y = 1.0f;
+			data[19].TextureCoordinate.X = 0f; data[19].TextureCoordinate.Y = 1.0f;
 
 			//right
 			data[20].Position = new Vector3(vExtents.X, -vExtents.Y * y, -vExtents.Z);
-			data[20].TextureCoordinate.X = 0f; data[20].TextureCoordinate.Y = 1.0f;
+			data[20].TextureCoordinate.X = 1f; data[20].TextureCoordinate.Y = 1.0f;
 			data[21].Position = new Vector3(vExtents.X, -vExtents.Y * y, vExtents.Z);
-			data[21].TextureCoordinate.X = 1f; data[21].TextureCoordinate.Y = 1.0f;
+			data[21].TextureCoordinate.X = 0f; data[21].TextureCoordinate.Y = 1.0f;
 			data[22].Position = new Vector3(vExtents.X, vExtents.Y, vExtents.Z);
-			data[22].TextureCoordinate.X = 1f; data[22].TextureCoordinate.Y = 0.0f;
+			data[22].TextureCoordinate.X = 0f; data[22].TextureCoordinate.Y = 0.0f;
 			data[23].Position = new Vector3(vExtents.X, vExtents.Y, -vExtents.Z);
-			data[23].TextureCoordinate.X = 0f; data[23].TextureCoordinate.Y = 0.0f;
+			data[23].TextureCoordinate.X = 1f; data[23].TextureCoordinate.Y = 0.0f;
 
 			vertices.SetData<VertexPositionTexture>(data);
 

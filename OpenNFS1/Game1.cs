@@ -1,6 +1,10 @@
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using NfsEngine;
+using OpenNFS1.UI.Screens;
 
 namespace OpenNFS1
 {
@@ -11,6 +15,10 @@ namespace OpenNFS1
 	{
 		GraphicsDeviceManager _graphics;
 		RenderTarget2D _renderTarget;
+
+		[DllImport("user32.dll")]
+		private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndIntertAfter,
+			int X, int Y, int cx, int cy, int uFlags);
 		
 		public Game1()
 		{
@@ -19,8 +27,16 @@ namespace OpenNFS1
 
 			GameConfig.Load();
 
-			_graphics.PreferredBackBufferWidth = 640;
-			_graphics.PreferredBackBufferHeight = 480;
+			if (GameConfig.FullScreen)
+			{
+				_graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+				_graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+			}
+			else
+			{
+				_graphics.PreferredBackBufferWidth = 640;
+				_graphics.PreferredBackBufferHeight = 480;
+			}
 			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
 			_graphics.IsFullScreen = false;
 		}
@@ -34,6 +50,17 @@ namespace OpenNFS1
 		protected override void Initialize()
 		{
 			base.Initialize();
+
+			if (GameConfig.FullScreen)
+			{
+				// move window to top-left
+				Type type = typeof(OpenTKGameWindow);
+				System.Reflection.FieldInfo field = type.GetField("window", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+				OpenTK.GameWindow window = (OpenTK.GameWindow)field.GetValue(this.Window);
+				this.Window.IsBorderless = true;
+				window.X = 0;
+				window.Y = 0;
+			}
 		}
 
 		/// <summary>
@@ -48,7 +75,13 @@ namespace OpenNFS1
 			Engine.Instance.Device.SetRenderTarget(_renderTarget);
 			Engine.Instance.ScreenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
 
-			Engine.Instance.Mode = new OpenNFS1.UI.Screens.HomeScreen();            
+			string gameDataPath = "CD_Data";
+			if (!Directory.Exists(gameDataPath) || Directory.GetDirectories(gameDataPath).Length == 0)
+				Engine.Instance.Screen = new ChooseDataDownloadScreen();
+			else
+			{
+				Engine.Instance.Screen = new HomeScreen();
+			}
 		}
 
 		/// <summary>
@@ -87,8 +120,17 @@ namespace OpenNFS1
 
 			using (SpriteBatch sprite = new SpriteBatch(Engine.Instance.Device))
 			{
+				Rectangle r = Window.ClientBounds;
+				if (GameConfig.FullScreen)
+				{
+					// retain original 4:3 aspect ratio
+					int originalWith = r.Width;
+					int w = (int)((4f / 3f) * r.Height);
+					r.Width = w;
+					r.X = originalWith / 2 - w / 2;
+				}
 				sprite.Begin();
-				sprite.Draw(_renderTarget, Window.ClientBounds, Color.White);
+				sprite.Draw(_renderTarget, r, Color.White);
 				sprite.End();
 			}
 		}

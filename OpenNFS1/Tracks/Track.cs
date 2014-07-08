@@ -29,7 +29,6 @@ namespace OpenNFS1.Parsers.Track
 		public VertexBuffer TerrainVertexBuffer { get; set; }
 		public VertexBuffer FenceVertexBuffer { get; set; }
 		public TrackfamFile TrackFam { get; set; }
-		public Vector3 StartPosition { get; set; }
 		public int CheckpointNode { get; set; }
 		public bool IsOpenRoad { get; set; }
 		
@@ -72,6 +71,7 @@ namespace OpenNFS1.Parsers.Track
 
 			Engine.Instance.Device.SetVertexBuffer(TerrainVertexBuffer);
 			_effect.CurrentTechnique.Passes[0].Apply();
+			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
 			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
 
 			var frustum = new BoundingFrustum(Engine.Instance.Camera.View * Engine.Instance.Camera.Projection);
@@ -80,26 +80,26 @@ namespace OpenNFS1.Parsers.Track
 			var segment = startSegment;
 			for (int i = 0; i < GameConfig.DrawDistance; i++)
 			{
-				if (!frustum.Intersects(segment.BoundingBox))
-					break;
-				
-				RenderSegment(segment);
-				renderedSegments.Add(segment);
-				segment = segment.Next;
 				if (segment == null) break;
+				if (frustum.Intersects(segment.BoundingBox))
+				{
+					RenderSegment(segment);
+					renderedSegments.Add(segment);
+				}
+				segment = segment.Next;
 			}
 
 			// draw segments from the player vehicle backwards. Stop when a segment is out of view
-			segment = startSegment;
+			segment = startSegment.Prev;
 			for (int i = 0; i < GameConfig.DrawDistance; i++)
 			{
-				if (!frustum.Intersects(segment.BoundingBox))
-					break;
-
-				RenderSegment(segment);
-				renderedSegments.Add(segment);
-				segment = segment.Prev;
 				if (segment == null) break;
+				if (frustum.Intersects(segment.BoundingBox))
+				{
+					RenderSegment(segment);
+					renderedSegments.Add(segment);
+				}
+				segment = segment.Prev;
 			}
 
 			DrawScenery(renderedSegments);
@@ -246,7 +246,7 @@ namespace OpenNFS1.Parsers.Track
 		{
 			_effect.Dispose();
 			TerrainVertexBuffer.Dispose();
-			FenceVertexBuffer.Dispose();
+			if (FenceVertexBuffer != null) FenceVertexBuffer.Dispose();
 			TrackFam.Dispose();
 		}
 	}

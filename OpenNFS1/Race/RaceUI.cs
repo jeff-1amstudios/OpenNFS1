@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using OpenNFS1.Vehicles.AI;
 using OpenNFS1.Parsers;
+using OpenNFS1.Physics;
 
 namespace OpenNFS1.UI
 {
@@ -52,22 +53,19 @@ namespace OpenNFS1.UI
             Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(15, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
 
             msg = String.Format("{0} kph", Math.Abs((int)_race.Player.Vehicle.Speed));
-            Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(301, -5), Color.WhiteSmoke, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
-            Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(300, -4), Color.Red, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
+            Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(270, -5), Color.WhiteSmoke, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
+            Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(271, -4), Color.Red, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
 
-            msg = String.Format("G:{0}", GearToString(_race.Player.Vehicle.Motor.Gearbox.CurrentGear));
-            Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(440, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
+            msg = String.Format("G:{0}", GearToString(((DrivableVehicle)_race.Player.Vehicle).Motor.Gearbox.CurrentGear));
+            Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(410, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
 
 			if (!GameConfig.SelectedTrackDescription.IsOpenRoad)
             {
 				msg = String.Format("L:{0}/{1}", Math.Min(_race.PlayerStats.CurrentLap, _race.NbrLaps), _race.NbrLaps);
                 Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(480, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
             }
-			var sortedDrivers = new List<IDriver>(_race.Drivers);
-			sortedDrivers.Sort((a1, a2) => 
-				a1.Vehicle.TrackProgress.CompareTo(a2.Vehicle.TrackProgress)
-			);
-			msg = String.Format("P:{0}/{1}", sortedDrivers.FindIndex(a=> a == _race.Player), sortedDrivers.Count);
+
+			msg = String.Format("P:{0}/{1}", _race.PlayerStats.Position + 1, _race.Drivers.Count);
 			Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(550, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
             Engine.Instance.SpriteBatch.End();
         }

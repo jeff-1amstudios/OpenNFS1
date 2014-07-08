@@ -9,6 +9,7 @@ using System.Diagnostics;
 using NfsEngine;
 using OpenNFS1.Parsers;
 using OpenNFS1.Tracks;
+using System.Linq;
 
 namespace OpenNFS1.Loaders
 {
@@ -28,13 +29,10 @@ namespace OpenNFS1.Loaders
 		public Track Assemble(TriFile tri)
 		{
 			_tri = tri;
-			_trackFam = tri.IsOpenRoad ? new OpenRoadTrackfamFile(tri.FileName) : new TrackfamFile(tri.FileName);
+			_trackFam = tri.IsOpenRoad ? new OpenRoadTrackfamFile(tri.FileName, GameConfig.AlternativeTimeOfDay) : new TrackfamFile(tri.FileName, GameConfig.AlternativeTimeOfDay);
 			AssembleTrackSegments();
 
-			Vector3 startPos = tri.Nodes[0].Position + new Vector3(0, 0, -2);
-			
 			Track track = new Track();
-			track.StartPosition = startPos;
 			track.RoadNodes = _tri.Nodes;
 			track.SceneryItems = AssembleSceneryItems();
 			track.TerrainSegments = _tri.Segments;
@@ -113,10 +111,6 @@ namespace OpenNFS1.Loaders
 						throw new NotImplementedException();
 				}
 
-				if (obj.Descriptor.Width == 0 && obj.Descriptor.Height == 0)
-				{
-
-				}
 				renderObject.Size = new Vector2(obj.Descriptor.Width, obj.Descriptor.Height);
 				renderObject.SegmentRef = obj.ReferenceNode / 4;
 				renderObject.Position = _tri.Nodes[obj.ReferenceNode].Position + ((obj.RelativePosition * GameConfig.TerrainScale) * 240);
@@ -146,18 +140,26 @@ namespace OpenNFS1.Loaders
 				for (int j = 1; j < TriFile.NbrTerrainPointsPerSide; j++)
 				{
 					tU = 0.0f;
+					int index1, index2;
+					GetPointIndicesForRightSide(segment, j, out index1, out index2);
+					
 					for (int row = 0; row < TriFile.NbrRowsPerSegment; row++)
 					{
-						vertices.Add(new VertexPositionTexture(segment.Rows[row].RightPoints[j], new Vector2(tU, 0.0f)));
-						vertices.Add(new VertexPositionTexture(segment.Rows[row].RightPoints[j - 1], new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].GetPoint(index1), new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].GetPoint(index2), new Vector2(tU, 1.0f)));
 						tU += 0.5f;
 					}
 
 					//attach the end of this segment to the start of the next if its not the last
 					if (segment.Next != null)
 					{
-						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].RightPoints[j], new Vector2(tU, 0.0f)));
-						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].RightPoints[j - 1], new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].GetPoint(index1), new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].GetPoint(index2), new Vector2(tU, 1.0f)));
+					}
+					else
+					{
+						vertices.Add(new VertexPositionTexture(segment.Rows[TriFile.NbrRowsPerSegment - 1].GetPoint(index1), new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[TriFile.NbrRowsPerSegment - 1].GetPoint(index2), new Vector2(tU, 1.0f)));
 					}
 				}
 
@@ -165,18 +167,25 @@ namespace OpenNFS1.Loaders
 				for (int j = 1; j < TriFile.NbrTerrainPointsPerSide; j++)
 				{
 					tU = 0.0f;
+					int index1, index2;
+					GetPointIndicesForLeftSide(segment, j, out index1, out index2);
 					for (int row = 0; row < TriFile.NbrRowsPerSegment; row++)
 					{
-						vertices.Add(new VertexPositionTexture(segment.Rows[row].LeftPoints[j - 1], new Vector2(tU, 1.0f)));
-						vertices.Add(new VertexPositionTexture(segment.Rows[row].LeftPoints[j], new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].GetPoint(index1), new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[row].GetPoint(index2), new Vector2(tU, 0.0f)));
 						tU += 0.5f;
 					}
 
 					//attach the end of this segment to the start of the next if its not the last
 					if (segment.Next != null)
 					{
-						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].LeftPoints[j - 1], new Vector2(tU, 1.0f)));
-						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].LeftPoints[j], new Vector2(tU, 0.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].GetPoint(index1), new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Next.Rows[0].GetPoint(index2), new Vector2(tU, 0.0f)));
+					}
+					else
+					{
+						vertices.Add(new VertexPositionTexture(segment.Rows[TriFile.NbrRowsPerSegment - 1].GetPoint(index1), new Vector2(tU, 1.0f)));
+						vertices.Add(new VertexPositionTexture(segment.Rows[TriFile.NbrRowsPerSegment - 1].GetPoint(index2), new Vector2(tU, 0.0f)));
 					}
 				}
 			}
@@ -186,10 +195,54 @@ namespace OpenNFS1.Loaders
 			return vertexBuffer;
 		}
 
+		void GetPointIndicesForRightSide(TerrainSegment segment, int terrainPointIndex, out int index1, out int index2)
+		{
+			// only care if this is the last terrain strip
+			if (terrainPointIndex == TriFile.NbrTerrainPointsPerSide - 1)
+			{
+				var node = _tri.Nodes[segment.Number * TriFile.NbrRowsPerSegment];
+				if (node.b[3] == 7)
+				{
+					index1 = 2;
+					index2 = 10;
+					return;
+				}
+			}
+
+			index1 = terrainPointIndex;
+			index2 = terrainPointIndex - 1;
+		}
+
+		void GetPointIndicesForLeftSide(TerrainSegment segment, int terrainPointIndex, out int index1, out int index2)
+		{
+			// only care if this is the last terrain strip
+			if (terrainPointIndex == TriFile.NbrTerrainPointsPerSide - 1)
+			{
+				var node = _tri.Nodes[segment.Number * TriFile.NbrRowsPerSegment];
+				if (node.b[3] == 12)
+				{
+					index1 = 9;
+					index2 = 4;
+					return;
+				}
+				else if (node.b[3] == 13)
+				{
+					index1 = 9;
+					index2 = 5;
+					return;
+				}
+			}
+
+			index1 = TriFile.NbrTerrainPointsPerSide + terrainPointIndex - 1;
+			index2 = TriFile.NbrTerrainPointsPerSide + terrainPointIndex;
+		}
+
+		
+
 		// Fences are defined by the TerrainSegment. If fence is enabled, we draw a fence from row0 to row2, then row2 to row4.
 		VertexBuffer AssembleFenceVertices()
 		{
-			Vector3 fenceHeight = new Vector3(0, GameConfig.TerrainScale * 100000, 0);
+			Vector3 fenceHeight = new Vector3(0, GameConfig.TerrainScale * 50000, 0);
 
 			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
 
@@ -243,10 +296,25 @@ namespace OpenNFS1.Loaders
 				}
 
 				// calculate bounding size for this segment
-				Vector3 a = segment.Rows[0].LeftPoints[TriFile.NbrTerrainPointsPerSide - 1];
-				Vector3 b = segment.Rows[TriFile.NbrRowsPerSegment - 1].RightPoints[TriFile.NbrTerrainPointsPerSide - 1];
-				Vector3 min = new Vector3(Math.Min(a.X, b.X), Math.Min(a.Y, b.Y), Math.Min(a.Z, b.Z));
-				Vector3 max = new Vector3(Math.Max(a.X, b.X), Math.Max(a.Y, b.Y), Math.Max(a.Z, b.Z));
+				var firstRow = segment.Rows[0];
+				var lastRow = segment.Next != null ? segment.Next.Rows[0] : segment.Rows[TriFile.NbrRowsPerSegment - 1];
+				Vector3 min = new Vector3(float.MaxValue), max = new Vector3();
+				List<Vector3> allPoints = new List<Vector3>();
+				allPoints.AddRange(firstRow.LeftPoints);
+				allPoints.AddRange(firstRow.RightPoints);
+				allPoints.AddRange(lastRow.LeftPoints);
+				allPoints.AddRange(lastRow.RightPoints);
+
+				foreach (var pos in allPoints)
+				{
+					if (pos.X < min.X) min.X = pos.X;
+					if (pos.X > max.X) max.X = pos.X;
+					if (pos.Y < min.Y) min.Y = pos.Y;
+					if (pos.Y > max.Y) max.Y = pos.Y;
+					if (pos.Z < min.Z) min.Z = pos.Z;
+					if (pos.Z > max.Z) max.Z = pos.Z;
+				}
+				
 				segment.BoundingBox = new BoundingBox(min, max);
 			}
 		

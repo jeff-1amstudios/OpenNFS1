@@ -41,6 +41,16 @@ namespace OpenNFS1.Tracks
 			return GetRightOffset(DistanceToRightVerge);
 		}
 
+		public Vector3 GetLeftVerge2()
+		{
+			return GetLeftOffset(DistanceToLeftVerge - 8);
+		}
+
+		public Vector3 GetRightVerge2()
+		{
+			return GetRightOffset(DistanceToRightVerge-8);
+		}
+
 
 		private Vector3 GetLeftOffset(float offset)
 		{

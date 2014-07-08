@@ -19,9 +19,13 @@ namespace OpenNFS1.Parsers
 		protected const int SCENERY_CHUNK = 1;
 		protected const int MESH_CHUNK = 2;
 
-        public TrackfamFile(string trackFile)
+        public TrackfamFile(string trackFile, bool alternateTimeOfDay)
         {
-            string textureFilePath = "SIMDATA\\NTRACKFM\\" + Path.GetFileNameWithoutExtension(trackFile) + "_T01.fam";
+			string textureFilePath;
+			if (!alternateTimeOfDay)
+				textureFilePath = "SIMDATA\\ETRACKFM\\" + Path.GetFileNameWithoutExtension(trackFile) + "_001.fam";
+			else
+				textureFilePath = "SIMDATA\\NTRACKFM\\" + Path.GetFileNameWithoutExtension(trackFile) + "_T01.fam";
             ReadFamFile(textureFilePath);
 
 			_meshCache = new Mesh[_root.HeaderChunks[2].HeaderChunks.Count];

@@ -7,15 +7,15 @@ namespace OpenNFS1.Vehicles
 {
     static class CarModelCache
     {
-        static Dictionary<string, CfmFile> _cache = new Dictionary<string,CfmFile>();
+		static Dictionary<string, CarMesh> _cache = new Dictionary<string, CarMesh>();
 
-		public static CfmFile GetCfm(string filename, bool drivable)
+		public static CarMesh GetCfm(string filename)
         {
             if (!_cache.ContainsKey(filename))
             {
-				CfmFile model = new CfmFile(filename, drivable);
-                _cache.Add(filename, model);
-                return model;
+				CfmFile cfm = new CfmFile(filename);
+                _cache.Add(filename, cfm.Mesh);
+                return cfm.Mesh;
             }
             else
             {

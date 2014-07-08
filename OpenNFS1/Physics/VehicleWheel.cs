@@ -13,7 +13,7 @@ namespace OpenNFS1.Physics
 	{
 		public const float Width = 1.5f;
 		Vector3 _axlePoint;
-		Vehicle _car;
+		DrivableVehicle _car;
 		float _steeringAngle;
 		float _size;
         float _rotation;
@@ -31,7 +31,7 @@ namespace OpenNFS1.Physics
         public bool IsSkidding { get; set; }
 
 
-		public VehicleWheel(Vehicle car, Vector3 axlePoint, float size, Texture2D texture, float renderXOffset)
+		public VehicleWheel(DrivableVehicle car, Vector3 axlePoint, float size, Texture2D texture, float renderXOffset)
 		{
 			_car = car;
 			_axlePoint = axlePoint;
@@ -46,10 +46,10 @@ namespace OpenNFS1.Physics
 		{
 			get
 			{
-				var m = Matrix.Identity; 
-				m.Right = _car.CarRight;
-				m.Up = _car.UpVector;
-				m.Forward = _car.Direction;
+				var m = Matrix.Identity;
+				m.Right = Vector3.Cross(_car.RenderDirection, _car.Up);
+				m.Up = _car.Up;
+				m.Forward = _car.RenderDirection;
 				return Vector3.Transform(_axlePoint, m * Matrix.CreateTranslation(_car.Position));
 			}
 		}
@@ -68,9 +68,9 @@ namespace OpenNFS1.Physics
 		public Vector3 GetOffsetPosition(Vector3 offset)
 		{
 			var m = Matrix.Identity;
-			m.Right = _car.CarRight;
-			m.Up = _car.UpVector;
-			m.Forward = _car.Direction;
+			m.Right = Vector3.Cross(_car.RenderDirection, _car.Up);
+			m.Up = _car.Up;
+			m.Forward = _car.RenderDirection;
 			var pos = _axlePoint + offset;
 			return Vector3.Transform(pos, m * Matrix.CreateTranslation(_car.Position));
 		}
@@ -96,9 +96,9 @@ namespace OpenNFS1.Physics
 		public void Render()
 		{
 			Matrix carOrientation = Matrix.Identity;
-			carOrientation.Forward = _car.Direction;
-			carOrientation.Up = _car.UpVector;
-			carOrientation.Right = _car.CarRight;
+			carOrientation.Forward = _car.RenderDirection;
+			carOrientation.Up = _car.Up;
+			carOrientation.Right = Vector3.Cross(_car.RenderDirection, _car.Up);
 			WheelModel.Render(
 				_wheelMatrix *
 				Matrix.CreateRotationX(_rotation / _size * 2f) *

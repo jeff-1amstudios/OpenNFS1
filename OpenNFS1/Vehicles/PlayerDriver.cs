@@ -10,7 +10,7 @@ namespace OpenNFS1.Vehicles.AI
 	{
 		DrivableVehicle _vehicle;
 
-		public DrivableVehicle Vehicle { get { return _vehicle; } }
+		public Vehicle Vehicle { get { return _vehicle; } }
 		public PlayerDriver(DrivableVehicle vehicle)
 		{
 			_vehicle = vehicle;
@@ -23,6 +23,7 @@ namespace OpenNFS1.Vehicles.AI
 			_vehicle.SteeringInput= VehicleController.Turn;
 			_vehicle.GearDownInput = VehicleController.GearDown;
 			_vehicle.GearUpInput = VehicleController.GearUp;
+			_vehicle.HandbrakeInput = VehicleController.Handbrake;
 			_vehicle.Update();
 		}
 

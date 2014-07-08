@@ -45,10 +45,11 @@ namespace OpenNFS1.Vehicles
 						break;
 				}
 			}
+			var tyreEntry = bmpChunk.FindByName("tyr1");
+			if (tyreEntry != null)
+				_wheelTexture = tyreEntry.Texture;
 
-			_wheelTexture = bmpChunk.FindByName("tyr1").Texture;
-
-			// This seems like it could be done in a shader but I couldn't get it to work well enough 
+			// This seems like it should be done in a shader but I couldn't get it to work well enough 
 			// (dealing with original paletted colors doesn't work so well in a texture stretched over a polygon)
 			
 			var rsidPoly = _polys.FirstOrDefault(a => a.TextureName == "rsid");
@@ -122,7 +123,7 @@ namespace OpenNFS1.Vehicles
 				{
 					continue;
 				}
-				else if (poly.TextureName == "rsid")
+				else if (_brakeOnTexture != null && poly.TextureName == "rsid")
 				{
 					Engine.Instance.Device.Textures[0] = enableBrakeLights ? _brakeOnTexture : _brakeOffTexture;
 				}

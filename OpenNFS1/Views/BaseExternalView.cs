@@ -35,7 +35,7 @@ namespace OpenNFS1.Views
 			}
 		}
 
-		public void RenderBackground(Vehicle car)
+		public void RenderBackground(DrivableVehicle car)
 		{
 			float carRpm = car.Motor.Rpm / car.Motor.RedlineRpm;
 			Engine.Instance.SpriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.LinearWrap, DepthStencilState.None, RasterizerState.CullNone);
@@ -47,7 +47,8 @@ namespace OpenNFS1.Views
 			float rotation = (float)(carRpm * Math.PI * 1.4f) - 2.56f;
 			Engine.Instance.SpriteBatch.Draw(_tachLineTexture, new Vector2(_tacho.Misc[2] + _size / 2, _tacho.Misc[3] + _size / 2), null, color, rotation, new Vector2(_needleWidth/2, 25), new Vector2(1f, _needleLength), SpriteEffects.None, 0);
 
-			Engine.Instance.SpriteBatch.Draw(_map.Texture, _map.GetDisplayAt(), Color.White);
+			// mini-map overlay
+			//Engine.Instance.SpriteBatch.Draw(_map.Texture, _map.GetDisplayAt(), Color.White);
 
 			// Draw bottom fill
 			const int barHeight = 17;

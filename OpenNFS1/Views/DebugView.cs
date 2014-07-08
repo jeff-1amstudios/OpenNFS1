@@ -8,10 +8,10 @@ namespace OpenNFS1
 {
 	class DebugView : IView
 	{
-		Vehicle _car;
+		DrivableVehicle _car;
 		FPSCamera _camera;
 
-		public DebugView(Vehicle car)
+		public DebugView(DrivableVehicle car)
 		{
 			_car = car;
 			_camera = new FPSCamera();

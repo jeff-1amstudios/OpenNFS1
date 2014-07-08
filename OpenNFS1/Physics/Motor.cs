@@ -37,7 +37,7 @@ namespace OpenNFS1.Physics
             get
             {
                 if (_gearbox.GearEngaged && _throttle == 0)
-                    return Math.Abs(_gearbox.CurrentRatio);
+                    return Math.Abs(_gearbox.CurrentRatio) * 4;
                 else
                     return 0;
             }

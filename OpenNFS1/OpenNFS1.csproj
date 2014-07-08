@@ -41,6 +41,7 @@
     <Compile Include="Dashboards\Dashboard.cs" />
     <Compile Include="Dashboards\DashboardDescription.cs" />
     <Compile Include="Dashboards\GearboxAnimation.cs" />
+    <Compile Include="Physics\PhysicsTypes.cs" />
     <Compile Include="Race\PlayerRaceStats.cs" />
     <Compile Include="PlayerUI.cs" />
     <Compile Include="Game1.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="Physics\Motor.cs" />
     <Compile Include="Physics\Spring.cs" />
     <Compile Include="Physics\Vector3Helper.cs" />
-    <Compile Include="Physics\Vehicle.cs" />
+    <Compile Include="Physics\DrivableVehicle.cs" />
     <Compile Include="Physics\VehicleFenceCollision.cs" />
     <Compile Include="Physics\VehicleWheel.cs" />
     <Compile Include="Program.cs" />
@@ -82,15 +83,14 @@
     <Compile Include="Tracks\TrackDescription.cs" />
     <Compile Include="Tracks\TrackNode.cs" />
     <Compile Include="Tracks\TrackObjectDescriptor.cs" />
-    <Compile Include="Tracks\TrackSegment.cs" />
     <Compile Include="Tracks\TrackSkybox.cs" />
+    <Compile Include="UI\Screens\ChooseDataDownloadScreen.cs" />
+    <Compile Include="UI\Screens\DataDownloadScreen.cs" />
+    <Compile Include="UI\Screens\RaceOptionsScreen.cs" />
     <Compile Include="Vehicles\TyreSmokeParticleSystem.cs" />
     <Compile Include="UIController.cs" />
-    <Compile Include="UI\RaceUI.cs" />
-    <Compile Include="UI\Screens\AboutScreen.cs" />
+    <Compile Include="Race\RaceUI.cs" />
     <Compile Include="UI\Screens\BaseUIScreen.cs" />
-    <Compile Include="UI\Screens\ChooseGearboxScreen.cs" />
-    <Compile Include="UI\Screens\ChooseTrackScreen.cs" />
     <Compile Include="UI\Screens\ControlsScreen.cs" />
     <Compile Include="UI\Screens\DoRaceScreen.cs" />
     <Compile Include="UI\Screens\LoadRaceScreen.cs" />
@@ -98,14 +98,13 @@
     <Compile Include="UI\Screens\RaceFinishedScreen.cs" />
     <Compile Include="UI\Screens\RacePausedScreen.cs" />
     <Compile Include="VehicleController.cs" />
-    <Compile Include="Vehicles\AIVehicle.cs" />
     <Compile Include="Vehicles\AI\AIDriver.cs" />
     <Compile Include="Vehicles\AI\IDriver.cs" />
-    <Compile Include="Vehicles\AI\PlayerDriver.cs" />
+    <Compile Include="Vehicles\PlayerDriver.cs" />
     <Compile Include="Vehicles\AI\TrafficDriver.cs" />
     <Compile Include="Vehicles\CarModel.cs" />
     <Compile Include="Vehicles\CarModelCache.cs" />
-    <Compile Include="Vehicles\DrivableVehicle.cs" />
+    <Compile Include="Vehicles\Vehicle.cs" />
     <Compile Include="Vehicles\Traffic\TrafficController.cs" />
     <Compile Include="Vehicles\Traffic\TrafficVehicle.cs" />
     <Compile Include="Vehicles\VehicleDescription.cs" />
@@ -117,10 +116,12 @@
     <Compile Include="Views\DropCameraView.cs" />
     <Compile Include="Views\IView.cs" />
     <Compile Include="Views\TelevisionView.cs" />
-    <Compile Include="Views\TrackFlybyView.cs" />
     <Compile Include="Vehicles\WheelModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip.Reduced">
+      <HintPath>..\lib\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -137,6 +138,21 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Audio\Environment\tunnel.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Audio\Vehicles\911\engine-off-high.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Audio\Vehicles\911\engine-off-low.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Audio\Vehicles\911\engine-on-high.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Audio\Vehicles\911\engine-on-low.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Audio\Vehicles\911\gear-change.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Audio\Vehicles\Common\grass_slide.wav">

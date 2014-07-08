@@ -36,11 +36,15 @@ namespace OpenNFS1.Parsers.Track
 
 		public override void Initialize()
 		{
-			float aspect = (float)_texture.Width / _texture.Height;
 			if (Size.X == 0)
+			{
+				float aspect = (float)_texture.Width / _texture.Height;
 				Size.X = Size.Y * aspect * GameConfig.TerrainScale * 10000;
+			}
 			if (Size.Y == 0)
-				Size.Y = Size.X * aspect * GameConfig.TerrainScale * 10000;
+			{
+				//Size.Y = Size.X * aspect * GameConfig.TerrainScale * 10000;
+			}
 
 			_matrix = Matrix.CreateScale(Size.X, Size.Y, 1) *
 							Matrix.CreateRotationY(Orientation) *

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using NfsEngine;
+using OpenNFS1.Physics;
 using OpenNFS1.Tracks;
 using OpenNFS1.Vehicles;
 using OpenNFS1.Views;
@@ -16,7 +17,7 @@ namespace OpenNFS1
 		List<IView> _views = new List<IView>();
 		int _currentView = 1;
 
-		
+
 		public PlayerUI(DrivableVehicle vehicle)
 		{
 			_vehicle = vehicle;

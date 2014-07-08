@@ -18,7 +18,6 @@ namespace NfsEngine
         private InputProvider _inputProvider;
         private GraphicsUtilities _graphicsUtils;
         private IWorld _world;
-        private IGameScreen _mode;
         public GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         public Vector2 ScreenSize;
@@ -86,7 +85,7 @@ namespace NfsEngine
             SoundEngine2.Instance.Update(gameTime);
             //SoundEngine.Instance.Update();
 
-            _mode.Update(gameTime);
+            Screen.Update(gameTime);
 
             ScreenEffects.Instance.Update(gameTime);
 
@@ -95,7 +94,7 @@ namespace NfsEngine
 
         public override void Draw(GameTime gameTime)
         {
-            _mode.Draw();
+            Screen.Draw();
             _graphicsUtils.Draw();
             ScreenEffects.Instance.Draw();
             _graphicsUtils.DrawText();
@@ -140,11 +139,8 @@ namespace NfsEngine
             set { _inputProvider = value; }
         }
 
-        public IGameScreen Mode
-        {
-            get { return _mode; }
-            set { _mode = value; }
-        }
+        public IGameScreen Screen {get; set; }
+        
 
         public SpriteBatch SpriteBatch
         {

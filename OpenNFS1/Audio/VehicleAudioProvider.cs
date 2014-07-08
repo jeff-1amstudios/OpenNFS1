@@ -13,41 +13,37 @@ namespace OpenNFS1
 {
     class VehicleAudioProvider
     {
-        Vehicle _car;
-        string _soundName;
+        DrivableVehicle _car;
 
         SoundEffectInstance _engineOnLow, _engineOnHigh, _engineOffLow, _engineOffHigh, _skidInstance, _offRoadInstance;
         SoundEffect _gearChange;
         List<SoundEffect> _skids = new List<SoundEffect>();
-        Random _random;
 		bool _isActive = false;
                 
-        public VehicleAudioProvider(Vehicle car, string vehicleSoundName)
+        public VehicleAudioProvider(DrivableVehicle car)
         {
             _car = car;
-            _soundName = vehicleSoundName;
         }
 
 
         public void Initialize()
         {
-            if (_random != null)
+			if (_engineOnLow != null)
             {
                 return;
             }
 
-            _random = new Random();
 			_isActive = true;
             
             SoundEffect temp;
-            temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-on-low", _soundName));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-on-low", _car.Descriptor.Name));
             _engineOnLow = temp.CreateInstance();
 			//.Play(0.3f, 0, 0);
-            temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-on-high", _soundName));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-on-high", _car.Descriptor.Name));
 			_engineOnHigh = temp.CreateInstance(); // temp.Play(0.3f, 0, 0);
-            temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-off-low", _soundName));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-off-low", _car.Descriptor.Name));
 			_engineOffLow = temp.CreateInstance(); //temp.Play(0.3f, 0, 0);
-            temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-off-high", _soundName));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-off-high", _car.Descriptor.Name));
 			_engineOffHigh = temp.CreateInstance(); //temp.Play(0.3f, 0, 0);
 
             temp = Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Vehicles/common/grass_slide");
@@ -63,7 +59,7 @@ namespace OpenNFS1
             _engineOffLow.Pause();
             _engineOffHigh.Pause();
 
-            _gearChange = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/gear-change", _soundName));
+            _gearChange = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/gear-change", _car.Descriptor.Name));
 
         }
 
@@ -123,7 +119,7 @@ namespace OpenNFS1
                 }
                 else
                 {
-                    _skidInstance = _skids[_random.Next(_skids.Count)].CreateInstance(); //.Play(0.3f, 0, 0);
+                    _skidInstance = _skids[Engine.Instance.Random.Next(_skids.Count)].CreateInstance(); //.Play(0.3f, 0, 0);
                 }
             }
             else

@@ -20,23 +20,23 @@ namespace OpenNFS1
 		int _nbrLaps;
 		DateTime _countdownStartTime, _raceStartTime;
 		bool _started, _finished;
-		Track _track;
 		public PlayerDriver Player { get; private set; }
 		TrafficController _trafficController;
-		public List<IDriver> Drivers {get; private set; }
+		public List<IDriver> Drivers { get; private set; }
 		public PlayerRaceStats PlayerStats { get; private set; }
+		public Track Track { get; private set; }
 
 		public Race(int nbrLaps, Track track, PlayerDriver player)
 		{
 			_nbrLaps = nbrLaps;
 			Player = player;
-			_track = track;
+			Track = track;
 			PlayerStats = new PlayerRaceStats();
 			Drivers = new List<IDriver>();
 			AddDriver(player);
 			if (track.Description.IsOpenRoad)
 			{
-				_trafficController = new TrafficController(_track, Player.Vehicle);
+				_trafficController = new TrafficController(this);
 			}
 		}
 
@@ -61,7 +61,13 @@ namespace OpenNFS1
 		{
 			VehicleController.ForceBrake = false;
 			_countdownStartTime = DateTime.Now;
-			Drivers.ForEach(a=> a.Vehicle.Motor.Gearbox.CurrentGear = 0);
+			Drivers.ForEach(a =>
+			{
+				if (a is AIDriver)
+				{
+					((DrivableVehicle)a.Vehicle).Motor.Gearbox.CurrentGear = 0;
+				}
+			});
 		}
 
 		public bool HasFinished
@@ -72,14 +78,31 @@ namespace OpenNFS1
 			}
 		}
 
-		// add a driver to the race, placing him in a starting grid
 		public void AddDriver(IDriver d)
 		{
-			d.Vehicle.Track = _track;
-			Vector3 pos = _track.StartPosition;
-			pos.Z -= Drivers.Count * 30;
-			pos.X += Drivers.Count % 2 == 0 ? 20 : -20;
-			d.Vehicle.Position = pos;
+			AddDriver(d, Track.RoadNodes[1]);
+		}
+
+		// add a driver to the race, placing him in a starting grid
+		public void AddDriver(IDriver d, TrackNode startNode)
+		{
+			d.Vehicle.PlaceOnTrack(Track, startNode);
+			if (d is TrafficDriver)
+			{
+			}
+			else if (d is PlayerDriver)
+			{
+
+			}
+			else
+			{
+				// place on starting grid
+				((AIDriver)d).VirtualLane = (Drivers.Count % 2 == 0 ? 3 : 0);
+				Vector3 pos = d.Vehicle.CurrentNode.GetLeftVerge();
+				pos.Z -= Drivers.Count * 30;
+				pos.X = ((AIDriver)d).GetNextTarget().X;
+				d.Vehicle.Position = pos;
+			}
 			Drivers.Add(d);
 		}
 
@@ -88,11 +111,11 @@ namespace OpenNFS1
 			foreach (var driver in Drivers)
 				driver.Update(Drivers);
 
-			_track.Update();
+			Track.Update();
 
 			/* so you cant reverse over the line  and get 0.1sec laps */
 			var node = Player.Vehicle.CurrentNode;
-			if (node.Number == _track.CheckpointNode && PlayerStats.HasPassedLapHalfwayPoint)
+			if (node.Number == Track.CheckpointNode && PlayerStats.HasPassedLapHalfwayPoint)
 			{
 				PlayerStats.OnLapStarted();
 			}
@@ -102,10 +125,21 @@ namespace OpenNFS1
 				PlayerStats.HasPassedLapHalfwayPoint = true;
 			}
 
+			var sortedDrivers = new List<IDriver>(Drivers);
+			sortedDrivers.Sort((a1, a2) =>
+				a2.Vehicle.TrackProgress.CompareTo(a1.Vehicle.TrackProgress)
+			);
+			PlayerStats.Position = sortedDrivers.FindIndex(a => a == Player);
+
 			if (SecondsTillStart <= 0 && !_started)
 			{
 				//VehicleController.ForceBrake = false;
-				Drivers.ForEach(a => a.Vehicle.Motor.Gearbox.CurrentGear = 1);
+				Drivers.ForEach(a => {
+					if (a.Vehicle is DrivableVehicle)
+					{
+						((DrivableVehicle)a.Vehicle).Motor.Gearbox.CurrentGear = 1;
+					}
+				});
 				_raceStartTime = DateTime.Now;
 				PlayerStats.OnLapStarted();
 				_started = true;
@@ -129,13 +163,14 @@ namespace OpenNFS1
 			Engine.Instance.Device.DepthStencilState = DepthStencilState.Default;
 			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
 
-			_track.Render(Engine.Instance.Camera.Position, Player.Vehicle.CurrentNode);
+			Track.Render(Engine.Instance.Camera.Position, Player.Vehicle.CurrentNode);
 
 			foreach (var driver in Drivers)
 			{
 				if (!renderPlayerVehicle && driver is PlayerDriver)
 					continue;
-				driver.Vehicle.RenderShadow();
+				if (driver.Vehicle is DrivableVehicle)
+					((DrivableVehicle)driver.Vehicle).RenderShadow();
 			}
 			foreach (var driver in Drivers)
 			{
@@ -143,8 +178,6 @@ namespace OpenNFS1
 					continue;
 				driver.Vehicle.Render();
 			}
-
-			if (_trafficController != null) _trafficController.Render();
 		}
 	}
 }
