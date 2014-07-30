@@ -14,6 +14,7 @@ namespace OpenNFS1.Views
             _car = car;
 			_camera = new SimpleCamera();
 			_camera.FieldOfView = GameConfig.FOV;
+			_camera.FarPlaneDistance = GameConfig.DrawDistance;
         }
 
         #region IView Members

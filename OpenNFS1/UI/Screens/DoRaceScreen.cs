@@ -31,7 +31,7 @@ namespace OpenNFS1
 			_car.AudioEnabled = true;
 
 			_race = new Race(_track.IsOpenRoad ? 1 : 3, _track, _playerDriver);
-			for (int i = 0; i < 0; i++)
+			for (int i = 0; i < 10; i++)
 			{
 				int j = Engine.Instance.Random.Next(VehicleDescription.Descriptions.Count);
 				_race.AddDriver(new RacingAIDriver(VehicleDescription.Descriptions[j]));
@@ -80,7 +80,7 @@ namespace OpenNFS1
 			
 			_playerUI.Update(gameTime);
 
-			if (_race.HasFinished)
+			if (_race.Finished)
 			{
 				_car.AudioEnabled = false;
 				Engine.Instance.Screen = new RaceFinishedScreen(_race, _track);

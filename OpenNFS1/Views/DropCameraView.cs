@@ -8,6 +8,7 @@ namespace OpenNFS1.Views
 {
 	class DropCameraView : BaseExternalView, IView
 	{
+		const int MaxCameraDistance = 15;
 		DrivableVehicle _car;
 		SimpleCamera _camera;
 		TrackNode _cameraNode;
@@ -17,6 +18,7 @@ namespace OpenNFS1.Views
 			_car = car;
 			_camera = new SimpleCamera();
 			_camera.FieldOfView = GameConfig.FOV;
+			_camera.FarPlaneDistance = GameConfig.DrawDistance;
 			PositionCameraAtNode(car.Track.RoadNodes[10]);
 		}
 
@@ -40,9 +42,9 @@ namespace OpenNFS1.Views
 
 		public void Update(GameTime gameTime)
 		{
-			if (Math.Abs(_car.CurrentNode.Number - _cameraNode.Number) > 20)
+			if (Math.Abs(_car.CurrentNode.Number - _cameraNode.Number) > MaxCameraDistance)
 			{
-				int nextNode = (_car.CurrentNode.Number + 20) % _car.Track.RoadNodes.Count;
+				int nextNode = (_car.CurrentNode.Number + MaxCameraDistance) % _car.Track.RoadNodes.Count;
 				PositionCameraAtNode(_car.Track.RoadNodes[nextNode]);
 			}
 			_camera.LookAt = _car.Position;

@@ -86,7 +86,6 @@ namespace OpenNFS1.Physics
             _maxPower = maxPower;
 			_redlineRpm = redline;
 			_gearbox = gearbox;
-			_gearbox.CurrentGear = 1;
             _gearbox.Motor = this;
 		}
 
@@ -136,6 +135,7 @@ namespace OpenNFS1.Physics
             if (_rpm >= _redlineRpm)
             {
                 _rpmLimiter = 0.2f;
+				_rpm = _redlineRpm;
             }
 
             _gearbox.Update(_rpm / _redlineRpm, action);

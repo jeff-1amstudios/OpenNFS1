@@ -24,7 +24,7 @@ namespace OpenNFS1
 			}
 		}
 
-		public static void Render(Vector3[] points, Matrix world)
+		public static void Render(Vector3[] points, bool ignoreDepthBuffer)
 		{
 			for (int i = 0; i < 4; i++)
 			{
@@ -33,11 +33,11 @@ namespace OpenNFS1
 
 			GraphicsDevice device = Engine.Instance.Device;
 
-			_effect.World = world;
+			_effect.World = Matrix.Identity;
 			_effect.View = Engine.Instance.Camera.View;
 			_effect.Projection = Engine.Instance.Camera.Projection;
 
-			device.DepthStencilState = DepthStencilState.None;
+			device.DepthStencilState = ignoreDepthBuffer ? DepthStencilState.None : DepthStencilState.Default;
 			device.BlendState = BlendState.AlphaBlend;
 			device.RasterizerState = RasterizerState.CullCounterClockwise;
 
@@ -49,11 +49,6 @@ namespace OpenNFS1
 			device.BlendState = BlendState.Opaque;
 			device.DepthStencilState = DepthStencilState.Default;
 			device.RasterizerState = RasterizerState.CullNone;
-		}
-
-		public static void Render(Vector3[] points)
-		{
-			Render(points, Matrix.Identity);
 		}
 	}
 }

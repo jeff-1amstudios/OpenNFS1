@@ -53,7 +53,7 @@ namespace OpenNFS1
 
 			if (GameConfig.FullScreen)
 			{
-				// move window to top-left
+				// hack to move window to top-left..
 				Type type = typeof(OpenTKGameWindow);
 				System.Reflection.FieldInfo field = type.GetField("window", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
 				OpenTK.GameWindow window = (OpenTK.GameWindow)field.GetValue(this.Window);
@@ -75,8 +75,7 @@ namespace OpenNFS1
 			Engine.Instance.Device.SetRenderTarget(_renderTarget);
 			Engine.Instance.ScreenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
 
-			string gameDataPath = "CD_Data";
-			if (!Directory.Exists(gameDataPath) || Directory.GetDirectories(gameDataPath).Length == 0)
+			if (!Directory.Exists(GameConfig.CdDataPath) || Directory.GetDirectories(GameConfig.CdDataPath).Length == 0)
 				Engine.Instance.Screen = new ChooseDataDownloadScreen();
 			else
 			{
@@ -111,7 +110,7 @@ namespace OpenNFS1
 		{
 			Engine.Instance.Device.SetRenderTarget(_renderTarget);
 
-			Color c = new Color(0.1f, 0.1f, 0.1f);
+			Color c = new Color(0.15f, 0.15f, 0.15f);
 			_graphics.GraphicsDevice.Clear(c);
 
 			base.Draw(gameTime);

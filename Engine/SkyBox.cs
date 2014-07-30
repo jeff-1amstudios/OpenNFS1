@@ -153,7 +153,7 @@ namespace NfsEngine
 			var ds = DepthStencilState.None;
 			
 			device.DepthStencilState = ds;
-			device.SamplerStates[0] = SamplerState.PointWrap;
+			device.SamplerStates[0] = SamplerState.LinearWrap;
 			device.RasterizerState = RasterizerState.CullCounterClockwise;
 			device.SetVertexBuffer(vertices);
 			device.Indices = indices;

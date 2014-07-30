@@ -56,16 +56,27 @@ namespace OpenNFS1.Vehicles
 					continue;
 				}
 
-				// end of track
-				if (driver.Vehicle.CurrentNode.Prev == null || driver.Vehicle.CurrentNode.Prev.Prev == null || driver.Vehicle.CurrentNode.Next == null || driver.Vehicle.CurrentNode.Next.Next == null)
+				// end of track, just stop
+				if (driver.Vehicle.CurrentNode.Next == null || driver.Vehicle.CurrentNode.Next.Next == null)
 				{
-					_race.Drivers.Remove(driver);
-					_traffic.Remove(driver);
-					continue;
+					driver.Vehicle.Speed = 0;
+				}
+
+				// start of track just stop
+				if (driver.Vehicle.CurrentNode.Prev == null || driver.Vehicle.CurrentNode.Prev.Prev == null)
+				{
+					driver.Vehicle.Speed = 0;
+					//_race.Drivers.Remove(driver);
+					//_traffic.Remove(driver);
+					//continue;
 				}
             }
 
-			while (_traffic.Count < 15)
+			// if player is close to the start or end of track, don't spawn new traffic
+			if (_race.Player.Vehicle.CurrentNode.Number < 20 || _race.Player.Vehicle.CurrentNode.Number > _race.Track.RoadNodes.Count - 20)
+				return;
+
+			while (_traffic.Count < 5)
 			{
 				int cfmIndex = Engine.Instance.Random.Next(_trafficModels.Length);
 
@@ -74,7 +85,7 @@ namespace OpenNFS1.Vehicles
 				var driver = new TrafficDriver(_trafficModels[cfmIndex], direction);
 				int distanceFromPlayer;
 				//if (direction == TrafficDriverDirection.Forward)
-					distanceFromPlayer = Engine.Instance.Random.Next(40, 140);
+					distanceFromPlayer = Engine.Instance.Random.Next(40, 200);
 				//else
 				//	distanceFromPlayer = Engine.Instance.Random.Next(-100, -30);
 				int nodeIndex = (_race.Player.Vehicle.CurrentNode.Number + distanceFromPlayer) % _race.Track.RoadNodes.Count - 1;

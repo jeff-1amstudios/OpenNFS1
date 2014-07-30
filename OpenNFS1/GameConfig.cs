@@ -9,6 +9,7 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using OpenNFS1.Vehicles;
 using OpenNFS1.Parsers.Track;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace OpenNFS1
 {
@@ -18,6 +19,8 @@ namespace OpenNFS1
 		public const float MeshScale = 0.040f;
 		public const float TerrainScale = 0.000080f;
 		public static readonly float FOV = MathHelper.ToRadians(65);
+		public const float MaxSegmentRenderCount = 50;
+		public static readonly SamplerState WrapSampler = SamplerState.LinearWrap;
 
 		// Set while navigating through menus
         public static VehicleDescription SelectedVehicle;

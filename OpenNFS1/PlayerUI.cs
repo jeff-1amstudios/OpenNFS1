@@ -27,7 +27,6 @@ namespace OpenNFS1
 			_views.Add(new DashboardView(_vehicle));
 			_views.Add(new BumperView(_vehicle));
 			_views.Add(new DropCameraView(_vehicle));
-			_views.Add(new TelevisionView(_vehicle));
 			_views[_currentView].Activate();
 		}
 

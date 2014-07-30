@@ -46,26 +46,16 @@ namespace OpenNFS1.UI.Screens
 		{
 			base.Draw();
 
-			WriteTitleLine("No game data found");
+			WriteLine("No game data found", Color.Red, 20, 30, TitleSize);
+			WriteLine("Download and use Need for Speed 1 CD data package (15mb)?", Color.White, 80, 30, TextSize);
+						
+			WriteLine("OK", _selectedIndex == 0, 40, 30, TextSize);
+			WriteLine("No thanks", _selectedIndex == 1, 0, 80, TextSize);
 
-			WriteLine("Download and use Need for Speed 1 CD data package (15mb)?");
-			WriteLine("");
-			string[] options = { "OK", "Cancel" };
-			float y = 250;
-			for (int i = 0; i < options.Length; i++)
-			{
-				Color c = Color.White;
-				if (_selectedIndex == i)
-					WriteLine("< " + options[i] + " >");
-				else
-					WriteLine("  " + options[i]);
-				y += 35;
-			}
-
-			WriteLine("The Need for Speed 1 CD data package contains files produced", Color.White, 350, 30, 0.5f);
-			WriteLine("by Pioneer Productions / EA Seattle in 1995.");
-			WriteLine("* 1amStudios and OpenNFS1 are not connected in any way", Color.White, 420, 30, 0.5f);
-			WriteLine("with Pioneer Productions or EA Seattle.");
+			WriteLine("The Need for Speed 1 CD data package contains files produced", Color.LightGray, 150, 30, TextSize);
+			WriteLine("by Pioneer Productions / EA Seattle in 1995.", Color.LightGray, 20, 30, TextSize);
+			WriteLine("* 1amStudios and OpenNFS1 are not connected in any way", Color.LightGray, 50, 30, TextSize);
+			WriteLine("with Pioneer Productions or EA Seattle.", Color.LightGray, 20, 30, TextSize);
 
 			Engine.Instance.SpriteBatch.End();
 		}

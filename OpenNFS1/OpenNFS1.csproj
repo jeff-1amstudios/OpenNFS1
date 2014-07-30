@@ -37,6 +37,7 @@
   <ItemGroup>
     <Compile Include="Audio\EnvironmentAudioProvider.cs" />
     <Compile Include="Audio\VehicleAudioProvider.cs" />
+    <Compile Include="Audio\BnkVehicleAudioProvider.cs" />
     <Compile Include="AverageValue.cs" />
     <Compile Include="Dashboards\Dashboard.cs" />
     <Compile Include="Dashboards\DashboardDescription.cs" />
@@ -51,7 +52,7 @@
     <Compile Include="Parsers\TrackfamFile.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="ObjectShadow.cs" />
-    <Compile Include="Parsers\Audio\BnkFileParser.cs" />
+    <Compile Include="Parsers\Audio\BnkFile.cs" />
     <Compile Include="Parsers\Audio\WavWriter.cs" />
     <Compile Include="Parsers\BaseChunk.cs" />
     <Compile Include="Parsers\BitmapChunk.cs" />
@@ -102,11 +103,10 @@
     <Compile Include="Vehicles\AI\IDriver.cs" />
     <Compile Include="Vehicles\PlayerDriver.cs" />
     <Compile Include="Vehicles\AI\TrafficDriver.cs" />
-    <Compile Include="Vehicles\CarModel.cs" />
+    <Compile Include="Vehicles\CarMesh.cs" />
     <Compile Include="Vehicles\CarModelCache.cs" />
     <Compile Include="Vehicles\Vehicle.cs" />
     <Compile Include="Vehicles\Traffic\TrafficController.cs" />
-    <Compile Include="Vehicles\Traffic\TrafficVehicle.cs" />
     <Compile Include="Vehicles\VehicleDescription.cs" />
     <Compile Include="Views\BaseExternalView.cs" />
     <Compile Include="Views\BumperView.cs" />
@@ -115,7 +115,6 @@
     <Compile Include="Views\DebugView.cs" />
     <Compile Include="Views\DropCameraView.cs" />
     <Compile Include="Views\IView.cs" />
-    <Compile Include="Views\TelevisionView.cs" />
     <Compile Include="Vehicles\WheelModel.cs" />
   </ItemGroup>
   <ItemGroup>

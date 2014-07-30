@@ -25,6 +25,8 @@ namespace OpenNFS1
             _car = car;
         }
 
+		public string BasePath { get { return GameConfig.CdDataPath + "/ConvertedAudio"; } }
+
 
         public void Initialize()
         {
@@ -36,30 +38,30 @@ namespace OpenNFS1
 			_isActive = true;
             
             SoundEffect temp;
-			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-on-low", _car.Descriptor.Name));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format(BasePath + "/Vehicles/{0}/engine-on-low", _car.Descriptor.Name));
             _engineOnLow = temp.CreateInstance();
 			//.Play(0.3f, 0, 0);
-			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-on-high", _car.Descriptor.Name));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format(BasePath + "/Vehicles/{0}/engine-on-high", _car.Descriptor.Name));
 			_engineOnHigh = temp.CreateInstance(); // temp.Play(0.3f, 0, 0);
-			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-off-low", _car.Descriptor.Name));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format(BasePath + "/Vehicles/{0}/engine-off-low", _car.Descriptor.Name));
 			_engineOffLow = temp.CreateInstance(); //temp.Play(0.3f, 0, 0);
-			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/engine-off-high", _car.Descriptor.Name));
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format(BasePath + "/Vehicles/{0}/engine-off-high", _car.Descriptor.Name));
 			_engineOffHigh = temp.CreateInstance(); //temp.Play(0.3f, 0, 0);
 
-            temp = Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Vehicles/common/grass_slide");
+			temp = Engine.Instance.ContentManager.Load<SoundEffect>(BasePath + "/Vehicles/common/grass_slide");
 			_offRoadInstance = temp.CreateInstance(); //temp.Play(0.3f, 0, 0, true);
             _offRoadInstance.Pause();
-            
-            _skids.Add(Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Vehicles/common/skid1"));
-            _skids.Add(Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Vehicles/common/skid2"));
-            _skids.Add(Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Vehicles/common/skid3"));
+
+			_skids.Add(Engine.Instance.ContentManager.Load<SoundEffect>(BasePath + "/Vehicles/common/skid1"));
+			_skids.Add(Engine.Instance.ContentManager.Load<SoundEffect>(BasePath + "/Vehicles/common/skid2"));
+			_skids.Add(Engine.Instance.ContentManager.Load<SoundEffect>(BasePath + "/Vehicles/common/skid3"));
 
             _engineOnLow.Pause();
             _engineOnHigh.Pause();
             _engineOffLow.Pause();
             _engineOffHigh.Pause();
 
-            _gearChange = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format("Content/Audio/Vehicles/{0}/gear-change", _car.Descriptor.Name));
+			_gearChange = Engine.Instance.ContentManager.Load<SoundEffect>(String.Format(BasePath + "/Vehicles/{0}/gear-change", _car.Descriptor.Name));
 
         }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using System.Text;
 using NfsEngine;
 using Microsoft.Xna.Framework;
@@ -40,11 +40,11 @@ namespace OpenNFS1.UI
             int secondsTillStart = _race.SecondsTillStart;
             if (secondsTillStart > 0)
             {
-                Engine.Instance.SpriteBatch.DrawString(_font, _race.SecondsTillStart.ToString(), new Vector2(375, 50), Color.Yellow, 0, Vector2.Zero, 2f, SpriteEffects.None, 0);
+                Engine.Instance.SpriteBatch.DrawString(_font, _race.SecondsTillStart.ToString(), new Vector2(300, 50), Color.Yellow, 0, Vector2.Zero, 1.5f, SpriteEffects.None, 0);
             }
             else if (secondsTillStart == 0)
             {
-                Engine.Instance.SpriteBatch.DrawString(_font, "Go!", new Vector2(375, 50), Color.Yellow, 0, Vector2.Zero, 2f, SpriteEffects.None, 0);
+                Engine.Instance.SpriteBatch.DrawString(_font, "Go!", new Vector2(300, 50), Color.Yellow, 0, Vector2.Zero, 1.5f, SpriteEffects.None, 0);
             }
 			
             Engine.Instance.SpriteBatch.Draw(_backgroundTexture, _backgroundRectangle, Color.White);
@@ -65,7 +65,7 @@ namespace OpenNFS1.UI
                 Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(480, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
             }
 
-			msg = String.Format("P:{0}/{1}", _race.PlayerStats.Position + 1, _race.Drivers.Count);
+			msg = String.Format("P:{0}/{1}", _race.PlayerStats.Position + 1, _race.Drivers.Count(a => a is RacingAIDriver || a is PlayerDriver));
 			Engine.Instance.SpriteBatch.DrawString(_font, msg, new Vector2(550, 0), Color.GreenYellow, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
             Engine.Instance.SpriteBatch.End();
         }

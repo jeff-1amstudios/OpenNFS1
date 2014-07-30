@@ -72,13 +72,13 @@ namespace OpenNFS1.Parsers.Track
 			Engine.Instance.Device.SetVertexBuffer(TerrainVertexBuffer);
 			_effect.CurrentTechnique.Passes[0].Apply();
 			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
-			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
+			Engine.Instance.Device.SamplerStates[0] = GameConfig.WrapSampler;
 
 			var frustum = new BoundingFrustum(Engine.Instance.Camera.View * Engine.Instance.Camera.Projection);
-			
+
 			// draw segments from the player vehicle forwards. Stop when a segment is out of view
 			var segment = startSegment;
-			for (int i = 0; i < GameConfig.DrawDistance; i++)
+			for (int i = 0; i < GameConfig.MaxSegmentRenderCount; i++)
 			{
 				if (segment == null) break;
 				if (frustum.Intersects(segment.BoundingBox))
@@ -86,12 +86,16 @@ namespace OpenNFS1.Parsers.Track
 					RenderSegment(segment);
 					renderedSegments.Add(segment);
 				}
+				else
+				{
+					break;
+				}
 				segment = segment.Next;
 			}
 
 			// draw segments from the player vehicle backwards. Stop when a segment is out of view
 			segment = startSegment.Prev;
-			for (int i = 0; i < GameConfig.DrawDistance; i++)
+			for (int i = 0; i < GameConfig.MaxSegmentRenderCount; i++)
 			{
 				if (segment == null) break;
 				if (frustum.Intersects(segment.BoundingBox))
@@ -109,7 +113,7 @@ namespace OpenNFS1.Parsers.Track
 				Engine.Instance.Device.SetVertexBuffer(FenceVertexBuffer);
 				_effect.World = Matrix.Identity;
 				_effect.CurrentTechnique.Passes[0].Apply();
-				Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
+				Engine.Instance.Device.SamplerStates[0] = GameConfig.WrapSampler;
 				foreach (var renderedSegment in renderedSegments)
 				{
 					DrawFenceStrips(renderedSegment);
@@ -119,26 +123,26 @@ namespace OpenNFS1.Parsers.Track
 			if (GameConfig.DrawDebugInfo)
 			{
 				var node = currentNode;
-				for (int i = 0; i < GameConfig.DrawDistance; i++)
+				for (int i = 0; i < GameConfig.MaxSegmentRenderCount; i++)
 				{
-					Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-						Matrix.CreateTranslation(node.Position), Color.Yellow,
-						null);
+					Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(node.GetLeftBoundary()), Color.Red);
+					Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(node.GetRightBoundary()), Color.Red);
+					Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(node.GetLeftVerge()), Color.Blue);
+					Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(node.GetRightVerge()), Color.Blue);
+					Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(node.Position), Color.Yellow);
 
-					Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-						Matrix.CreateTranslation(node.GetLeftBoundary()), Color.Yellow,
-						null);
-
-					Engine.Instance.GraphicsUtils.AddSolidShape(ShapeType.Cube,
-						Matrix.CreateTranslation(node.GetRightBoundary()), Color.Yellow,
-						null);
-
-					Engine.Instance.GraphicsUtils.AddLine(node.GetLeftBoundary(), node.GetRightBoundary(), Color.Yellow);
+					if (node.Number % TriFile.NbrRowsPerSegment == 0)
+					{
+						Engine.Instance.GraphicsUtils.AddLine(node.GetLeftBoundary(), node.GetRightBoundary(), Color.White);
+					}
 
 					node = node.Next;
 					if (node == null) break;
 				}
-			}			
+
+				GameConsole.WriteLine(String.Format("Position node: {0}, segment: {1}", currentNode.Number, (int)(currentNode.Number / TriFile.NbrRowsPerSegment)));
+				GameConsole.WriteLine(String.Format("Node property: {0}, flags: {1}, {2}, {3}", currentNode.NodeProperty, currentNode.Flag1, currentNode.Flag2, currentNode.Flag3));
+			}
 		}
 
 		private void RenderSegment(TerrainSegment segment)

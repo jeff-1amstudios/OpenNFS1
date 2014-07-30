@@ -30,13 +30,15 @@ namespace OpenNFS1.Parsers
 
 			BitmapEntry found = _root.HeaderChunks[TERRAIN_CHUNK].BitmapChunks[groupId].Bitmaps.Find(a => a.Id == id);
 
-			if (found != null)
+			if (found == null)
 			{
 				Debug.WriteLine("Warning: Ground texture not found: " + textureNbr);
-				return found.Texture;
+				return null;
 			}
 			else
-				return null;
+			{
+				return found.Texture;
+			}
         }
 
         public override Texture2D GetSceneryTexture(int textureNbr)

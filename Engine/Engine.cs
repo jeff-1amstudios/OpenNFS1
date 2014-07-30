@@ -77,14 +77,14 @@ namespace NfsEngine
 
         public override void Update(GameTime gameTime)
         {
-			FrameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
+			
             base.Update(gameTime);
+
+			FrameTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+			GameConsole.Clear();
             
             _inputProvider.Update(gameTime);
             SoundEngine2.Instance.Update(gameTime);
-            //SoundEngine.Instance.Update();
-
             Screen.Update(gameTime);
 
             ScreenEffects.Instance.Update(gameTime);

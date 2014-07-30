@@ -18,6 +18,7 @@ namespace OpenNFS1.Views
             _car = car;
             _camera = new FixedChaseCamera();
 			_camera.FieldOfView = GameConfig.FOV;
+			_camera.FarPlaneDistance = GameConfig.DrawDistance;
             _camera.ChaseDistance = distance;
             _camera.ChaseHeight = height;
             _camera.ChaseOffset = offset;

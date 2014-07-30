@@ -86,6 +86,7 @@ namespace OpenNFS1.Physics
             
             _ratios = ratios;
             _changeTime = changeTime;
+			_currentGear = GEAR_NEUTRAL;
         }
 
         public void GearUp()

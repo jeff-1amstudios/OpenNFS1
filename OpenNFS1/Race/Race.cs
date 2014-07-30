@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using System.Text;
 using OpenNFS1.Physics;
 using NfsEngine;
@@ -19,7 +19,8 @@ namespace OpenNFS1
 	{
 		int _nbrLaps;
 		DateTime _countdownStartTime, _raceStartTime;
-		bool _started, _finished;
+		bool _started;
+		public bool Finished { get; private set; }
 		public PlayerDriver Player { get; private set; }
 		TrafficController _trafficController;
 		public List<IDriver> Drivers { get; private set; }
@@ -53,7 +54,7 @@ namespace OpenNFS1
 
 		public int SecondsTillStart
 		{
-			get { return 3 - (int)new TimeSpan(DateTime.Now.Ticks - _countdownStartTime.Ticks).TotalSeconds; }
+			get { return 30 - (int)new TimeSpan(DateTime.Now.Ticks - _countdownStartTime.Ticks).TotalSeconds; }
 		}
 
 
@@ -61,21 +62,6 @@ namespace OpenNFS1
 		{
 			VehicleController.ForceBrake = false;
 			_countdownStartTime = DateTime.Now;
-			Drivers.ForEach(a =>
-			{
-				if (a is AIDriver)
-				{
-					((DrivableVehicle)a.Vehicle).Motor.Gearbox.CurrentGear = 0;
-				}
-			});
-		}
-
-		public bool HasFinished
-		{
-			get
-			{
-				return _finished;
-			}
 		}
 
 		public void AddDriver(IDriver d)
@@ -90,14 +76,11 @@ namespace OpenNFS1
 			if (d is TrafficDriver)
 			{
 			}
-			else if (d is PlayerDriver)
-			{
-
-			}
-			else
+			else if (d is RacingAIDriver)
 			{
 				// place on starting grid
-				((AIDriver)d).VirtualLane = (Drivers.Count % 2 == 0 ? 3 : 0);
+				int lane = (Drivers.Count % 2 == 0 ? AIDriver.MaxVirtualLanes - 1 : 0);
+				((AIDriver)d).VirtualLane = lane;
 				Vector3 pos = d.Vehicle.CurrentNode.GetLeftVerge();
 				pos.Z -= Drivers.Count * 30;
 				pos.X = ((AIDriver)d).GetNextTarget().X;
@@ -125,21 +108,16 @@ namespace OpenNFS1
 				PlayerStats.HasPassedLapHalfwayPoint = true;
 			}
 
-			var sortedDrivers = new List<IDriver>(Drivers);
-			sortedDrivers.Sort((a1, a2) =>
-				a2.Vehicle.TrackProgress.CompareTo(a1.Vehicle.TrackProgress)
-			);
-			PlayerStats.Position = sortedDrivers.FindIndex(a => a == Player);
+			var racingDrivers = new List<IDriver>(Drivers.Where(a => a is RacingAIDriver || a is PlayerDriver));
+			racingDrivers.Sort((a1, a2) => a2.Vehicle.TrackPosition.CompareTo(a1.Vehicle.TrackPosition));
+			PlayerStats.Position = racingDrivers.FindIndex(a => a == Player);
 
 			if (SecondsTillStart <= 0 && !_started)
 			{
-				//VehicleController.ForceBrake = false;
-				Drivers.ForEach(a => {
-					if (a.Vehicle is DrivableVehicle)
-					{
-						((DrivableVehicle)a.Vehicle).Motor.Gearbox.CurrentGear = 1;
-					}
-				});
+				foreach (var d in racingDrivers)
+				{
+					((DrivableVehicle)d.Vehicle).Motor.Gearbox.CurrentGear = 1;
+				}
 				_raceStartTime = DateTime.Now;
 				PlayerStats.OnLapStarted();
 				_started = true;
@@ -147,12 +125,12 @@ namespace OpenNFS1
 
 			if (PlayerStats.CurrentLap > _nbrLaps)
 			{
-				if (Player.Vehicle.Speed > 1)
+				if (Player.Vehicle.Speed > 0)
 				{
 					VehicleController.ForceBrake = true;
 				}
 				else
-					_finished = true;
+					Finished = true;
 			}
 			if (_trafficController != null) _trafficController.Update();
 		}
@@ -161,21 +139,24 @@ namespace OpenNFS1
 		{
 			Engine.Instance.Device.BlendState = BlendState.Opaque;
 			Engine.Instance.Device.DepthStencilState = DepthStencilState.Default;
-			Engine.Instance.Device.SamplerStates[0] = SamplerState.PointWrap;
+			Engine.Instance.Device.SamplerStates[0] = GameConfig.WrapSampler;
 
 			Track.Render(Engine.Instance.Camera.Position, Player.Vehicle.CurrentNode);
 
+			var frustum = new BoundingFrustum(Engine.Instance.Camera.View * Engine.Instance.Camera.Projection);
+			
 			foreach (var driver in Drivers)
 			{
-				if (!renderPlayerVehicle && driver is PlayerDriver)
+				bool isPlayer = driver == Player;
+				if (isPlayer && !renderPlayerVehicle)
+					continue;
+
+				if (!frustum.Intersects(driver.Vehicle.BoundingSphere))
 					continue;
 				if (driver.Vehicle is DrivableVehicle)
-					((DrivableVehicle)driver.Vehicle).RenderShadow();
-			}
-			foreach (var driver in Drivers)
-			{
-				if (!renderPlayerVehicle && driver is PlayerDriver)
-					continue;
+				{
+					((DrivableVehicle)driver.Vehicle).RenderShadow(isPlayer);
+				}
 				driver.Vehicle.Render();
 			}
 		}

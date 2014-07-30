@@ -31,15 +31,15 @@ namespace OpenNFS1
 
             settings.MaxParticles = 800;
             
-            settings.Duration = TimeSpan.FromSeconds(0.5f);
+            settings.Duration = TimeSpan.FromSeconds(0.7f);
 			settings.DurationRandomness = 1f;
 
             settings.MinHorizontalVelocity = 0;
             settings.MaxHorizontalVelocity = 5;
 
-			settings.EmitterVelocitySensitivity = 0.5f;
+			settings.EmitterVelocitySensitivity = 0.6f;
 
-            settings.MinVerticalVelocity = 1;
+            settings.MinVerticalVelocity = 3;
             settings.MaxVerticalVelocity = 7;
 
             settings.Gravity = new Vector3(0, -2, 0);
@@ -49,7 +49,7 @@ namespace OpenNFS1
             //settings.MinRotateSpeed = -1;
             //settings.MaxRotateSpeed = 1;
 
-			settings.MinStartSize = 1;
+			settings.MinStartSize = 4;
 			settings.MaxStartSize = 4;
 
 			settings.MinEndSize = 10;

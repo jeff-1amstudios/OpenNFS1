@@ -27,7 +27,7 @@ namespace OpenNFS1.Physics
 		public VehicleDescription Descriptor { get; private set; }
 
 		public float BrakePower = 70;
-		public float HandbrakePower = 10;
+		public float HandbrakePower = 40;
 
 		public Motor Motor { get; private set; }
 		public Vector3 RenderDirection;
@@ -47,6 +47,7 @@ namespace OpenNFS1.Physics
 		// inputs
 		public float ThrottlePedalInput, BrakePedalInput;
 		public bool GearUpInput, GearDownInput, HandbrakeInput;
+		public bool AutoDrift;  //used for ai racers
 
 		public DrivableVehicle(VehicleDescription desc)
 			: base(desc.ModelFile)
@@ -95,8 +96,14 @@ namespace OpenNFS1.Physics
 				Wheels[i].Rotation -= Speed * Engine.Instance.FrameTime;
 
 			//back wheels
-			for (int i = 2; i < 4; i++)
-				Wheels[i].Rotation -= Engine.Instance.FrameTime * (Motor.WheelsSpinning ? 50 : Speed);
+			if (!HandbrakeInput)
+			{
+				for (int i = 2; i < 4; i++)
+				{
+					Wheels[i].Rotation -= Engine.Instance.FrameTime * (Motor.WheelsSpinning ? 50 : Speed);
+				}
+			}
+				
 
 			Wheels[0].Steer(_steeringWheel);
 			Wheels[1].Steer(_steeringWheel);
@@ -112,7 +119,7 @@ namespace OpenNFS1.Physics
 			else if (_isOnGround && Math.Abs(_rearSlipFactor) > 0)
 			{
 				Wheels[2].IsSkidding = Wheels[3].IsSkidding = true;
-				//_audioProvider.PlaySkid(true);
+				_audioProvider.PlaySkid(true);
 			}
 			else if (_isOnGround && Math.Abs(_steeringWheel) > 0.25f && _frontSlipFactor > 0.43f)
 			{
@@ -276,20 +283,10 @@ namespace OpenNFS1.Physics
 			else
 			{
 				_frontSlipFactor = 0;
-				//If we are stopped or moving very slowly, limit rotation!
-				if (Math.Abs(Speed) < 1)
-					_rotationChange = 0;
-				else if (Math.Abs(Speed) < 20.0f && _rotationChange != 0)
+				if (_rotationChange != 0)
 				{
-					_rotationChange *= (0.2f * Math.Abs(Speed));
-				}
-				else
-				{
-					if (_rotationChange != 0)
-					{
-						_frontSlipFactor = Math.Min(0.91f, Descriptor.Mass * Math.Abs(Speed) * FrontSlipMultiplier);
-						_rotationChange *= 1 - _frontSlipFactor;
-					}
+					_frontSlipFactor = Math.Min(0.91f, Descriptor.Mass * Math.Abs(Speed) * FrontSlipMultiplier);
+					_rotationChange *= 1 - _frontSlipFactor;
 				}
 			}
 		}
@@ -299,32 +296,30 @@ namespace OpenNFS1.Physics
 		{
 			if (_isOnGround)
 			{
-				if (HandbrakeInput || (SteeringInput != 0 && _rearSlipFactor != 0))
+				if (((AutoDrift && Speed > 100) || HandbrakeInput || (SteeringInput != 0 && _rearSlipFactor != 0)) && Speed > 10)
 				{
 					if (SteeringInput < 0)
 					{
-						//if (_rearSlipFactor < 0) _rearSlipFactor *= 0.7f;
+						float prevSlipFactor = _rearSlipFactor;
 						_rearSlipFactor = Math.Min(RearSlipFactorMax, _rearSlipFactor + RearSlipFactorSpeed * Engine.Instance.FrameTime);
+						if (prevSlipFactor < 0 && _rearSlipFactor > 0) _rearSlipFactor = 0;
 					}
 					else if (SteeringInput > 0)
 					{
-						//if (_rearSlipFactor > 0) _rearSlipFactor *= 0.7f;
+						float prevSlipFactor = _rearSlipFactor;
 						_rearSlipFactor = Math.Max(-RearSlipFactorMax, _rearSlipFactor - RearSlipFactorSpeed * Engine.Instance.FrameTime);
+						if (prevSlipFactor > 0 && _rearSlipFactor < 0) _rearSlipFactor = 0;
 					}
 				}
-				if (SteeringInput == 0)
+				if (SteeringInput == 0 || Speed < 10)
 				{
 					if (Math.Abs(_rearSlipFactor) > 0.03f)
 						_rearSlipFactor += 0.7f * (_rearSlipFactor > 0 ? -RearSlipFactorSpeed : RearSlipFactorSpeed) * Engine.Instance.FrameTime;
 					else
 						_rearSlipFactor = 0;
 				}
-
-				//if (Math.Abs(SteeringInput) > 0) _rearSlipSpeed += Engine.Instance.FrameTime * 2.0f;
-				//else _rearSlipSpeed = 0;
-
-				//GameConsole.WriteLine("RS: " + _rearSlipSpeed, 9);
 			}
+
 			RenderDirection = Vector3.TransformNormal(Direction, Matrix.CreateFromAxisAngle(Up, _rearSlipFactor));
 		}
 
@@ -344,11 +339,11 @@ namespace OpenNFS1.Physics
 			VehicleFenceCollision.Handle(this);
 		}
 
-		public void RenderShadow()
+		public void RenderShadow(bool isPlayer)
 		{
 			// Shadow
 			Vector3[] points = new Vector3[4];
-			float y = -Wheels[0].Size / 2;
+			float y = -Wheels[0].Size / 2 + 0.4f;
 			float xoffset = 0.1f;
 			points[0] = Wheels[0].GetOffsetPosition(new Vector3(-xoffset, y, -2));
 			points[1] = Wheels[1].GetOffsetPosition(new Vector3(xoffset, y, -2));
@@ -362,12 +357,16 @@ namespace OpenNFS1.Physics
 				points[2].Y = _currentHeightOfTrack;
 				points[3].Y = _currentHeightOfTrack;
 			}
-			ObjectShadow.Render(points);
+			ObjectShadow.Render(points, isPlayer);
 		}
 
 		public override void Render()
 		{
-			base.Render();
+			_effect.View = Engine.Instance.Camera.View;
+			_effect.Projection = Engine.Instance.Camera.Projection;
+			_effect.World = GetRenderMatrix();
+			_effect.CurrentTechnique.Passes[0].Apply();
+			_model.Render(_effect, BrakePedalInput > 0);
 			
 			WheelModel.BeginBatch();
 			foreach (VehicleWheel wheel in Wheels)

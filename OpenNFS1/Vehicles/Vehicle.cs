@@ -28,11 +28,11 @@ namespace OpenNFS1.Vehicles
 		public Vector3 Up { get; set; }
 		public float Speed { get; set; }
 		public TrackNode CurrentNode { get; private set; }
-		public float TrackProgress { get; set; }
+		public float TrackPosition { get; set; }
 		
 
 		protected CarMesh _model;
-		private AlphaTestEffect _effect;
+		protected AlphaTestEffect _effect;
 		public float _steeringWheel;
 
 		// inputs
@@ -50,6 +50,14 @@ namespace OpenNFS1.Vehicles
 		public Vector3 Right
 		{
 			get { return Vector3.Cross(Direction, Up); }
+		}
+
+		public BoundingSphere BoundingSphere
+		{
+			get
+			{
+				return new BoundingSphere(Position, _model.BoundingBox.Max.Z - _model.BoundingBox.Min.Z);
+			}
 		}
 
 		public Vehicle(string cfmFile)
@@ -78,6 +86,7 @@ namespace OpenNFS1.Vehicles
 			TrackNode node = null, nextNode = null;
 
 			if (CurrentNode.Next == null) return;
+			if (CurrentNode.Prev == null) return;
 
 			if (Distance2d(Position, CurrentNode.Next.Position) < Distance2d(Position, CurrentNode.Prev.Position))
 			{
@@ -118,7 +127,7 @@ namespace OpenNFS1.Vehicles
 			var dist = Distance2d(closestPoint1, closestPoint2);
 			var carDist = Distance2d(closestPoint1, Position);
 			float ratio = Math.Min(carDist / dist, 1.0f);
-			TrackProgress = CurrentNode.Number + ratio;
+			TrackPosition = CurrentNode.Number + ratio;
 
 			// if the road is sloping downwards and we have enough speed, unstick from ground
 			if (node.Slope - nextNode.Slope > 50 && Speed > 100 && _isOnGround)
@@ -132,6 +141,7 @@ namespace OpenNFS1.Vehicles
 				Up = Vector3.Lerp(node.Up, nextNode.Up, ratio);
 				Up = Vector3.Normalize(Up);
 				Direction = Vector3.Cross(Up, Right);
+				Direction.Normalize();
 			}
 
 			_currentHeightOfTrack = MathHelper.Lerp(closestPoint1.Y, closestPoint2.Y, ratio);
@@ -172,10 +182,15 @@ namespace OpenNFS1.Vehicles
 				else
 					_steeringWheel = 0;
 			}
-			GameConsole.WriteLine("steering: " + _steeringWheel, 11);
-			_rotationChange = _steeringWheel * 0.05f;
-			if (Speed > 0)
-				_rotationChange *= -1;
+			if (_isOnGround)
+			{
+				_rotationChange = _steeringWheel * 0.05f;
+				if (Math.Abs(Speed) < 2)
+					_rotationChange = 0;
+				
+				if (Speed > 0)
+					_rotationChange *= -1;
+			}
 
 			HandleExtraSteeringPhysics();
 		}
@@ -241,7 +256,7 @@ namespace OpenNFS1.Vehicles
 			Engine.Instance.Device.RasterizerState = RasterizerState.CullNone;
 			Engine.Instance.Device.BlendState = BlendState.Opaque;
 			_effect.CurrentTechnique.Passes[0].Apply();
-			_model.Render(_effect, false);
+			_model.Render(_effect);
 		}
 
 

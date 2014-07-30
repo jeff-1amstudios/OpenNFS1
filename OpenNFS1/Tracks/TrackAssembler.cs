@@ -201,7 +201,7 @@ namespace OpenNFS1.Loaders
 			if (terrainPointIndex == TriFile.NbrTerrainPointsPerSide - 1)
 			{
 				var node = _tri.Nodes[segment.Number * TriFile.NbrRowsPerSegment];
-				if (node.b[3] == 7)
+				if (node.NodeProperty == TrackNodeProperty.RIGHT_TUNNEL_A2_A9)
 				{
 					index1 = 2;
 					index2 = 10;
@@ -219,13 +219,13 @@ namespace OpenNFS1.Loaders
 			if (terrainPointIndex == TriFile.NbrTerrainPointsPerSide - 1)
 			{
 				var node = _tri.Nodes[segment.Number * TriFile.NbrRowsPerSegment];
-				if (node.b[3] == 12)
+				if (node.NodeProperty == TrackNodeProperty.LEFT_TUNNEL_A9_A4)
 				{
 					index1 = 9;
 					index2 = 4;
 					return;
 				}
-				else if (node.b[3] == 13)
+				if (node.NodeProperty == TrackNodeProperty.LEFT_TUNNEL_A9_A5)
 				{
 					index1 = 9;
 					index2 = 5;

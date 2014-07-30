@@ -20,6 +20,7 @@ namespace OpenNFS1
             _car = car;
             _camera = new SimpleCamera();
 			_camera.FieldOfView = GameConfig.FOV;
+			_camera.FarPlaneDistance = GameConfig.DrawDistance;
 
 			var dashfile = Path.GetFileNameWithoutExtension(car.Descriptor.ModelFile) + "dh.fsh";
 			var dashDescription = DashboardDescription.Descriptions.Find(a => a.Filename == dashfile);
@@ -38,7 +39,7 @@ namespace OpenNFS1
         public void Update(GameTime gameTime)
         {
             _camera.Position = _car.Position + new Vector3(0, 5, 0);
-			_camera.LookAt = _camera.Position + _car.Direction * 60f + new Vector3(0, _car.BodyPitch.Position, 0);
+			_camera.LookAt = _camera.Position + _car.RenderDirection * 60f + new Vector3(0, _car.BodyPitch.Position, 0);
 			_camera.UpVector = _car.Up; // +new Vector3(_car.Roll.Position * 0.2f, 0, 0);
 
             _dashboard.Update(gameTime);

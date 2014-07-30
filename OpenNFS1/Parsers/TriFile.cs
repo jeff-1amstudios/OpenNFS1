@@ -107,7 +107,10 @@ namespace OpenNFS1.Parsers
 				node.DistanceToRightBarrier = reader.ReadByte();
 				node.DistanceToRightBarrier *= GameConfig.TerrainScale * vergeScale;
 
-				node.b = reader.ReadBytes(4);
+				node.Flag1 = reader.ReadByte();
+				node.Flag2 = reader.ReadByte();
+				node.Flag3 = reader.ReadByte();
+				node.NodeProperty = reader.ReadByte();
 
 				// unused trackNodes are filled with zeroes, so stop when we have a node with a zero position
 				if (node.DistanceToLeftVerge == 0 && node.DistanceToRightVerge == 0
@@ -117,11 +120,6 @@ namespace OpenNFS1.Parsers
 				}
 				
 				//Debug.WriteLine("{0},{1},{2},{3}", node.b[0], node.b[1], node.b[2], node.b[3]);
-
-				if (node.b[2] != 0 && node.b[2] != 34 && node.b[2] != 2)
-				{
-
-				}
 
 				node.Position = new Vector3(reader.ReadInt32(), reader.ReadInt32(), -reader.ReadInt32()) * GameConfig.TerrainScale;
 

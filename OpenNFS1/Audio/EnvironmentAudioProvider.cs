@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using System.Text;
 using Microsoft.Xna.Framework.Audio;
 using NfsEngine;
@@ -25,13 +24,15 @@ namespace OpenNFS1.Audio
 
         List<SoundEffect> _collisions;
         SoundEffectInstance _collisionInstance;
+
+		public string BasePath { get { return GameConfig.CdDataPath + "/ConvertedAudio"; } }
         
         private EnvironmentAudioProvider()
         {
             _collisions = new List<SoundEffect>();
-            _collisions.Add(Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Environment/collision1"));
-            _collisions.Add(Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Environment/collision2"));
-            _collisions.Add(Engine.Instance.ContentManager.Load<SoundEffect>("Content/Audio/Environment/collision3"));
+            _collisions.Add(Engine.Instance.ContentManager.Load<SoundEffect>(BasePath + "/Environment/collision1"));
+			_collisions.Add(Engine.Instance.ContentManager.Load<SoundEffect>(BasePath + "/Environment/collision2"));
+			_collisions.Add(Engine.Instance.ContentManager.Load<SoundEffect>(BasePath + "/Environment/collision3"));
         }
 
         public void PlayVehicleFenceCollision()

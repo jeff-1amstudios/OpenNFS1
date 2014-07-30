@@ -170,20 +170,17 @@ namespace NfsEngine
 
         #region Utilities (Line/Text/Object drawing)
 
-        public void AddSolidShape(ShapeType type, Matrix worldTransform, Color color, Texture2D texture)
+        public void AddCube(Matrix worldTransform, Color color)
         {
             if (sShapeList.Count >= MAX_SHAPES)
             {
                 return;
             }
-            if (sShapeList.Count > 4)
-            {
-            }
             ShapeData shapeData = new ShapeData();
-            shapeData.mType = type;
+            shapeData.mType = ShapeType.Cube;
             shapeData.mWorldMatrix = worldTransform;
             shapeData.mColor = color;
-            shapeData.mTexture = texture;
+            shapeData.mTexture = null;
             sShapeList.Add(shapeData);
         }
 

@@ -17,25 +17,26 @@ namespace OpenNFS1.Vehicles.AI
 		public int VirtualLane { get; set; }
 		public Vehicle Vehicle { get; protected set; }
 
-		protected const int MaxVirtualLanes = 4;
+		public const int MaxVirtualLanes = 4;
 
 		public virtual Vector3 GetNextTarget()
 		{
-			return Vector3.Lerp(Vehicle.CurrentNode.Next.Next.GetLeftVerge2(), Vehicle.CurrentNode.Next.Next.GetRightVerge2(), VirtualLane * (1f / MaxVirtualLanes));
+			return Vector3.Lerp(Vehicle.CurrentNode.Next.Next.GetLeftVerge2(), Vehicle.CurrentNode.Next.Next.GetRightVerge2(), (float)VirtualLane / (MaxVirtualLanes));
 		}
 				
-		protected void FollowTrack()
+		protected virtual void FollowTrack()
 		{
+			Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(GetNextTarget()), Color.Yellow);
 			float angle = Utility.GetSignedAngleBetweenVectors(Vehicle.Direction, GetNextTarget() - Vehicle.Position, true);
 			if (angle < -0.1f)
 			{
 				Vehicle.SteeringInput = 0.5f;
-				GameConsole.WriteLine("turning right", 5);
+				//GameConsole.WriteLine("turning right", 5);
 			}
 			else if (angle > 0.1f)
 			{
 				Vehicle.SteeringInput = -0.5f;
-				GameConsole.WriteLine("turning left", 5);
+				//GameConsole.WriteLine("turning left", 5);
 			}
 			else
 			{
@@ -56,6 +57,7 @@ namespace OpenNFS1.Vehicles.AI
 		{
 			_vehicle = new DrivableVehicle(vehicleDescriptor);
 			_vehicle.SteeringSpeed = 7;
+			_vehicle.AutoDrift = false;
 			Vehicle = _vehicle;
 			_firstLaneChangeAllowed = Engine.Instance.Random.Next(5, 40);
 		}
@@ -77,23 +79,33 @@ namespace OpenNFS1.Vehicles.AI
 
 			FollowTrack();
 			
-			foreach (var driver in otherDrivers)
+			foreach (var otherDriver in otherDrivers)
 			{
-				if (driver == this) continue;
-				if (!(driver is AIDriver)) continue;
+				if (otherDriver == this) continue;
+				//if (!(otherDriver is AIDriver)) continue;
 				// if I am not in the same lane, ignore
-				if (driver is AIDriver && ((AIDriver)driver).VirtualLane != VirtualLane) continue;
+				if (otherDriver is AIDriver && ((AIDriver)otherDriver).VirtualLane != VirtualLane) continue;
+				if (otherDriver is TrafficDriver && ((TrafficDriver)otherDriver).VirtualLane != VirtualLane) continue;
+				if (otherDriver is PlayerDriver) continue;  //ignore player for now
+				
 				// if I am going slower than the other driver, ignore
-				if (Vehicle.Speed < driver.Vehicle.Speed) continue;
+				if (Vehicle.Speed < otherDriver.Vehicle.Speed) continue;
 
-				var progressDist = driver.Vehicle.TrackProgress - _vehicle.TrackProgress;
+				var progressDist = otherDriver.Vehicle.TrackPosition - _vehicle.TrackPosition;
 				// if we are only slightly behind another driver (less than 2 nodes back) then consider them a possible danger
 				if (progressDist > 0 && progressDist < 2f)
 				{
-					// pick a new lane
+					// pick a new lane if we're far enough from the start of the race.
 					if (Vehicle.CurrentNode.Number > _firstLaneChangeAllowed)
 					{
-						VirtualLane = Engine.Instance.Random.Next(Math.Max(0, VirtualLane - 1), Math.Min(MaxVirtualLanes - 1, VirtualLane + 1) + 1);
+						if (Engine.Instance.Random.Next() % 2 == 0)
+							VirtualLane = Math.Max(0, VirtualLane - 1);
+						else
+							VirtualLane = Math.Min(MaxVirtualLanes, VirtualLane + 1);
+					}
+					else
+					{
+						Vehicle.Speed = Math.Max(0, otherDriver.Vehicle.Speed * 0.8f);
 					}
 				}
 			}

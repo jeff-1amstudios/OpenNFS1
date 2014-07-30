@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NfsEngine;
 using OpenNFS1.Parsers;
+using OpenNFS1.Parsers.Audio;
 using OpenNFS1.Vehicles;
 
 namespace OpenNFS1.UI.Screens
@@ -53,7 +55,8 @@ namespace OpenNFS1.UI.Screens
 		int _currentVehicle = 2;
 		int _currentTrack = 4;
 		int _selectedControl = RaceButtonSelected;
-
+		SoundEffect _engineOnEffect;
+		SoundEffectInstance _inst;
 
 		public HomeScreen()
 			: base()
@@ -83,6 +86,16 @@ namespace OpenNFS1.UI.Screens
 				_currentVehicle = _vehicles.FindIndex(a => a.Descriptor == GameConfig.SelectedVehicle);
 
 			if (_currentTrack == -1) _currentTrack = 0;
+			/*
+			
+			BnkFile bnk = new BnkFile("traffc_sw.bnk");
+			var sample = bnk.Samples[0];
+			_engineOnEffect = new SoundEffect(sample.PCMData, sample.SampleRate, sample.NbrChannels == 2 ? AudioChannels.Stereo : AudioChannels.Mono);
+			_inst = _engineOnEffect.CreateInstance();
+			_inst.IsLooped = true;
+			_inst.Pitch = 0.3f;
+			_inst.Play();
+			 */
 		}
 
 		public void Update(GameTime gameTime)
