@@ -1,7 +1,7 @@
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Dashboards;
 using OpenNFS1.Physics;
 using OpenNFS1.Vehicles;

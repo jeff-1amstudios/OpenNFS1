@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 #endregion
 
-namespace NfsEngine
+namespace GameEngine
 {
     /// <summary>
     /// Custom vertex structure for drawing point sprite particles.

@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Audio;
 
 namespace OpenNFS1.Physics

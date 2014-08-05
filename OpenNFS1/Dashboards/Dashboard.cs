@@ -6,7 +6,7 @@ using System.IO;
 using OpenNFS1.Parsers;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Physics;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Input;

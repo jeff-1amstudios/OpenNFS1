@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework.Audio;
-using NfsEngine;
+using GameEngine;
 
 namespace OpenNFS1.Audio
 {

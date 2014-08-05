@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Parsers;
 using OpenNFS1.Parsers.Audio;
 using OpenNFS1.Vehicles;

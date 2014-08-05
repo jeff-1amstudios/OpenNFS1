@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Microsoft.Xna.Framework.Graphics;
-using NfsEngine;
+using GameEngine;
 using Microsoft.Xna.Framework;
 using OpenNFS1.Vehicles;
 

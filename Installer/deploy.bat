@@ -8,3 +8,4 @@ copy %src%\OpenNFS1.exe %dest%
 copy %src%\*.dll %dest%
 copy %src%\*.pdb %dest%
 del %dest%\IgnoreMe.dll
+pause

@@ -8,8 +8,8 @@
     <ProjectGuid>{F66B2F9A-AF38-40F9-A094-522C823D04EE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NfsEngine</RootNamespace>
-    <AssemblyName>NfsEngine</AssemblyName>
+    <RootNamespace>GameEngine</RootNamespace>
+    <AssemblyName>GameEngine</AssemblyName>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

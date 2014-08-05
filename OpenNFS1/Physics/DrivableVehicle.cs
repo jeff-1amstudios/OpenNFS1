@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Parsers.Track;
 using OpenNFS1.Tracks;
 using OpenNFS1.Vehicles;

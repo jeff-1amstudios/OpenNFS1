@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
-using NfsEngine;
+using GameEngine;
 using Microsoft.Xna.Framework.Graphics;
 using OpenNFS1.Loaders;
 using OpenNFS1.Tracks;

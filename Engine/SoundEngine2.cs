@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework;
 
-namespace NfsEngine
+namespace GameEngine
 {
     class SoundEffectDescriptor 
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.UI.Screens;
 
 namespace OpenNFS1
@@ -61,14 +61,8 @@ namespace OpenNFS1
 				window.X = 0;
 				window.Y = 0;
 			}
-
-			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 		}
 
-		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-		{
-			File.WriteAllText("exception.txt", e.ExceptionObject.ToString());
-		}
 
 		/// <summary>
 		/// LoadContent will be called once per game and is the place to load

@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Parsers;
 
 namespace OpenNFS1.UI.Screens

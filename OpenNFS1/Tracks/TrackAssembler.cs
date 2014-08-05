@@ -6,7 +6,7 @@ using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Parsers;
 using OpenNFS1.Tracks;
 using System.Linq;

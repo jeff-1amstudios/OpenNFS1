@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using NfsEngine;
+using GameEngine;
 
-namespace NfsEngine
+namespace GameEngine
 {
     /// <summary>
     /// Camera that stays a fixed distance behind an object but swings freely

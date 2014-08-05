@@ -4,7 +4,7 @@ using OpenNFS1;
 using OpenNFS1.Dashboards;
 using OpenNFS1.Physics;
 using OpenNFS1.Vehicles;
-using NfsEngine;
+using GameEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;

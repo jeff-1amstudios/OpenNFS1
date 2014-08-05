@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenNFS1.Physics;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.UI.Screens;
 using OpenNFS1.Parsers.Track;
 using OpenNFS1.Tracks;

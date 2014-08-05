@@ -18,7 +18,7 @@ using System.Diagnostics;
 using System.IO;
 #endregion
 
-namespace NfsEngine
+namespace GameEngine
 {
 	/// <summary>
 	/// The main component in charge of displaying particles.

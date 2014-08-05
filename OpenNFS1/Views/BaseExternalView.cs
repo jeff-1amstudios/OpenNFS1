@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Parsers;
 using OpenNFS1.Physics;
 

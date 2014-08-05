@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
 
-namespace NfsEngine
+namespace GameEngine
 {
     /// <summary>
     /// Used for text justification.

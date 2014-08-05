@@ -146,9 +146,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Engine\NfsEngine.csproj">
+    <ProjectReference Include="..\Engine\GameEngine.csproj">
       <Project>{F66B2F9A-AF38-40F9-A094-522C823D04EE}</Project>
-      <Name>NfsEngine</Name>
+      <Name>GameEngine</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenNFS_Content\OpenNFS_Content\OpenNFS_Content.csproj">
       <Project>{860ce445-91b2-4b47-b87f-d4555b889ff4}</Project>

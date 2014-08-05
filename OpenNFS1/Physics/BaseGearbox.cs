@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
-using NfsEngine;
+using GameEngine;
 
 namespace OpenNFS1.Physics
 {

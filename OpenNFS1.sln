@@ -5,11 +5,11 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenNFS1", "OpenNFS1\OpenNFS1.csproj", "{2BBFF57F-1C9D-430E-8343-D2662437114D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NfsEngine", "Engine\NfsEngine.csproj", "{F66B2F9A-AF38-40F9-A094-522C823D04EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine", "Engine\GameEngine.csproj", "{F66B2F9A-AF38-40F9-A094-522C823D04EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenNFS_Content", "OpenNFS_Content\OpenNFS_Content\OpenNFS_Content.csproj", "{860CE445-91B2-4B47-B87F-D4555B889FF4}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "OpenNFS_ContentContent", "OpenNFS_Content\OpenNFS_ContentContent\OpenNFS_ContentContent.contentproj", "{E5E5EB5F-5A79-4199-8FAA-89CB564C6CF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenNFS_ContentContent", "OpenNFS_Content\OpenNFS_ContentContent\OpenNFS_ContentContent.contentproj", "{E5E5EB5F-5A79-4199-8FAA-89CB564C6CF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

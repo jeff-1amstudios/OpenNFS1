@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NfsEngine
+namespace GameEngine
 {
     public interface IGameScreen : IDrawableObject
     {

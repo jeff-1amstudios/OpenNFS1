@@ -8,7 +8,7 @@ using System.Threading;
 using Ionic.Zip;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using NfsEngine;
+using GameEngine;
 
 namespace OpenNFS1.UI.Screens
 {

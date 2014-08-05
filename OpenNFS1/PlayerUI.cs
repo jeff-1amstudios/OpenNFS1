@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Physics;
 using OpenNFS1.Tracks;
 using OpenNFS1.Vehicles;

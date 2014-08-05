@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 #endregion
 
-namespace NfsEngine
+namespace GameEngine
 {
     /// <summary>
     /// Helper for objects that want to leave particles behind them as they

@@ -13,7 +13,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 #endregion
 
-namespace NfsEngine
+namespace GameEngine
 {
     /// <summary>
     /// Settings class describes all the tweakable options used

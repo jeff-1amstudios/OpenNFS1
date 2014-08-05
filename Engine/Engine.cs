@@ -5,9 +5,9 @@ using Microsoft.Xna.Framework;
 using System.Diagnostics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using NfsEngine;
+using GameEngine;
 
-namespace NfsEngine
+namespace GameEngine
 {
     public class Engine : DrawableGameComponent
     {

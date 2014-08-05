@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using NfsEngine;
+using GameEngine;
 using OpenNFS1.Parsers.Track;
 using OpenNFS1.Physics;
 using OpenNFS1.UI;

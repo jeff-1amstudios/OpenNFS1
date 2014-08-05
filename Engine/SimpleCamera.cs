@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
-using NfsEngine;
+using GameEngine;
 
-namespace NfsEngine
+namespace GameEngine
 {
 
 	public class SimpleCamera : ICamera
