@@ -41,10 +41,6 @@ namespace OpenNFS1.Parsers.Track
 				float aspect = (float)_texture.Width / _texture.Height;
 				Size.X = Size.Y * aspect * GameConfig.TerrainScale * 10000;
 			}
-			if (Size.Y == 0)
-			{
-				//Size.Y = Size.X * aspect * GameConfig.TerrainScale * 10000;
-			}
 
 			_matrix = Matrix.CreateScale(Size.X, Size.Y, 1) *
 							Matrix.CreateRotationY(Orientation) *

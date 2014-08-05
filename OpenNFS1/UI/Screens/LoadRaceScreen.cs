@@ -15,6 +15,8 @@ namespace OpenNFS1
     {
 		float _loadingTime;
 		int _nbrDots = 0;
+		TriFile _tri;
+		TrackAssembler _assembler;
 
         public LoadRaceScreen() : base()
         {
@@ -46,7 +48,12 @@ namespace OpenNFS1
 		{
 			base.Draw();
 			WriteLine(GameConfig.SelectedTrackDescription.Name, Color.White, 20, 30, TitleSize);
-			WriteLine(String.Format("Loading {0}", new string('.', _nbrDots)));
+			WriteLine(String.Format("Loading {0}", new string('.', _nbrDots)), TextColor, 50, 30, TextSize);
+			
+			WriteLine("Reading track file " + GameConfig.SelectedTrackDescription.FileName, TextColor, 20, 30, TextSize);
+			if (_assembler != null)
+				WriteLine(_assembler.ProgressMessage, TextColor, 20, 30, TextSize);
+			
 			Engine.Instance.SpriteBatch.End();
 		}
 
@@ -54,8 +61,9 @@ namespace OpenNFS1
 
         private void LoadTrack()
         {
-			TriFile tri = new TriFile(GameConfig.SelectedTrackDescription.FileName);
-			GameConfig.CurrentTrack = new TrackAssembler().Assemble(tri);
+			_tri = new TriFile(GameConfig.SelectedTrackDescription.FileName);
+			_assembler = new TrackAssembler();
+			GameConfig.CurrentTrack = _assembler.Assemble(_tri);
 			GameConfig.CurrentTrack.Description = GameConfig.SelectedTrackDescription;
             
         }

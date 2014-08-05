@@ -61,6 +61,13 @@ namespace OpenNFS1
 				window.X = 0;
 				window.Y = 0;
 			}
+
+			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+		}
+
+		void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			File.WriteAllText("exception.txt", e.ExceptionObject.ToString());
 		}
 
 		/// <summary>
@@ -75,12 +82,7 @@ namespace OpenNFS1
 			Engine.Instance.Device.SetRenderTarget(_renderTarget);
 			Engine.Instance.ScreenSize = new Vector2(GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width, GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height);
 
-			if (!Directory.Exists(GameConfig.CdDataPath) || Directory.GetDirectories(GameConfig.CdDataPath).Length == 0)
-				Engine.Instance.Screen = new ChooseDataDownloadScreen();
-			else
-			{
-				Engine.Instance.Screen = new HomeScreen();
-			}
+			Engine.Instance.Screen = new OpenNFS1SplashScreen();
 		}
 
 		/// <summary>

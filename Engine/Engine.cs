@@ -21,7 +21,6 @@ namespace NfsEngine
         public GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         public Vector2 ScreenSize;
-        private bool _fullScreen;
 		public float FrameTime;
                 
         public static Engine Instance
@@ -54,24 +53,19 @@ namespace NfsEngine
 
             //Game bits
             _inputProvider = new InputProvider(base.Game);
-            _graphicsUtils = new GraphicsUtilities();
+			var defaultFont = Engine.Instance.ContentManager.Load<SpriteFont>("Content\\ArialBlack");
+            _graphicsUtils = new GraphicsUtilities(defaultFont);
             _spriteBatch = new SpriteBatch(Device);
             base.Game.Components.Add(this);
         }
 
         public float AspectRatio
         {
-            get
-            {
-                if (_fullScreen)
-                    return ScreenSize.X / ScreenSize.Y;
-                else
-                {
-					return (float)Device.Viewport.Width / (float)Device.Viewport.Height;
-                    //Rectangle rect = Game.Window.ClientBounds;
-                    //return (float)rect.Width / (float)rect.Height;
-                }
-            }
+			get
+			{
+
+				return (float)Device.Viewport.Width / (float)Device.Viewport.Height;
+			}
         }
         
 

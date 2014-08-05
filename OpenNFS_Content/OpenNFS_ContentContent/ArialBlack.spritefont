@@ -35,7 +35,7 @@ with.
     Style controls the style of the font. Valid entries are "Regular", "Bold", "Italic",
     and "Bold, Italic", and are case sensitive.
     -->
-    <Style>Italic</Style>
+    <Style>Regular</Style>
 
     <!--
     If you uncomment this line, the default character will be substituted if you draw

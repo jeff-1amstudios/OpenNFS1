@@ -77,6 +77,7 @@ namespace OpenNFS1.Vehicles
 
 		public virtual void Update()
 		{
+			if (CurrentNode.Next == null || CurrentNode.Prev == null) return;
 			float elapsedSeconds = Engine.Instance.FrameTime;
 			Direction = Vector3.TransformNormal(Direction, Matrix.CreateFromAxisAngle(Up, _rotationChange));			
 			Position += Speed * Direction * Engine.Instance.FrameTime * 2.5f;
@@ -84,10 +85,7 @@ namespace OpenNFS1.Vehicles
 			UpdateSteering();
 			UpdateTrackNode();
 			TrackNode node = null, nextNode = null;
-
-			if (CurrentNode.Next == null) return;
-			if (CurrentNode.Prev == null) return;
-
+			
 			if (Distance2d(Position, CurrentNode.Next.Position) < Distance2d(Position, CurrentNode.Prev.Position))
 			{
 				node = CurrentNode;

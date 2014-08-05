@@ -49,13 +49,13 @@ namespace NfsEngine
     public class GraphicsUtilities : IDrawableObject
     {
         #region Creation / Initialization
-        public GraphicsUtilities()
+        public GraphicsUtilities(SpriteFont font)
         {
             CreateLineEffect();
             CreateShapeEffect();
             CreateCube();
-            
-            mFont1 = Engine.Instance.ContentManager.Load<SpriteFont>("Content\\Fonts\\Arial_14");
+
+			mFont1 = font;
             mSpriteBatch = new SpriteBatch(Engine.Instance.Device);
 
         }
@@ -603,7 +603,6 @@ namespace NfsEngine
         private List<ShapeData> sShapeList = new List<ShapeData>();
 
         // Shape-drawing data
-        VertexDeclaration mBasicShapeVertexDecl;
         BasicEffect mBasicShapeEffect;
         VertexPositionNormalTexture[] mCubeVertices;
         VertexBuffer mCubeVertexBuffer;

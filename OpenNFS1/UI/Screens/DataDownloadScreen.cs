@@ -41,42 +41,33 @@ namespace OpenNFS1.UI.Screens
 		public override void Draw()
 		{
 			base.Draw();
-			
-			WriteTitleLine("Download CD data");
+
+			WriteLine("Downloading CD data package", Color.Red, 0, 30, TextSize);
 
 			if (_dataDownloaded > 0)
 			{
 				int ratio = (int)(((double)_dataDownloaded / (double)_dataContentLength) * 50);
 				string progress = new string('=', ratio);
-				WriteLine(progress, Color.White, 150, 30, 0.5f);
+				WriteLine(progress, TextColor, 80, 30, TextSize);
 
 				long downloadedMb = _dataDownloaded / 1024 / 1024;
 				long contentLengthMb = _dataContentLength / 1024 / 1024;
-				WriteLine(String.Format("Downloaded {0}mb / {1}mb", downloadedMb, contentLengthMb));
+				WriteLine(String.Format("Downloaded {0}mb / {1}mb", downloadedMb, contentLengthMb), TextColor, 20, 30, TextSize);
 			}
 
 			if (_unpacking)
 			{
-				WriteLine("");
-				WriteLine("Unpacking into CD_Data folder...");
+				WriteLine("Unpacking into CD_Data folder...", TextColor, 30, 30, TextSize);
 			}
 			if (_completed)
 			{
-				WriteLine("Unpacking complete! Hit enter to continue.");
+				WriteLine("Unpacking complete! Hit enter to continue.", TextColor, 30, 30, TextSize);
 			}
 
 			if (_downloadError)
 			{
-				WriteLine("An error occured while downloading.");
-				WriteLine("Please check exception.txt for details.");
-				WriteLine("");
-				WriteLine("Press Enter to exit.");
+				WriteLine("An error occured while downloading - please check\r\nexception.txt for details.\r\n\r\nHit enter to quit.", TextColor, 60, 30, TextSize);
 			}
-
-			WriteLine("The Need for Speed 1 CD data package contains files produced", Color.White, 350, 30, 0.5f);
-			WriteLine("by Pioneer Productions / EA Seattle in 1995.");
-			WriteLine("* 1amStudios and OpenNFS1 are not connected in any way", Color.White, 420, 30, 0.5f);
-			WriteLine("with Pioneer Productions or EA Seattle.");
 
 			Engine.Instance.SpriteBatch.End();
 		}

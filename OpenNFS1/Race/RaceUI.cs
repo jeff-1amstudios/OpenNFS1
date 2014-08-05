@@ -30,7 +30,7 @@ namespace OpenNFS1.UI
 			Color[] pixel = new Color[1] { Color.Black };
 			_backgroundTexture = new Texture2D(Engine.Instance.Device, 1, 1);
 			_backgroundTexture.SetData<Color>(pixel);
-            _font = Engine.Instance.ContentManager.Load<SpriteFont>("Content\\ArialBlack");
+            _font = Engine.Instance.ContentManager.Load<SpriteFont>("Content\\ArialBlack-Italic");
         }
 
         public void Render()

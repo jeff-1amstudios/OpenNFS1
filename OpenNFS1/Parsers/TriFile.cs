@@ -298,11 +298,7 @@ namespace OpenNFS1.Parsers
 
 					// Ignore the top 2 bits to find the texture to use
 					terrainSegment.FenceTextureId = fenceType & (0xff >> 2);
-					Debug.WriteLine("fence: " + fenceType + ", texture: " + terrainSegment.FenceTextureId + ", " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
-					if (!terrainSegment.HasLeftFence && !terrainSegment.HasRightFence)
-					{
-
-					}
+					//Debug.WriteLine("fence: " + fenceType + ", texture: " + terrainSegment.FenceTextureId + ", " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);
 				}
 
 				//Debug.WriteLine("TRKD: " + i + ", " + terrainSegment.Rows[0].RightPoints[5] + ", fence: " + terrainSegment.FenceTextureId + " , " + terrainSegment.HasLeftFence + ", " + terrainSegment.HasRightFence);

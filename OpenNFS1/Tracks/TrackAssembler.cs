@@ -26,9 +26,17 @@ namespace OpenNFS1.Loaders
 		private TrackfamFile _trackFam;
 		private TriFile _tri;
 
+		public string ProgressMessage;
+
+		private void AddProgress(string progress)
+		{
+			ProgressMessage += "\r\n" + progress;
+		}
+
 		public Track Assemble(TriFile tri)
 		{
 			_tri = tri;
+			AddProgress("Reading track scenery file");
 			_trackFam = tri.IsOpenRoad ? new OpenRoadTrackfamFile(tri.FileName, GameConfig.AlternativeTimeOfDay) : new TrackfamFile(tri.FileName, GameConfig.AlternativeTimeOfDay);
 			AssembleTrackSegments();
 
@@ -65,6 +73,7 @@ namespace OpenNFS1.Loaders
 
 		private List<SceneryItem> AssembleSceneryItems()
 		{
+			AddProgress("Assembling scenery items");
 			List<SceneryItem> renderObjects = new List<SceneryItem>();
 
 			foreach (var obj in _tri.Scenery)
@@ -126,6 +135,7 @@ namespace OpenNFS1.Loaders
 
 		private VertexBuffer AssembleTerrainVertices()
 		{
+			AddProgress("Assembling terrain vertices");
 			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
 
 			for (int segmentIndex = 0; segmentIndex < _tri.Segments.Count; segmentIndex++)
@@ -242,6 +252,7 @@ namespace OpenNFS1.Loaders
 		// Fences are defined by the TerrainSegment. If fence is enabled, we draw a fence from row0 to row2, then row2 to row4.
 		VertexBuffer AssembleFenceVertices()
 		{
+			AddProgress("Assembling fence vertices");
 			Vector3 fenceHeight = new Vector3(0, GameConfig.TerrainScale * 50000, 0);
 
 			List<VertexPositionTexture> vertices = new List<VertexPositionTexture>();
@@ -286,6 +297,8 @@ namespace OpenNFS1.Loaders
 
 		void AssembleTrackSegments()
 		{
+			AddProgress("Assembling track segments");
+
 			const int textureCount = 10;
 			foreach (var segment in _tri.Segments)
 			{

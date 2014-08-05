@@ -54,7 +54,7 @@ namespace OpenNFS1
 
 		public int SecondsTillStart
 		{
-			get { return 30 - (int)new TimeSpan(DateTime.Now.Ticks - _countdownStartTime.Ticks).TotalSeconds; }
+			get { return 3 - (int)new TimeSpan(DateTime.Now.Ticks - _countdownStartTime.Ticks).TotalSeconds; }
 		}
 
 
@@ -76,14 +76,17 @@ namespace OpenNFS1
 			if (d is TrafficDriver)
 			{
 			}
-			else if (d is RacingAIDriver)
+			else if (d is RacingAIDriver || d is PlayerDriver)
 			{
 				// place on starting grid
-				int lane = (Drivers.Count % 2 == 0 ? AIDriver.MaxVirtualLanes - 1 : 0);
-				((AIDriver)d).VirtualLane = lane;
-				Vector3 pos = d.Vehicle.CurrentNode.GetLeftVerge();
+				int lane = (Drivers.Count % 2 == 0 ? AIDriver.MaxVirtualLanes - 1 : 1);
+				if (d is RacingAIDriver)
+				{
+					((RacingAIDriver)d).VirtualLane = lane;
+				}
+				Vector3 pos = d.Vehicle.CurrentNode.Position;
 				pos.Z -= Drivers.Count * 30;
-				pos.X = ((AIDriver)d).GetNextTarget().X;
+				pos.X = Vector3.Lerp(d.Vehicle.CurrentNode.GetLeftVerge2(), d.Vehicle.CurrentNode.GetRightVerge2(), (float)lane / (AIDriver.MaxVirtualLanes)).X;
 				d.Vehicle.Position = pos;
 			}
 			Drivers.Add(d);

@@ -21,7 +21,7 @@ namespace OpenNFS1.Physics
 		// for reflecting away from walls
 		public float MaxRotationPerSec = 5f;
 		public float RearSlipFactorSpeed = 1.6f;
-		public float RearSlipFactorMax = 0.7f;
+		public float RearSlipFactorMax = 0.5f;
 		public float FrontSlipMultiplier = 0.0000017f;
 
 		public VehicleDescription Descriptor { get; private set; }
@@ -34,8 +34,15 @@ namespace OpenNFS1.Physics
 		public Spring BodyPitch { get; private set; }
 		public Spring BodyRoll { get; private set; }
 
-		public float RotateCarAfterCollision { get; set; }
-
+		private float _rotateAfterCollision;
+		public float RotateCarAfterCollision
+		{
+			set
+			{
+				_rotateAfterCollision = value;
+				_rotationChange = 0;
+			}
+		}
 		public VehicleWheel[] Wheels { get; private set; }
 
 		float _frontSlipFactor, _rearSlipFactor;		
@@ -225,6 +232,7 @@ namespace OpenNFS1.Physics
 
 		public override void Update()
 		{
+			if (CurrentNode.Next == null) return;
 			float elapsedSeconds = Engine.Instance.FrameTime;
 
 			UpdateRearSlip();
@@ -260,23 +268,23 @@ namespace OpenNFS1.Physics
 			float maxRot = MaxRotationPerSec * Engine.Instance.FrameTime;
 
 			// Handle car rotation after collision
-			if (RotateCarAfterCollision != 0)
+			if (_rotateAfterCollision != 0)
 			{
 				_audioProvider.PlaySkid(true);
 
-				if (RotateCarAfterCollision > maxRot)
+				if (_rotateAfterCollision > maxRot)
 				{
 					_rotationChange += maxRot;
-					RotateCarAfterCollision -= maxRot;
+					_rotateAfterCollision -= maxRot;
 				}
-				else if (RotateCarAfterCollision < -maxRot)
+				else if (_rotateAfterCollision < -maxRot)
 				{
 					_rotationChange -= maxRot;
-					RotateCarAfterCollision += maxRot;
+					_rotateAfterCollision += maxRot;
 				}
 				else
 				{
-					_rotationChange += RotateCarAfterCollision;
+					_rotationChange += _rotateAfterCollision;
 					RotateCarAfterCollision = 0;
 				}
 			}

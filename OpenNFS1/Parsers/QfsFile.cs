@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,13 +11,13 @@ namespace OpenNFS1.Parsers
 	// A QFS file is a compressed FSH file.  A FSH file holds bitmaps
 	class QfsFile
 	{
-		public FshFile Fsh { get; private set; }
+		public FshFile Content { get; private set; }
 
 		public QfsFile(string filename)
 		{
 			filename = Path.Combine(GameConfig.CdDataPath, filename);
 			byte[] decompressedData = Decompress(filename);
-			Fsh = new FshFile(decompressedData);
+			Content = new FshFile(decompressedData);
 		}
 		
 		
@@ -95,7 +96,7 @@ namespace OpenNFS1.Parsers
 
 			if (outpos != outlen)
 			{
-				//printf("Warning: bad length ? %d instead of %d\n", outpos, outlen);
+				Debug.WriteLine("Warning: bad length ? {0} instead of {1}\n", outpos, outlen);
 			}
 			
 			return outbuf;

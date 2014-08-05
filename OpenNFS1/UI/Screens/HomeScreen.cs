@@ -19,7 +19,7 @@ namespace OpenNFS1.UI.Screens
 		{
 			Descriptor = desc;
 			QfsFile qfs = new QfsFile(@"Frontend\Art\Control\" + desc.UIImageFile);
-			Bitmap = qfs.Fsh.Header.Bitmaps.Find(a => a.Id == "0000");
+			Bitmap = qfs.Content.Header.Bitmaps.Find(a => a.Id == "0000");
 		}
 	}
 
@@ -32,7 +32,7 @@ namespace OpenNFS1.UI.Screens
 		{
 			Descriptor = desc;
 			QfsFile qfs = new QfsFile(@"Frontend\Art\Control\" + desc.ImageFile);
-			Bitmap = qfs.Fsh.Header.Bitmaps.Find(a => a.Id == "0000");
+			Bitmap = qfs.Content.Header.Bitmaps.Find(a => a.Id == "0000");
 		}
 	}
 
@@ -55,17 +55,15 @@ namespace OpenNFS1.UI.Screens
 		int _currentVehicle = 2;
 		int _currentTrack = 4;
 		int _selectedControl = RaceButtonSelected;
-		SoundEffect _engineOnEffect;
-		SoundEffectInstance _inst;
 
 		public HomeScreen()
 			: base()
 		{
 			QfsFile qfs = new QfsFile(@"FRONTEND\ART\control\central.qfs");
-			_background = qfs.Fsh.Header.FindByName("bgnd");
-			_vehicleSelection = qfs.Fsh.Header.FindByName("Tlb1");
-			_trackSelection = qfs.Fsh.Header.FindByName("Brb4");
-			_raceButtonSelection = qfs.Fsh.Header.FindByName("Ra1l");
+			_background = qfs.Content.Header.FindByName("bgnd");
+			_vehicleSelection = qfs.Content.Header.FindByName("Tlb1");
+			_trackSelection = qfs.Content.Header.FindByName("Brb4");
+			_raceButtonSelection = qfs.Content.Header.FindByName("Ra1l");
 
 			foreach (var vehicle in VehicleDescription.Descriptions)
 			{
@@ -86,16 +84,6 @@ namespace OpenNFS1.UI.Screens
 				_currentVehicle = _vehicles.FindIndex(a => a.Descriptor == GameConfig.SelectedVehicle);
 
 			if (_currentTrack == -1) _currentTrack = 0;
-			/*
-			
-			BnkFile bnk = new BnkFile("traffc_sw.bnk");
-			var sample = bnk.Samples[0];
-			_engineOnEffect = new SoundEffect(sample.PCMData, sample.SampleRate, sample.NbrChannels == 2 ? AudioChannels.Stereo : AudioChannels.Mono);
-			_inst = _engineOnEffect.CreateInstance();
-			_inst.IsLooped = true;
-			_inst.Pitch = 0.3f;
-			_inst.Play();
-			 */
 		}
 
 		public void Update(GameTime gameTime)

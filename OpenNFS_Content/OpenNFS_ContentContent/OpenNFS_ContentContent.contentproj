@@ -61,9 +61,16 @@
       <Processor>MGSpriteFontDescriptionProcessor</Processor>
     </Compile>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ArialBlack-Italic.spritefont">
+      <Name>ArialBlack-Italic</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>MGSpriteFontDescriptionProcessor</Processor>
+    </Compile>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\$(XnaFrameworkVersion)\Microsoft.Xna.GameStudio.ContentPipeline.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(ProjectDir)..\OpenNFS_Content\bin\windows\content\*.xnb $(SolutionDir)OpenNFS1\bin\WindowsGL\Debug\Content</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y /I /S $(ProjectDir)..\OpenNFS_Content\bin\windows\content\*.xnb $(SolutionDir)OpenNFS1\bin\WindowsGL\Debug\Content</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\..\packages\MonoGame.Binaries.3.2.0\build\net40\MonoGame.Binaries.targets" Condition="Exists('..\..\packages\MonoGame.Binaries.3.2.0\build\net40\MonoGame.Binaries.targets')" />
   <!--

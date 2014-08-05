@@ -42,7 +42,6 @@
     <Compile Include="Dashboards\Dashboard.cs" />
     <Compile Include="Dashboards\DashboardDescription.cs" />
     <Compile Include="Dashboards\GearboxAnimation.cs" />
-    <Compile Include="Physics\PhysicsTypes.cs" />
     <Compile Include="Race\PlayerRaceStats.cs" />
     <Compile Include="PlayerUI.cs" />
     <Compile Include="Game1.cs" />
@@ -87,12 +86,12 @@
     <Compile Include="Tracks\TrackSkybox.cs" />
     <Compile Include="UI\Screens\ChooseDataDownloadScreen.cs" />
     <Compile Include="UI\Screens\DataDownloadScreen.cs" />
+    <Compile Include="UI\Screens\OpenNFS1SplashScreen.cs" />
     <Compile Include="UI\Screens\RaceOptionsScreen.cs" />
     <Compile Include="Vehicles\TyreSmokeParticleSystem.cs" />
     <Compile Include="UIController.cs" />
     <Compile Include="Race\RaceUI.cs" />
     <Compile Include="UI\Screens\BaseUIScreen.cs" />
-    <Compile Include="UI\Screens\ControlsScreen.cs" />
     <Compile Include="UI\Screens\DoRaceScreen.cs" />
     <Compile Include="UI\Screens\LoadRaceScreen.cs" />
     <Compile Include="UI\Screens\HomeScreen.cs" />
@@ -127,166 +126,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Audio\Environment\collision1.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Environment\collision2.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Environment\collision3.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Environment\tunnel.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\911\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\911\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\911\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\911\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\911\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Common\grass_slide.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Common\skid1.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Common\skid2.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Common\skid3.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\ZR1\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\ZR1\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\ZR1\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\ZR1\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\ZR1\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Viper\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Viper\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Viper\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Viper\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Viper\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\F512\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\F512\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\F512\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\F512\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\F512\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\NSX\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\NSX\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\NSX\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\NSX\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\NSX\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Diablo\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Diablo\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Diablo\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Diablo\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Diablo\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\RX7\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\RX7\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\RX7\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\RX7\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\RX7\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Supra\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Supra\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Supra\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Supra\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Supra\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Warrior\engine-off-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Warrior\engine-off-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Warrior\engine-on-high.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Warrior\engine-on-low.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\Audio\Vehicles\Warrior\gear-change.wav">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\smoke.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\splash-screen.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Icon.ico" />
@@ -310,6 +153,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\MonoGame.Binaries.3.2.0\build\net40\MonoGame.Binaries.targets" Condition="Exists('..\packages\MonoGame.Binaries.3.2.0\build\net40\MonoGame.Binaries.targets')" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

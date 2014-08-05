@@ -28,7 +28,6 @@ namespace NfsEngine
             }
         }
 
-        private Color _fadeColor;
         private float _alpha;
         private FadeDirection _fadeDirection;
         private Texture2D _fadeTexture;

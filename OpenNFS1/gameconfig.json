@@ -2,6 +2,6 @@
 	"fullScreen": false,
 	"cdDataPath": "c:\\games\\NFSSE_CDDATA",
 	"drawDistance": 5000,
-	"respectOpenRoadCheckpoints": false,
-	"drawDebugInfo": true
+	"respectOpenRoadCheckpoints": true,
+	"drawDebugInfo": false
 }

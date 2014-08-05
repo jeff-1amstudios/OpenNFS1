@@ -13,24 +13,17 @@ namespace OpenNFS1.UI.Screens
     class BaseUIScreen
     {
 		protected SpriteFont Font { get; private set; }
-		int _currentLine = 30;
-		static BitmapEntry _background;
+		static Texture2D _background;
+		int _currentLine;
 		protected float TextSize = 0.5f;
 		protected float TitleSize = 1;
 		protected float SectionSize = 0.8f;
+		protected Color TextColor = Color.Orange;
 
         public BaseUIScreen()
         {
-			Font = Engine.Instance.ContentManager.Load<SpriteFont>("Content\\ArialBlack");
-
-			if (_background == null)
-			{
-				if (Directory.Exists(GameConfig.CdDataPath))
-				{
-					QfsFile qfs = new QfsFile(@"Frontend\IArt\InstLoad.qfs");
-					_background = qfs.Fsh.Header.FindByName("bgnd");
-				}
-			}
+			Font = Engine.Instance.ContentManager.Load<SpriteFont>("Content\\ArialBlack-Italic");
+			_background = Engine.Instance.ContentManager.Load<Texture2D>("Content\\splash-screen.jpg");
         }
 
 		public virtual void Draw()
@@ -38,15 +31,9 @@ namespace OpenNFS1.UI.Screens
 			Engine.Instance.SpriteBatch.Begin();
 			if (_background != null)
 			{
-				Engine.Instance.SpriteBatch.Draw(_background.Texture, Vector2.Zero, Color.FromNonPremultiplied(108, 108, 108, 255));
+				Engine.Instance.SpriteBatch.Draw(_background, Vector2.Zero, Color.FromNonPremultiplied(50, 50, 50, 255));
 			}
-			_currentLine = 30;
-		}
-
-		public void WriteTitleLine(string text)
-		{
-			Engine.Instance.SpriteBatch.DrawString(Font, text, new Vector2(20, _currentLine), Color.Yellow, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 0);
-			_currentLine += 80;
+			_currentLine = 5;
 		}
 
 		public void WriteLine(string text)
@@ -66,9 +53,20 @@ namespace OpenNFS1.UI.Screens
 
 		public void WriteLine(string text, Color c, int lineOffset, int column, float size)
 		{
+			if (String.IsNullOrEmpty(text)) return;
+
 			_currentLine += lineOffset;
-			Engine.Instance.SpriteBatch.DrawString(Font, text, new Vector2(column+2, _currentLine+2), Color.FromNonPremultiplied(0,0,0,150), 0, Vector2.Zero, size, SpriteEffects.None, 0);
-			Engine.Instance.SpriteBatch.DrawString(Font, text, new Vector2(column, _currentLine), c, 0, Vector2.Zero, size, SpriteEffects.None, 0);
+			string[] lines = text.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+			for (int i = 0; i <lines.Length; i++)
+			{
+				if (lines[i] != "")
+				{
+					Engine.Instance.SpriteBatch.DrawString(Font, lines[i], new Vector2(column + 2, _currentLine + 2), Color.FromNonPremultiplied(0, 0, 0, 150), 0, Vector2.Zero, size, SpriteEffects.None, 0);
+					Engine.Instance.SpriteBatch.DrawString(Font, lines[i], new Vector2(column, _currentLine), c, 0, Vector2.Zero, size, SpriteEffects.None, 0);
+				}
+				if (i < lines.Length-1)
+					_currentLine += 20;
+			}
 		}
     }
 }

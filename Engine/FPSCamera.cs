@@ -57,11 +57,7 @@ namespace OneAmEngine
 		private const float Deceleration = -5.0f;
 		private const float JumpVelocity = 0.23f;
 		private const float MaxSpeed = 1.5f;
-
-
-		private float fovx;
-		private float znear;
-
+		
 		private float _strafeDelta, _forwardDelta, _velocity;
 
 		private Vector3 _orientation, _position;
@@ -84,9 +80,6 @@ namespace OneAmEngine
 
 		public FPSCamera()
 		{
-			fovx = DEFAULT_FOVX;
-			znear = DEFAULT_ZNEAR;
-
 			Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.ToRadians(DEFAULT_FOVX), Engine.Instance.AspectRatio, DEFAULT_ZNEAR, 15000);
 			View = Matrix.Identity;
 		}

@@ -26,17 +26,19 @@ namespace OpenNFS1.Vehicles.AI
 				
 		protected virtual void FollowTrack()
 		{
-			Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(GetNextTarget()), Color.Yellow);
-			float angle = Utility.GetSignedAngleBetweenVectors(Vehicle.Direction, GetNextTarget() - Vehicle.Position, true);
+			var target = GetNextTarget();
+			if (GameConfig.DrawDebugInfo)
+			{
+				Engine.Instance.GraphicsUtils.AddCube(Matrix.CreateTranslation(target), Color.Yellow);
+			}
+			float angle = Utility.GetSignedAngleBetweenVectors(Vehicle.Direction, target - Vehicle.Position, true);
 			if (angle < -0.1f)
 			{
 				Vehicle.SteeringInput = 0.5f;
-				//GameConsole.WriteLine("turning right", 5);
 			}
 			else if (angle > 0.1f)
 			{
 				Vehicle.SteeringInput = -0.5f;
-				//GameConsole.WriteLine("turning left", 5);
 			}
 			else
 			{
@@ -56,7 +58,7 @@ namespace OpenNFS1.Vehicles.AI
 		public RacingAIDriver(VehicleDescription vehicleDescriptor)
 		{
 			_vehicle = new DrivableVehicle(vehicleDescriptor);
-			_vehicle.SteeringSpeed = 7;
+			_vehicle.SteeringSpeed = 6;
 			_vehicle.AutoDrift = false;
 			Vehicle = _vehicle;
 			_firstLaneChangeAllowed = Engine.Instance.Random.Next(5, 40);
@@ -64,7 +66,7 @@ namespace OpenNFS1.Vehicles.AI
 
 		public override void Update(List<IDriver> otherDrivers)
 		{
-			_vehicle.ThrottlePedalInput = 0.7f;
+			_vehicle.ThrottlePedalInput = 0.9f;
 			_vehicle.BrakePedalInput = 0;
 
 			var node = _vehicle.CurrentNode;
@@ -85,7 +87,6 @@ namespace OpenNFS1.Vehicles.AI
 				//if (!(otherDriver is AIDriver)) continue;
 				// if I am not in the same lane, ignore
 				if (otherDriver is AIDriver && ((AIDriver)otherDriver).VirtualLane != VirtualLane) continue;
-				if (otherDriver is TrafficDriver && ((TrafficDriver)otherDriver).VirtualLane != VirtualLane) continue;
 				if (otherDriver is PlayerDriver) continue;  //ignore player for now
 				
 				// if I am going slower than the other driver, ignore
