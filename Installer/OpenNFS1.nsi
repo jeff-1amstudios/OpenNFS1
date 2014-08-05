@@ -4,7 +4,7 @@
 Name "OpenNFS1"
 
 ; The file to write
-OutFile "OpenNFS1-Install.exe"
+OutFile "OpenNFS1_Install-v1.2.exe"
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\OpenNFS1

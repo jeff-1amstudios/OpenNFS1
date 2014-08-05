@@ -8,4 +8,5 @@ copy %src%\OpenNFS1.exe %dest%
 copy %src%\*.dll %dest%
 copy %src%\*.pdb %dest%
 del %dest%\IgnoreMe.dll
-pause
+
+"C:\Program Files (x86)\NSIS\makensis" /V1 OpenNFS1.nsi
