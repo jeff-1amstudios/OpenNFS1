@@ -76,8 +76,7 @@ namespace OpenNFS1.UI.Screens
 		{
 			try
 			{
-				string url = "http://www.1amstudios.com/download/nfs1_cd_data.zip";
-				url = "http://127.0.0.1/nfs1_cd_data.zip";
+				string url = "http://www.1amstudios.com/download/NFSSE_cd_data.zip";
 
 				WebRequest request = WebRequest.Create(url);
 				var response = request.GetResponse();

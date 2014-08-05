@@ -36,7 +36,7 @@ namespace OpenNFS1
 			});
 			_trackDescriptions.Add(new TrackDescription()
 			{
-				FileName = "SIMDATA\\MISC\\cl3.tri",
+				FileName = "SIMDATA\\MISC\\cl1.tri",
 				Name = "Coastal",
 				IsOpenRoad = true,
 				ImageFile = "coast.qfs",
