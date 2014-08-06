@@ -40,6 +40,7 @@ Section "OpenNFS1 (required)"
   ; Include all files in the deploy folder
   File /r "deploy\*.*"
   File /r "3rdparty"
+  File "readme.txt"
   
   Call CheckAndInstallDotNet
   Call InstallOAL
