@@ -160,6 +160,9 @@ namespace OpenNFS1
 				{
 					((DrivableVehicle)driver.Vehicle).RenderShadow(isPlayer);
 				}
+                if (driver is AIDriver && ((AIDriver)driver).AtEndOfTrack)
+                    continue; 
+
 				driver.Vehicle.Render();
 			}
 		}

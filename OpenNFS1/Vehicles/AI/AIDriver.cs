@@ -16,6 +16,7 @@ namespace OpenNFS1.Vehicles.AI
 	{
 		public int VirtualLane { get; set; }
 		public Vehicle Vehicle { get; protected set; }
+        public Boolean AtEndOfTrack { get; set; }
 
 		public const int MaxVirtualLanes = 4;
 
@@ -54,6 +55,7 @@ namespace OpenNFS1.Vehicles.AI
 	{		
 		private float _firstLaneChangeAllowed;  //avoid all racers changing lanes immediately
 		private DrivableVehicle _vehicle;
+        public bool AtEndOfTrack;
 
 		public RacingAIDriver(VehicleDescription vehicleDescriptor)
 		{
@@ -76,6 +78,7 @@ namespace OpenNFS1.Vehicles.AI
 			{
 				_vehicle.ThrottlePedalInput = 0;
 				_vehicle.BrakePedalInput = 1;
+                AtEndOfTrack = true;
 				return;
 			}
 

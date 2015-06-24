@@ -20,7 +20,7 @@ namespace OpenNFS1
 		public const float TerrainScale = 0.000080f;
 		public static readonly float FOV = MathHelper.ToRadians(65);
 		public const float MaxSegmentRenderCount = 50;
-		public static readonly SamplerState WrapSampler = SamplerState.LinearWrap;
+		public static readonly SamplerState WrapSampler = SamplerState.AnisotropicWrap;
 
 		// Set while navigating through menus
         public static VehicleDescription SelectedVehicle;

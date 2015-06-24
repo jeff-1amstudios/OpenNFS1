@@ -84,6 +84,7 @@ namespace OpenNFS1.Vehicles
 
 			UpdateSteering();
 			UpdateTrackNode();
+            if (CurrentNode.Next == null || CurrentNode.Prev == null) return;
 			TrackNode node = null, nextNode = null;
 			
 			if (Distance2d(Position, CurrentNode.Next.Position) < Distance2d(Position, CurrentNode.Prev.Position))

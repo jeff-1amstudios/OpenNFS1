@@ -34,10 +34,11 @@ namespace OpenNFS1
 			}
 			else
 			{
-				_graphics.PreferredBackBufferWidth = 640;
-				_graphics.PreferredBackBufferHeight = 480;
+				_graphics.PreferredBackBufferWidth = 800;
+				_graphics.PreferredBackBufferHeight = 600;
 			}
 			_graphics.PreferredDepthStencilFormat = DepthFormat.Depth24;
+            _graphics.PreferMultiSampling = true;
 			_graphics.IsFullScreen = false;
 		}
 

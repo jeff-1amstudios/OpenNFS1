@@ -60,6 +60,7 @@ namespace OpenNFS1.Vehicles
 				if (driver.Vehicle.CurrentNode.Next == null || driver.Vehicle.CurrentNode.Next.Next == null)
 				{
 					driver.Vehicle.Speed = 0;
+                    driver.AtEndOfTrack = true;
 				}
 
 				// start of track just stop

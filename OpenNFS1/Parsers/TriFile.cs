@@ -158,11 +158,6 @@ namespace OpenNFS1.Parsers
 				node.XOrientation = reader.ReadInt16();
 				node.unk2 = reader.ReadBytes(2);
 
-				if (node.Number == 365)
-				{
-					node.GetLeftBoundary();
-				}
-
 				if (prevNode != null)
 				{
 					prevNode.Next = node;
