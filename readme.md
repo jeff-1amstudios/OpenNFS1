@@ -13,16 +13,14 @@ OpenNFS1 is a ground-up remake of the original EA Need for Speed 1. The code is 
   * Monogame >= 3.2.0
   * .NET 4
 
-## Installation
-
-### From source
+### Build from source
 ```
 git clone https://github.com/jeff-1amstudios/OpenNFS1.git
 ```
-Open OpenNFS1.sln in Visual Studio 2013
+Open OpenNFS1.sln in Visual Studio
 
 ### Installer
-You can also install the last stable release from the [Releases page](https://github.com/jeff-1amstudios/OpenNFS1/releases)
+You can also install the last stable binary from the [Releases page](https://github.com/jeff-1amstudios/OpenNFS1/releases)
 
 ## Legal:
 Models, textures, tracks, cars by Pioneer Productions / EA Seattle (C) 1995.
