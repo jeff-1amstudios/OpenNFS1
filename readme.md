@@ -22,7 +22,7 @@ git clone https://github.com/jeff-1amstudios/OpenNFS1.git
 Open OpenNFS1.sln in Visual Studio 2013
 
 ### Installer
-You can also install the last stable release from http://www.1amstudios.com/projects/OpenNFS1
+You can also install the last stable release from the [Releases page](https://github.com/jeff-1amstudios/OpenNFS1/releases)
 
 ## Legal:
 Models, textures, tracks, cars by Pioneer Productions / EA Seattle (C) 1995.
